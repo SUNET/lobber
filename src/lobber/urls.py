@@ -5,9 +5,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    #(r'^nordushare/', include('nordushare.foo.urls')),
-    (r'^nordushare/$', 'filbunke.share.views.torrent_list'),
-    (r'^nordushare/(?P<handle>.+)/$', 'filbunke.share.views.torrent_view'),
+    (r'^nordushare/', include('lobber.share.urls')),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
