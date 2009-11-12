@@ -1,7 +1,7 @@
-# filbunke.org (in Emacs -*- org -*- mode)
+# lobber.org (in Emacs -*- org -*- mode)
 
 * What
-Project notes about 'filbunke', a closed BitTorrent tracker and
+Project notes about 'lobber', a closed BitTorrent tracker and
 torrent index for the Nordic NREN's, operated by NORDUnet.
 * Terms used in this document
 - Shared file -- one or more files a user wants to share with other people
@@ -81,15 +81,6 @@ TODO
 * Notes
 ** NRKbeta and opentracker
 http://search.cpan.org/dist/WWW-Opentracker-Stats/
-** Django installation
-*** Test, in ~linus/nordushare
-Superuser: allan
-Password: tar kakan
-* Time planning
-| 2009-11-02--06 | 8h  | Internetdagarna, Appelbaum, All hands in Copenhagen |
-| 2009-11-09--13 | 30h | A good week                                         |
-| 2009-11-16--20 | 0h  | Juniper course,  Amsterdam                          |
-| 2009-11-23--28 | 12h | GN3 multiculti, stakeholders                        |
 * Progress [1/7]
 - [X] Working tracker
 - [ ] Proper DNS names
