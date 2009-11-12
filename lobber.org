@@ -1,0 +1,100 @@
+# filbunke.org (in Emacs -*- org -*- mode)
+
+* What
+Project notes about 'filbunke', a closed BitTorrent tracker and
+torrent index for the Nordic NREN's, operated by NORDUnet.
+* Terms used in this document
+- Shared file -- one or more files a user wants to share with other people
+- Torrent -- a file with information about i) the file that is shared
+  and ii) the URL of the tracker.
+* Requirements
+** Functional
+- A web page for uploading torrents (HTTP PUT/POST client->server)
+  - Uploading a torrent requires WebSSO (+oauth?) authentication
+    - Do we need authorization or can all authenticated users upload?
+- A web page listing and serving torrents (HTTP GET server->client)
+  - Access to the list of torrents requires WebSSO (+oauth?)
+    authentication
+  - There shall be an RSS/Atom feed with available torrents
+- A running BiTorrent tracker ([[http://erdgeist.org/arts/software/opentracker/][opentracker]] has been suggested)
+- Anybody that has the torrent file may download the shared file
+** Performance
+- At least [x] torrent uploads per [time unit]
+- At least [x] torrents served per [time unit]
+- At least [x] torrents hosted on the server
+- At least 100k simultaneous bittorrent _users_, whatever that means
+  for the tracker (FIXME: find some numbers)
+* Design
+** Closing down opentracker
+Do we need to close down the tracker to avoid people using it?  I
+think so.  The way of doing this is to compile with
+WANT_ACCESSLIST_WHITE and then update a whitelist file on the tracker
+server (20 bytes) for each new torrent and SIGHUP the tracker.
+
+- How many times per second can we do that and with how big a file
+  before it becomes unfeasable?
+
+- How do we remove entries from the whitelist file?
+
+- How would this work with clusters of trackers?
+** Alternative whitelist implementation
+*** Requirements
+- few readers
+- few writers
+- all on separate hosts
+- search speed is paramount
+- write speed is [subordinate]
+*** Contenders
+- DYI hash table (-networking, +simple)
+- DYI b-tree
+- BerkleyDB + some DYI networking
+- filesystem, webdav, httpd caching (much like hash table)
+- [[http://1978th.net/tokyocabinet/][TokioCabinet]] (-networking, +simple) pretty much the same as the DIY
+  alternatives w/o writing the low level stuff, good
+- [[http://couchdb.apache.org/][CouchDB]] -- HTTP, JSON
+- [[http://incubator.apache.org/cassandra/][Cassandra]] ([[http://en.wikipedia.org/wiki/Cassandra_%28database%29][@wikipedia]]) -- might be too heavy ("ColumnFamily-based
+  data model richer than typical key/value systems")
+- Redis
+- MongoDB
+- Hypertable
+** Data model
+- The central object is an upload object (Upload) which has data and
+  may have meta data (Metadata).
+  - An Upload is created from data (the shared file(s)), a torrent
+    file or perhaps something else.
+  - An Upload has a TTL.
+- An upload object can have zero or more upload access objects
+  (Access) associated to it.
+** Web
+*** Upload torrent
+File: [input, path to file]
+Share: [check box, default true]
+Name: [input, text, optional]
+Upload: [button] ==> Torrent uploaded
+*** Torrent uploaded
+Your torrent has been uploaded [and shared].
+Your torrent: [URL] ==> Admin torrent
+*** Admin torrent
+TODO
+*** List published torrents
+
+* Notes
+** NRKbeta and opentracker
+http://search.cpan.org/dist/WWW-Opentracker-Stats/
+** Django installation
+*** Test, in ~linus/nordushare
+Superuser: allan
+Password: tar kakan
+* Time planning
+| 2009-11-02--06 | 8h  | Internetdagarna, Appelbaum, All hands in Copenhagen |
+| 2009-11-09--13 | 30h | A good week                                         |
+| 2009-11-16--20 | 0h  | Juniper course,  Amsterdam                          |
+| 2009-11-23--28 | 12h | GN3 multiculti, stakeholders                        |
+* Progress [1/7]
+- [X] Working tracker
+- [ ] Proper DNS names
+- [ ] Dummy page in Django
+- [ ] Web page with authentication
+- [ ] Uploading a torrent updates whitelist and HUP's the tracker
+- [ ] List of public torrents
+- [ ] Old torrent files are removed, from index (i.e. web page) and from whitelist
