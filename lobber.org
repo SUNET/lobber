@@ -81,11 +81,32 @@ TODO
 * Notes
 ** NRKbeta and opentracker
 http://search.cpan.org/dist/WWW-Opentracker-Stats/
-* Progress [1/7]
+** Playing with torrent files
+On nordushare-dev, the 'bittorrent' package was installed.
+*** make a torrent file
+  btmakemetafile vmlinuz http://nordushare-dev.nordu.net:4711/announce
+*** view a torrent file
+linus@nordushare-dev:~/tmp$ btshowmetainfo vmlinuz.torrent /usr/bin/btshowmetainfo:8: DeprecationWarning: the sha module is deprecated; use the hashlib module instead
+  from sha import *
+btshowmetainfo 20021207 - decode BitTorrent metainfo files
+
+metainfo file.: vmlinuz.torrent
+info hash.....: fd5c5211671b261b289dfe12a1d657b898b75902
+file name.....: vmlinuz
+file size.....: 3907424 (14 * 262144 + 237408)
+announce url..: http://nordushare-dev.nordu.net:4711/announce
+
+
+* Progress [3/11]
 - [X] Working tracker
+- [X] Dummy page in Django
+- [ ] List of public, non expired torrents on start page
+- Uploading torrent file
+  - [X] Torrent and one Handle object is created in database
+  - [ ] File lands on disk
+  - [ ] Whitelist is updated and HUP is sent to tracker
+- [ ] Client is running, seeding everything in database (that hasn't expired)
+- [ ] Authentication is working
 - [ ] Proper DNS names
-- [ ] Dummy page in Django
-- [ ] Web page with authentication
-- [ ] Uploading a torrent updates whitelist and HUP's the tracker
-- [ ] List of public torrents
 - [ ] Old torrent files are removed, from index (i.e. web page) and from whitelist
+- [ ] Proper Apache in front of Django

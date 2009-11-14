@@ -1,5 +1,9 @@
 from django.conf.urls.defaults import *
-urlpatterns = patterns('lobber.share.views',
+urlpatterns = patterns(
+    'lobber.share.views',               # Prefixing function.
     (r'^$', 'torrent_list'),
-    (r'^(?P<handle>.+)/$', 'torrent_view'),
-)
+    (r'^new/$', 'upload'),
+    (r'^upload/$', 'torrent_add'),
+    (r'^(?P<handle_id>\d+)/$', 'torrent_view'),
+    (r'^upload/$', 'torrent_add'),
+    )

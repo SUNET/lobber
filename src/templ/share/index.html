@@ -1,0 +1,9 @@
+{% if torrents %}
+  <ul>
+    {% for t in torrents %}
+      <li>{{ t.name }}</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>Seems like we're out of shared material.  Please share something.</p>
+{% endif %}

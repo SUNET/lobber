@@ -1,0 +1,2 @@
+Depends on
+- BitTorrent (Debian package 'bittorrent') for bencode.py.
