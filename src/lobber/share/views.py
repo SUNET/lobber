@@ -41,7 +41,7 @@ def torrent_add(req):
                        #creation = ,
                        expiration = form.cleaned_data['expires'])
             h.save()
-            return HttpResponseRedirect('/nordushare/%s/' % h.id) # --> torrent_view
+            return HttpResponseRedirect('../%s/' % h.id)
     else:
         form = UploadTorrentForm()
     return render_to_response('share/upload.html', {'form': form})
