@@ -14,9 +14,6 @@ def torrent_list(req):
                 torrents.append(h.torrent)
     return render_to_response('share/index.html', {'torrents': torrents})
 
-def upload(req):
-    return render_to_response('share/upload.html')
-
 from BitTorrent.bencode import bdecode, bencode
 from hashlib import sha1
 def do_hash(data):                      # FIXME: Move.
