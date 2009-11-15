@@ -21,16 +21,12 @@ def do_hash(data):                      # FIXME: Move.
     info = cont['info']
     return sha1(bencode(info)).hexdigest()
 
-# from django.core.files.uploadedfile import SimpleUploadedFile
 def torrent_add(req):
-    #return HttpResponse('ok')
     if req.method == 'POST':
         form = UploadTorrentForm(req.POST, req.FILES)
         if form.is_valid():
-            # TODO: Process form.cleaned_data (a dict keyed with form
-            # members).
             tfile = req.FILES['file']
-            t = Torrent(#owner = current user,
+            t = Torrent(#owner = <current user>,
                         name = form.cleaned_data['name'],
                         data = tfile.name,
                         hashval = do_hash(tfile.read()))
