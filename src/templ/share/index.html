@@ -1,7 +1,7 @@
 {% if torrents %}
   <ul>
     {% for t in torrents %}
-      <li>{{ t.name }}</li>
+      <li><a href="torrent/{{ t.data.url }}">{{ t.name }}</a></li>
     {% endfor %}
   </ul>
 {% else %}
