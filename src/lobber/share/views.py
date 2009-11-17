@@ -27,10 +27,10 @@ def do_hash(data):
     return sha1(bencode(info)).hexdigest()
 
 def add_hash_to_whitelist(thash):
-    wlf = file('%s/%s' % (BASE_DIR, 'tracker-whitelist'), 'w+')
+    wlf = file('%s/%s' % (BASE_DIR, 'tracker/whitelist'), 'w+')
     wlf.write(thash + '\n')
     wlf.close()
-    pidf = file('%s/%s' % (BASE_DIR, 'tracker.pid'), 'r')
+    pidf = file('%s/%s' % (BASE_DIR, 'tracker/pid'), 'r')
     pid = int(pidf.read())
     pidf.close()
     os.kill(pid, 1)
