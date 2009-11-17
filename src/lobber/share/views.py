@@ -5,7 +5,7 @@ from django.shortcuts import render_to_response
 from django.core.servers.basehttp import FileWrapper
 from forms import UploadTorrentForm
 from lobber.share.models import Torrent, Handle
-from settings import MEDIA_ROOT
+from settings import BASE_DIR, MEDIA_ROOT
 
 def torrent_list(req):
     MAX = 40
@@ -17,26 +17,42 @@ def torrent_list(req):
                 torrents.append(h.torrent)
     return render_to_response('share/index.html', {'torrents': torrents})
 
+####################
+# FIXME: Move this to some other file.
 from BitTorrent.bencode import bdecode, bencode
 from hashlib import sha1
-def do_hash(data):                      # FIXME: Move.
+def do_hash(data):
     cont = bdecode(data)
     info = cont['info']
     return sha1(bencode(info)).hexdigest()
+
+def add_hash_to_whitelist(thash):
+    wlf = file('%s/%s' % (BASE_DIR, 'tracker-whitelist'), 'w+')
+    wlf.write(thash + '\n')
+    wlf.close()
+    pidf = file('%s/%s' % (BASE_DIR, 'tracker.pid'), 'r')
+    pid = int(pidf.read())
+    pidf.close()
+    os.kill(pid, 1)
+    
+####################
 
 def torrent_add(req):
     if req.method == 'POST':
         form = UploadTorrentForm(req.POST, req.FILES)
         if form.is_valid():
+            # Store torrent file in file system and add its hash to
+            # the trackers whitelist.
             tfile = req.FILES['file']
             content = tfile.read()
+            thash = do_hash(content)
             f = file('%s/torrents/%s' % (MEDIA_ROOT, tfile.name), 'w')
             f.write(content)
             f.close()
             t = Torrent(#owner = <current user>,
                         name = form.cleaned_data['name'],
                         data = tfile.name,
-                        hashval = do_hash(content))
+                        hashval = thash)
             t.save()
             h = Handle(torrent = t,
                        name = form.cleaned_data['name'],
@@ -44,6 +60,7 @@ def torrent_add(req):
                        #creation = ,
                        expiration = form.cleaned_data['expires'])
             h.save()
+            add_hash_to_whitelist(thash)
             return HttpResponseRedirect('../%s' % h.id)
     else:
         form = UploadTorrentForm()
