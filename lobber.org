@@ -58,6 +58,7 @@ server (20 bytes) for each new torrent and SIGHUP the tracker.
 - MongoDB
 - Hypertable
 ** Data model
+*** Take 1
 - The central object is an upload object (Upload) which has data and
   may have meta data (Metadata).
   - An Upload is created from data (the shared file(s)), a torrent
@@ -65,6 +66,26 @@ server (20 bytes) for each new torrent and SIGHUP the tracker.
   - An Upload has a TTL.
 - An upload object can have zero or more upload access objects
   (Access) associated to it.
+*** Take 2 <2009-12-02 Wed>
+(type 'resource
+  (name :text)     
+  (description :text :optional)
+  (owner :user)
+  (acl :acl :optional)  ; default: no access
+  (file :file :optional)  ; present => resource represents a torrent file
+  (next :resource :optional)) ; present => res. repr. a tag
+
+(type 'handle
+  (secret :text)
+  (expiration :date)
+  (resource :resource))
+
+(type 'user)
+  (name :text :unique))
+
+(type 'acl       ; first match
+  (id :user)
+  (permisssions :int))  ; two bits -- read and write
 ** Web
 *** Upload torrent
 File: [input, path to file]
@@ -96,17 +117,42 @@ file name.....: vmlinuz
 file size.....: 3907424 (14 * 262144 + 237408)
 announce url..: http://nordushare-dev.nordu.net:4711/announce
 
-
-* Progress [3/11]
-- [X] Working tracker
+** Check out
+- that bit in torrents the DHT article was talking about
+* Progress [4/8]
+** Needed for demo on the 2009-12-16
+- [X] Working tracker running
 - [X] Dummy page in Django
-- [ ] List of public, non expired torrents on start page
+- [X] List of public, non expired torrents on start page
 - Uploading torrent file
   - [X] Torrent and one Handle object is created in database
-  - [ ] File lands on disk
+  - [X] File lands on disk
   - [ ] Whitelist is updated and HUP is sent to tracker
-- [ ] Client is running, seeding everything in database (that hasn't expired)
-- [ ] Authentication is working
+- [X] Client is running, seeding everything in database (that hasn't expired)
+- [ ] _Some_ authentication
+- [ ] Tracker sends 4xx rather than 5xx on "not allowed"
+- [ ] Save torrent files named as the hash of the torrent, present them in
+      web as what was typed in as "name" (content-disposition?)
+- [ ] Send mail with links on handle creation
+*** Use cases for demo
+**** UC1 -- web usage
+0. [user0] generates a torrent file and starts seeding it
+1. [user0] logs in ==> "my torrents" view w/ an upload widget included
+2. [user0] uploads a torrent file, adds an email address ==> mail is sent
+3. [user1] clicks the direct torrent link in mail from (2) ==> gets the torrent
+4. [user1] clicks the web link in mail from (2) ==> "a torrent" view
+**** UC2 -- api usage
+0. user gets himself a "longlived cookie"
+1. user uses "longlived cookie" to upload a torrent using wget/curl
+**** UC3 -- adding a seeder
+0. admin adds an ACL to tag ":all" with read permissions for user0
+1. admin creates a new handle for tag ":all" and sends its secret
+   (secret0) to user0
+2. user0 starts a bt-client and points it at http://.../feed/secret0/
+** For 0.1, after 2009-12-16
 - [ ] Proper DNS names
 - [ ] Old torrent files are removed, from index (i.e. web page) and from whitelist
 - [ ] Proper Apache in front of Django
+- [ ] Federated identity
+* Questions
+- Should we flag the torrents as private?

@@ -1,2 +1,7 @@
 Depends on
-- BitTorrent (Debian package 'bittorrent') for bencode.py.
+- BitTorrent
+  - Debian/Ubuntu: apt-get install bittorrent
+  - OS X: sed -e 's/python25/python26/g' -e 's/py25-/py26-/g' -i .bak /opt/local/var/macports/sources/rsync.macports.org/release/ports/net/bittorrent/Portfile && port install bittorrent
+
+Tested with
+- python 2.6
