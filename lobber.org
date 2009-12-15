@@ -86,6 +86,48 @@ server (20 bytes) for each new torrent and SIGHUP the tracker.
 (type 'acl       ; first match
   (id :user)
   (permisssions :int))  ; two bits -- read and write
+*** Take 3 <2009-12-11 Fri>
+See [[file:src/lobber/share/models.py][file:~/p/lobber/src/lobber/share/models.py]] for data model.
+Some terminology:
+- There are three representations: torrent, rss and html.  Suffixing
+  an object name (i.e. an instance) in a URL with a dot and one of the
+  representations will result in the object (instance) being returned
+  in this specific form
+- There are four object types: torrrent, tag, user and key.
+- There are four object operations: get, list, new and del.  Apart
+  from the user object type, all four operations are valid on all four
+  object types.  For user objects, only get and list are valid.
+- The canonical form of a URL is
+    https://HOST.DOMAIN.TLD/APPLICATION/SECRET/OBJECT/INSTANCE.REPRESENTATION
+- Note that a URL with a secret, used for "API calls", has the secret
+  prepended to the object type, like
+  https://.../aec070645fe53ee3b3763059376134f058cc337247c978add178b6ccdfb0019f/tag/ndn.rss
+- URL secrets are (probably) the sha256 sum of some decently random value.
+- Here's an example of how URL's map to database queries
+  - wget https://.../secret0/torrent/foo.torrent ==>
+    - select from torrent where owner=< secret0->owner > and name="foo"
+- An ACL is associated with a user via a key.  Anyone who knows the
+  secret in the key will be able to act on behalf of that user.  The
+  ACL consists of regular expressions denoting which actions are
+  allowed.  First match wins.
+
+  ACL -- key -- user
+                 /\
+                /  \
+              tag  torrent
+
+  - A key has zero or one ACL.
+  - An ACL has one or more keys.
+  - A key has one owner (user).
+  - A user has zero or more keys.
+  - A user has zero or more torrents and tags.
+  - A torrent has one owner (user).
+  - A torrent has zero or more tags.
+  - A tag has one owner (user).
+  - A tag has zero or more torrents.
+- Requests from a user with an HTTP session (cookie) is treated as if
+  the request had contained a secret for a key tied to the logged in
+  user with an ACL containing one entry with the value of ".*".
 ** Web
 *** Upload torrent
 File: [input, path to file]
@@ -120,7 +162,7 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 ** Check out
 - that bit in torrents the DHT article was talking about
 * Progress [4/8]
-** Needed for demo on the 2009-12-16
+** Needed for demo 2009-12-18
 - [X] Working tracker running
 - [X] Dummy page in Django
 - [X] List of public, non expired torrents on start page
@@ -137,17 +179,17 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 *** Use cases for demo
 **** UC1 -- web usage
 0. [user0] generates a torrent file and starts seeding it
-1. [user0] logs in ==> "my torrents" view w/ an upload widget included
+1. [user0] logs in ==> "my torrents" view (w/ an upload widget)
 2. [user0] uploads a torrent file, adds an email address ==> mail is sent
 3. [user1] clicks the direct torrent link in mail from (2) ==> gets the torrent
 4. [user1] clicks the web link in mail from (2) ==> "a torrent" view
 **** UC2 -- api usage
-0. user gets himself a "longlived cookie"
-1. user uses "longlived cookie" to upload a torrent using wget/curl
+0. [user0] gets himself a "longlived cookie" [cookie0]
+1. [user0] uses [cookie0] to upload a torrent using wget/curl
 **** UC3 -- adding a seeder
-0. admin adds an ACL to tag ":all" with read permissions for user0
-1. admin creates a new handle for tag ":all" and sends its secret
-   (secret0) to user0
+0. admin adds an ACL to tag ":all" with read permissions for [user0]
+1. admin creates a new handle for tag ":all" and sends its secret,
+   [secret0], to [user0]
 2. user0 starts a bt-client and points it at http://.../feed/secret0/
 ** For 0.1, after 2009-12-16
 - [ ] Proper DNS names
