@@ -5,11 +5,11 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    (r'^nordushare/login/$', 'django.contrib.auth.views.login'),
+    (r'^nordushare/logout/$', 'django.contrib.auth.views.logout'),
     (r'^nordushare/', include('lobber.share.urls')),
-
+    (r'^admin/', include(admin.site.urls)),
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    (r'^admin/', include(admin.site.urls)),
 )

@@ -198,3 +198,15 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 - [ ] Federated identity
 * Questions
 - Should we flag the torrents as private?
+* Flow
+** User fills in a web form
+- lobber/share/urls.py
+- lobber/share/views.py (req.method != 'POST')
+  render_to_response(SOME-FILE.html, lobber.share.forms.SOME-FORM)
+- templ/share/SOME-FILE.html
+  action=SOME-ACTION
+- lobber/share/urls.py
+- lobber/share/views.py (req.method == 'POST')
+  if lobber.share.forms.SOME-FORM().is_valid():
+     
+  
