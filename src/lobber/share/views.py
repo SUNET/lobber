@@ -21,12 +21,15 @@ def do_hash(data):
     return sha1(bencode(info)).hexdigest()
 
 def add_hash_to_whitelist(thash):
-    wlf = file('%s/%s' % (BASE_DIR, 'tracker/whitelist'), 'w+')
+    # Append hash to whitelist file.
+    wlf = file('%s/%s' % (BASE_DIR, 'tracker/whitelist'), 'a')
     wlf.write(thash + '\n')
     wlf.close()
+    # Read PID file.
     pidf = file('%s/%s' % (BASE_DIR, 'tracker/pid'), 'r')
     pid = int(pidf.read())
     pidf.close()
+    # HUP tracker.
     os.kill(pid, 1)
     
 def list_torrents(max=40):
@@ -61,10 +64,10 @@ def torrent_add(req):
                         #creation =,
                         published = form.cleaned_data['published'],
                         expiration = form.cleaned_data['expires'],
-                        data = tfile.name,
-                        hashval = thash)
+                        data = torrent_file.name,
+                        hashval = torrent_hash)
             t.save()
-            add_hash_to_whitelist(thash)
+            add_hash_to_whitelist(torrent_hash)
             return HttpResponseRedirect('../%s' % t.id)
     else:
         form = UploadTorrentForm()
