@@ -71,9 +71,12 @@ TEMPLATE_DIRS = (
     '/home/linus/lobber/src/templ',
 )
 
+LOGIN_URL = '/nordushare/login/'
+LOGIN_REDIRECT_URL = '/nordushare/user/'
+
 INSTALLED_APPS = (
     'django.contrib.auth',
-    'django.contrib.contenttypes',
+    'django.contrib.contenttypes',      # For the Permission model.
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',

@@ -4,4 +4,4 @@ class UploadTorrentForm(forms.Form):
     file = forms.FileField()
     name = forms.CharField(max_length=128)
     published = forms.BooleanField(initial=True, required=False)
-    expires = forms.DateTimeField()
+    expires = forms.DateTimeField(required=False)
