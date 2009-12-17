@@ -1,0 +1,16 @@
+<p>Hi, {{ user.first_name }}!
+<hr>
+
+{% if torrents %}
+  <ul>
+    {% for t in torrents %}
+      <li><a href="torrent/{{ t.data.url }}">{{ t.name }}</a> ({{t.creation}})</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>You haven't uploaded any files yet.
+    Please <a href="/nordushare/upload">share something</a>.</p>
+{% endif %}
+
+<hr>
+<p><a href="/nordushare/logout/">Log out</a>
