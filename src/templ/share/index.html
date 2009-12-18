@@ -1,7 +1,8 @@
 {% if torrents %}
+<p>Published torrents:
   <ul>
     {% for t in torrents %}
-      <li><a href="torrent/{{ t.data.url }}">{{ t.name }}</a> ({{t.owner}})</li>
+      <li><a href="torrent/{{t.data.url}}">{{ t.name }}</a> (shared by {{t.owner.get_full_name}} {{t.creation}})</li>
     {% endfor %}
   </ul>
 {% else %}
