@@ -56,22 +56,28 @@ def torrent_add(req):
             torrent_file = req.FILES['file']
             torrent_file_content = torrent_file.read()
             torrent_hash = do_hash(torrent_file_content)
-            f = file('%s/torrents/%s' % (MEDIA_ROOT, torrent_file.name), 'w')
+            name_on_disk = '%s/torrents/%s' % (MEDIA_ROOT,
+                                               '%s.torrent' % torrent_hash)
+            f = file(name_on_disk, 'w')
             f.write(torrent_file_content)
             f.close()
+
             t = Torrent(owner = req.user,
                         name = form.cleaned_data['name'],
                         #creation =,
                         published = form.cleaned_data['published'],
                         expiration = form.cleaned_data['expires'],
-                        data = torrent_file.name,
+                        data = '%s.torrent' % torrent_hash,
                         hashval = torrent_hash)
             t.save()
             add_hash_to_whitelist(torrent_hash)
             return HttpResponseRedirect('../%s' % t.id)
     else:
         form = UploadTorrentForm()
-    return render_to_response('share/upload.html', {'form': form})
+    return render_to_response('share/upload.html',
+                              {'form': form,
+                               'announce_url':
+                               'http://nordushare-dev.nordu.net:4711/announce'})
 
 def torrent_view(req, handle_id):
     t = Torrent.objects.get(id__exact = int(handle_id))
