@@ -46,7 +46,7 @@ def torrent_list(req):
 
 @login_required(redirect_field_name='redirect_to')
 def torrent_add(req):
-    if req.method == 'POST':
+    if req.method == 'POST':        # Got form from user -- handle it.
         if not req.user.is_authenticated():
             return HttpResponse("not logged in")
         form = UploadTorrentForm(req.POST, req.FILES)
@@ -69,7 +69,7 @@ def torrent_add(req):
             t.save()
             add_hash_to_whitelist(torrent_hash)
             return HttpResponseRedirect('../%s' % t.id)
-    else:
+    else:                               # Render an empty form.
         form = UploadTorrentForm()
     return render_to_response('share/upload.html', {'form': form})
 
