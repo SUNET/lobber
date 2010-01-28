@@ -1,0 +1,12 @@
+<h3>Please upload a torrent file (.torrent)</h3>
+
+<form enctype="multipart/form-data" method="post" action="/nordushare/upload_f/">
+  <p>When creating the torrent file, the tracker announce URL must
+  be <code>{{ announce_url }}</code>
+
+  {{ form.as_p }}
+
+  <input type="submit" value="Share it!" />
+</form>
+
+<p><a href="/nordushare">&lt;back to start page&gt;</a>

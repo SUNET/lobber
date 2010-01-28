@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 
 from settings import BASE_DIR, MEDIA_ROOT
-from forms import UploadTorrentForm
+from forms import UploadForm, UploadTorrentForm, UploadAppletForm
 from lobber.share.models import Torrent, Tag, Key, ACL
 
 ####################
@@ -44,40 +44,73 @@ def torrent_list(req):
     return render_to_response('share/index.html',
                               {'torrents': list_torrents()})
 
+def upload(req):
+    if req.method == 'POST':          # User posted data -- handle it.
+        form = UploadForm(req.POST, req.FILES)
+        if form.is_valid():
+            d = {'name': form.cleaned_data['name'],
+                 'published': form.cleaned_data['published'],
+                 'expires': form.cleaned_data['expires']}
+            if d['published']:
+                d['published'] = 'checked="checked"'
+            if 'torrent_ul' in req.POST: # Button named 'torrent_ul' pressed.
+                d.update({'form': UploadTorrentForm(d),
+                          'announce_url': 'http://nordushare-dev.nordu.net:4711/announce'})
+                return render_to_response('share/upload-torrent.html', d)
+            elif 'applet_ul' in req.POST:
+                d.update({'form': UploadAppletForm(d)})
+                return render_to_response('share/upload-applet.html', d)
+    else:
+        form = UploadForm()
+    return render_to_response('share/upload.html', {'form': form})
+
+# Helper function.  FIXME: Move.
+def store_torrent(req, form):
+    # Store torrent file in the file system and add its hash
+    # to the trackers whitelist.
+    torrent_file = req.FILES['file']
+    torrent_file_content = torrent_file.read()
+    torrent_hash = do_hash(torrent_file_content)
+    name_on_disk = '%s/torrents/%s' % (MEDIA_ROOT, '%s.torrent' % torrent_hash)
+    f = file(name_on_disk, 'w')
+    f.write(torrent_file_content)
+    f.close()
+    t = Torrent(owner = req.user,
+                name = form.cleaned_data['name'],
+                published = form.cleaned_data['published'],
+                expiration = form.cleaned_data['expires'],
+                data = '%s.torrent' % torrent_hash,
+                hashval = torrent_hash)
+    t.save()
+    add_hash_to_whitelist(torrent_hash)
+    return HttpResponseRedirect('../%s' % t.id)
+
+# This is ghetto, having a separate function for each upload type.
+# It's only temporary!  I swear!
 @login_required(redirect_field_name='redirect_to')
-def torrent_add(req):
-    if req.method == 'POST':
+def torrent_add1(req):
+    if req.method == 'POST':          # User posted data -- handle it.
         if not req.user.is_authenticated():
             return HttpResponse("not logged in")
         form = UploadTorrentForm(req.POST, req.FILES)
         if form.is_valid():
-            # Store torrent file in the file system and add its hash
-            # to the trackers whitelist.
-            torrent_file = req.FILES['file']
-            torrent_file_content = torrent_file.read()
-            torrent_hash = do_hash(torrent_file_content)
-            name_on_disk = '%s/torrents/%s' % (MEDIA_ROOT,
-                                               '%s.torrent' % torrent_hash)
-            f = file(name_on_disk, 'w')
-            f.write(torrent_file_content)
-            f.close()
+            return store_torrent(req, form)
+    else:                               # Render an empty form.
+        form = UploadForm()
+    return render_to_response('share/upload.html', {'form': form})
 
-            t = Torrent(owner = req.user,
-                        name = form.cleaned_data['name'],
-                        #creation =,
-                        published = form.cleaned_data['published'],
-                        expiration = form.cleaned_data['expires'],
-                        data = '%s.torrent' % torrent_hash,
-                        hashval = torrent_hash)
-            t.save()
-            add_hash_to_whitelist(torrent_hash)
-            return HttpResponseRedirect('../%s' % t.id)
-    else:
-        form = UploadTorrentForm()
-    return render_to_response('share/upload.html',
-                              {'form': form,
-                               'announce_url':
-                               'http://nordushare-dev.nordu.net:4711/announce'})
+@login_required(redirect_field_name='redirect_to')
+def torrent_add2(req):
+    if req.method == 'POST':          # User posted data -- handle it.
+        if not req.user.is_authenticated():
+            return HttpResponse("not logged in")
+        form = UploadAppletForm(req.POST, req.FILES)
+        if form.is_valid():
+            return store_torrent(req, form)
+    else:                               # Render an empty form.
+        form = UploadForm()
+    return render_to_response('share/upload.html', {'form': form})
+
 
 def torrent_view(req, handle_id):
     t = Torrent.objects.get(id__exact = int(handle_id))
