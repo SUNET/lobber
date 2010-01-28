@@ -85,8 +85,9 @@ def torrent_view(req, handle_id):
 
 def torrent_get(req, tfile):
     fn = '%s/torrents/%s' % (MEDIA_ROOT, tfile)
-    response = HttpResponse(FileWrapper(file(fn)), content_type='text/plain')
+    response = HttpResponse(FileWrapper(file(fn)), content_type='application/x-bittorrent')
     response['Content-Length'] = os.path.getsize(fn)
+    response['Content-Disposition'] = 'filename=%s.torrent' % tfile # FIXME: Find Torrent object and use .name instead.
     return response
 
 # def login(req):
