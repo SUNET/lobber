@@ -8,7 +8,7 @@
     <PARAM NAME = "ARCHIVE" VALUE = "/jars/lobber-client-core-1.0-SNAPSHOT.jar,/jars/sbbi-upnplib-1.0.4.jar,/jars/commons-logging.jar,/jars/commons-jxpath-1.1.jar" >
     <param name = "type" value = "application/x-java-applet;version=1.6">
     <param name = "scriptable" value = "false">
-    <param name = "name" value="{{ name }}"/>
+    <param name = "uploadname" value="{{ name }}"/>
     <param name = "published" value="{{ published }}"/>
     <param name = "expires" value="{{ expires }}"/>
     <param name = "sessionid" value="{{ sessionid }}"/>
@@ -22,7 +22,7 @@
             WIDTH = "300"
             HEIGHT = "50"
             tracker = "{{ announce_url }}"
-            name = "{{ name }}"
+            uploadname = "{{ name }}"
             published = "{{ published }}"
             expires = "{{ expires }}"
             sessionid = "{{ sessionid }}"
