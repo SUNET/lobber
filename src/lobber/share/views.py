@@ -76,7 +76,8 @@ def upload(req):
                  'published': form.cleaned_data['published'],
                  'expires': form.cleaned_data['expires'],
                  'sessionid': req.session.session_key,
-                 'announce_url': 'http://nordushare-dev.nordu.net:4711/announce'}
+                 'announce_url': 'http://nordushare-dev.nordu.net:4711/announce',
+                 'apiurl': 'http://nordushare-dev.nordu.net/nordushare/upload_f/'}
             if d['published']:
                 d['published'] = 'checked=checked'
             if 'torrent_ul' in req.POST: # Button named 'torrent_ul' pressed.
