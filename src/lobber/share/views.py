@@ -75,12 +75,12 @@ def upload(req):
             d = {'name': form.cleaned_data['name'],
                  'published': form.cleaned_data['published'],
                  'expires': form.cleaned_data['expires'],
-                 'sessionid': req.session.session_key}
+                 'sessionid': req.session.session_key,
+                 'announce_url': 'http://nordushare-dev.nordu.net:4711/announce'}
             if d['published']:
                 d['published'] = 'checked=checked'
             if 'torrent_ul' in req.POST: # Button named 'torrent_ul' pressed.
-                d.update({'form': UploadTorrentForm(d),
-                          'announce_url': 'http://nordushare-dev.nordu.net:4711/announce'})
+                d.update({'form': UploadTorrentForm(d)})
                 return render_to_response('share/upload-torrent.html', d)
             elif 'applet_ul' in req.POST:
                 d.update({'form': UploadAppletForm(d)})
