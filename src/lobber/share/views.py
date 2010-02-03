@@ -50,7 +50,8 @@ def upload(req):
         if form.is_valid():
             d = {'name': form.cleaned_data['name'],
                  'published': form.cleaned_data['published'],
-                 'expires': form.cleaned_data['expires']}
+                 'expires': form.cleaned_data['expires'],
+                 'sessionid': req.session.session_key}
             if d['published']:
                 d['published'] = 'checked="checked"'
             if 'torrent_ul' in req.POST: # Button named 'torrent_ul' pressed.
