@@ -7,7 +7,7 @@ from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 
-from settings import BASE_DIR, MEDIA_ROOT, LOGIN_URL
+from settings import BASE_DIR, MEDIA_ROOT, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL
 from forms import UploadForm, UploadTorrentForm, UploadAppletForm
 from lobber.share.models import Torrent, Tag, Key, ACL
 
@@ -76,8 +76,8 @@ def upload(req):
                  'published': form.cleaned_data['published'],
                  'expires': form.cleaned_data['expires'],
                  'sessionid': req.session.session_key,
-                 'announce_url': 'http://nordushare-dev.nordu.net:4711/announce',
-                 'apiurl': 'http://nordushare-dev.nordu.net/nordushare/upload_f/'}
+                 'announce_url': ANNOUNCE_URL,
+                 'apiurl': '%s/upload_f/' % NORDUSHARE_URL}
             if d['published']:
                 d['published'] = 'checked=checked'
             if 'torrent_ul' in req.POST: # Button named 'torrent_ul' pressed.

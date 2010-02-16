@@ -4,6 +4,9 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 BASE_DIR = '/home/linus/nordushare'
+BASE_URL = 'http://nordushare-dev.nordu.net'
+NORDUSHARE_URL = '%s/nordushare' % BASE_URL
+ANNOUNCE_URL = '%s:4711/announce' % BASE_URL
 
 ADMINS = (
     ('Linus Nordberg', 'linus@nordu.net'),
