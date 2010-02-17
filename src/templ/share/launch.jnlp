@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0+" codebase="/jars">
+  <information>
+    <title>Lobber Client</title>
+    <vendor>NORDUnet<vendor/>
+    <homepage>http://www.nordu.net<homepage/>
+    <description kind="one-line">An applet for talking to a lobber service</description>
+  </information>
+  <security>
+     <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.6+"
+     initial-heap-size="32m"
+     max-heap-size="512m"/>
+
+<jar href="lobber-client-core-1.0-SNAPSHOT.jar" main="true"/>
+<jar href="commons-httpclient-3.1.jar"/>
+<jar href="commons-logging-1.0.4.jar"/>
+<jar href="commons-codec-1.2.jar"/>
+<jar href="sbbi-upnplib-1.0.4.jar"/>
+<jar href="wizard-0.1.12.jar"/>
+
+  </resources>
+  <application-desc main-class="net.nordu.lobber.client.applet.LobberClientApp">
+    <argument>tracker={{ announce_url }}</argument>
+    <argument>uploadname={{ name }}</argument>
+    <argument>published={{ published }}</argument>
+    <argument>expires={{ expires }}</argument>
+    <argument>sessionid={{ sessionid }}</argument>
+    <argument>apiurl={{ apiurl }}</argument>
+  </application-desc>
+</jnlp>
