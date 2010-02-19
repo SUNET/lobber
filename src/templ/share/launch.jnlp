@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp spec="1.0+" codebase="/jars">
+<jnlp spec="1.0+" codebase="{{baseurl}}/jars">
   <information>
     <title>Lobber Client</title>
     <vendor>NORDUnet<vendor/>
@@ -14,12 +14,12 @@
      initial-heap-size="32m"
      max-heap-size="512m"/>
 
-<jar href="lobber-client-core-1.0-SNAPSHOT.jar" main="true"/>
-<jar href="commons-httpclient-3.1.jar"/>
-<jar href="commons-logging-1.0.4.jar"/>
-<jar href="commons-codec-1.2.jar"/>
-<jar href="sbbi-upnplib-1.0.4.jar"/>
-<jar href="wizard-0.1.12.jar"/>
+<jar href="{{baseurl}}/jars/lobber-client-core-1.0-SNAPSHOT.jar" main="true"/>
+<jar href="{{baseurl}}/jars/commons-httpclient-3.1.jar"/>
+<jar href="{{baseurl}}/jars/commons-logging-1.0.4.jar"/>
+<jar href="{{baseurl}}/jars/commons-codec-1.2.jar"/>
+<jar href="{{baseurl}}/jars/sbbi-upnplib-1.0.4.jar"/>
+<jar href="{{baseurl}}/jars/wizard-0.1.12.jar"/>
 
   </resources>
   <application-desc main-class="net.nordu.lobber.client.applet.LobberClientApp">
