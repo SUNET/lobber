@@ -20,13 +20,11 @@
 <jar href="{{baseurl}}/../jars/commons-codec-1.2.jar"/>
 <jar href="{{baseurl}}/../jars/sbbi-upnplib-1.0.4.jar"/>
 <jar href="{{baseurl}}/../jars/wizard-0.1.12.jar"/>
+<jar href="{{baseurl}}/../jars/jcalendar-1.3.3.jar"/>
 
   </resources>
   <application-desc main-class="net.nordu.lobber.client.applet.LobberClientApp">
     <argument>tracker={{ announce_url }}</argument>
-    <argument>uploadname={{ name }}</argument>
-    <argument>published={{ published }}</argument>
-    <argument>expires={{ expires }}</argument>
     <argument>sessionid={{ sessionid }}</argument>
     <argument>apiurl={{ apiurl }}</argument>
   </application-desc>
