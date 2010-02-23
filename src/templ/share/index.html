@@ -1,9 +1,10 @@
-{% extends "base_ui.html" %}
+{% extends "share/base_ui.html" %}
 
-{% block title %}Lobber - Published Torrents{% endblock %}
+{% block title %}Lobber{% endblock %}
 
 {% block main %}
 {% if torrents %}
+<h1>Published Torrents</h1>
 <div id="accordion">
     {% for t in torrents %}
       <div>
