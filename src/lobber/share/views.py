@@ -64,7 +64,8 @@ def torrent_list(req):
     if not req.user.is_authenticated():
         return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
     return render_to_response('share/index.html',
-                              {'torrents': list_torrents()})
+                              {'torrents': list_torrents(),
+				'user': req.user})
 
 def upload(req):
     if not req.user.is_authenticated():
