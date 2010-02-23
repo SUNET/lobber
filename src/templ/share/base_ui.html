@@ -10,10 +10,13 @@ $("#logout").button("Logout");
 {% block body %}
 <div id="header">
 {% if user %}
-	{{ user.first_name }}&nbsp;<a id="logout" href="/nordushare/logout">log out</a>
+   {{ user.first_name }}&nbsp;<a id="logout" href="/nordushare/logout">log out</a>
 {% endif %}
 </div>
 <div id="main">
    {% block main %}{% endblock %}
+</div>
+<div id="footer">
+
 </div>
 {% endblock %}
