@@ -9,7 +9,7 @@ $("#logout").button("Logout");
 
 {% block body %}
 <div id="header">
-{% if user %}
+{% if user.first_name %}
    {{ user.first_name }}&nbsp;<a id="logout" href="/nordushare/logout">log out</a>
 {% endif %}
 </div>
