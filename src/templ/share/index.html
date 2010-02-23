@@ -3,6 +3,11 @@
 {% block title %}Lobber{% endblock %}
 
 {% block main %}
+<form method="post" action="/nordushare/upload/">
+  {{ form.as_p }}
+  <input type="submit" name="torrent_ul" value="Upload a torrent file" />
+  <input type="submit" name="applet_ul" value="Use Java applet for making a torrent file" />
+</form>
 {% if torrents %}
 <h1>Published Torrents</h1>
 <div id="accordion">
@@ -17,9 +22,6 @@
     {% endfor %}
 </div>
 {% else %}
-  <p>Seems like we're out of shared material.
-    Please <a href="/nordushare/upload">share something</a>.</p>
+  <p>Seems like we're out of shared material.</p>
 {% endif %}
-
-<p>Please <a href="/nordushare/upload">share some more</a>!</p>
 {% endblock %}
