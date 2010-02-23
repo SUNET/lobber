@@ -7,9 +7,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title>{% block title %}{% endblock %}</title>
         {% block code %}{% endblock %}
-        <style type="text/css">
-           body{ font: 62.5% "Trebuchet MS", sans-serif; margin: 50px;}
-        </style>
+        {% block style %}{% endblock %}
 </head>
 <body>
 {% block body %}{% endblock %}
