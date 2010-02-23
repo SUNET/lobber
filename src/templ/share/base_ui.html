@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{%block code %}
+<script type="text/javascript">
+$("#accordion").accordion({ header: "h3" });
+$("#logout").button("Logout");
+</script>
+{% endblock %}
+
+{% block body %}
+<div id="header">
+%{ if user }
+{{ user.first_name }}&nbsp;<a id="logout" href="/nordushare/logout">log out</a>
+%{ endif %}
+</div>
+<div id="main">
+   {% block main %}{% endblock %}
+</div>
+{% endblock %}
