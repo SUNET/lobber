@@ -4,21 +4,31 @@
 <script type="text/javascript">
 $(function() {
    $("#accordion").accordion({ header: "h3" });
-   $("#logout").button("Logout");
+   $("#logout").button();
 });
 </script>
 {% endblock %}
 
+{%block style %}
+<style type="text/css">
+   body{ font: 62.5% "Trebuchet MS", sans-serif; margin: 50px;}
+   #footer{ border-top: 1px solid black; margin-top: 50px;}
+</style>
+{% endblock %}
+
 {% block body %}
 <div id="header">
-{% if user %}
-   {{ user.first_name }}&nbsp;<a id="logout" href="/nordushare/logout">log out</a>
-{% endif %}
+   <div id="branding">Lobber</div>
+   <div id="headlinks">
+   {% if user %}
+      {{ user.first_name }}&nbsp;<a id="logout" href="/nordushare/logout">log out</a>
+   {% endif %}
+   </div>
 </div>
 <div id="main">
    {% block main %}{% endblock %}
 </div>
 <div id="footer">
-
+   <a href="#about">About Lobber</a>
 </div>
 {% endblock %}
