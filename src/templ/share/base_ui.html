@@ -2,14 +2,16 @@
 
 {%block code %}
 <script type="text/javascript">
-$("#accordion").accordion({ header: "h3" });
-$("#logout").button("Logout");
+$(function() {
+   $("#accordion").accordion({ header: "h3" });
+   $("#logout").button("Logout");
+});
 </script>
 {% endblock %}
 
 {% block body %}
 <div id="header">
-{% if user.first_name %}
+{% if user %}
    {{ user.first_name }}&nbsp;<a id="logout" href="/nordushare/logout">log out</a>
 {% endif %}
 </div>
