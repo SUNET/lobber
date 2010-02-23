@@ -4,12 +4,18 @@
 
 {% block main %}
 {% if torrents %}
-<p>Published torrents:
-  <ul>
+<h2>Published torrents:</h2>
+<div id="accordion">
     {% for t in torrents %}
-      <li><a href="torrent/{{t.data.url}}">{{ t.name }}</a> (shared by {{t.owner.get_full_name}} {{t.creation}})</li>
+      <div>
+         <h3><a href="#">{{ t.name }}</a></h3>
+         <div>
+            <a href="torrent/{{t.data.url}}">{{ t.name }}</a> (shared by {{t.owner.get_full_name}} {{t.creation}})
+            {{ t.data }}
+         </div>
+      </div>
     {% endfor %}
-  </ul>
+</div>
 {% else %}
   <p>Seems like we're out of shared material.
     Please <a href="/nordushare/upload">share something</a>.</p>
