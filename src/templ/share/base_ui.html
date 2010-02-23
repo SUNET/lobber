@@ -31,7 +31,7 @@ $(function() {
       </ul>
    {% endif %}
    </div>
-   <div id="branding">Lobber</div>
+   <div id="branding">{% block title %}{% endblock %}</div>
 </div>
 <div id="main">
    {% block main %}{% endblock %}
