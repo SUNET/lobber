@@ -4,9 +4,8 @@
 
 {% block main %}
 <form method="post" action="/nordushare/upload/">
-  {{ form.as_p }}
-  <input type="submit" name="torrent_ul" value="Upload a torrent file" />
-  <input type="submit" name="applet_ul" value="Use Java applet for making a torrent file" />
+  <input type="submit" name="torrent_ul" value="I want to upload a torrent file" />
+  <input type="submit" name="javaws_ul" value="I want to run a Java app, making a torrent file for me" />
 </form>
 {% if torrents %}
 <h1>Published Torrents</h1>
