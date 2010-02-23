@@ -15,22 +15,22 @@ $(function() {
    #footer{ border-top: 1px solid black; margin-top: 50px;}
    #branding{ font: 300% "Trebuchet MS", sans-serif; margin: 10px; float: left}
    #linklist ul{ list-style: none; padding: 0; margin: 0; }
-   #linklist li{ float: left; margin 0 0.15em}
+   #linklist li{ float: left; margin: 0 0.15em}
    #main{ clear: both; font: 62.5% "Trebuchet MS", sans-serif; margin: 50px;}
 </style>
 {% endblock %}
 
 {% block body %}
 <div id="header">
-   <div id="branding">Lobber</div>
    <div id="linklist">
    {% if user %}
       <ul>
-         <li>{{ user.first_name }}</li>
+         <li><a href="/nordushare/user">{{ user.first_name }}</a></li>
          <li><a id="logout" href="/nordushare/logout">log out</a></li>
       </ul>
    {% endif %}
    </div>
+   <div id="branding">Lobber</div>
 </div>
 <div id="main">
    {% block main %}{% endblock %}
