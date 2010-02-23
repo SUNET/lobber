@@ -12,7 +12,10 @@ $(function() {
 {%block style %}
 <style type="text/css">
    body{ font: 100% "Trebuchet MS", sans-serif; margin: 50px; width: 61.8%}
-   #footer{ font: 61.8% "Trebuchet MS", sans-serif; border-top: 1px solid black; margin-top: 50px;}
+   #footer{ font: 61.8% "Trebuchet MS", sans-serif; border-top: 1px solid black; margin-top: 50px; padding-top: 10px;}
+   #footer ul { float: center; margin-right: 50px; }
+   #footer ul{ list-style: none; padding: 0; margin: 0; }
+   #footer li{ float: left; margin: 0 0.15em}
    #branding{ font: 300% "Trebuchet MS", sans-serif; margin-left: 50px; margin-bottom: 20px; float: left}
    #linklist { float: right; margin-right: 50px; }
    #linklist ul{ list-style: none; padding: 0; margin: 0; }
@@ -37,6 +40,8 @@ $(function() {
    {% block main %}{% endblock %}
 </div>
 <div id="footer">
-   <a href="#about">About Lobber</a>
+   <ul>
+     <li><a href="#about">About Lobber</a></li>
+   </ul>
 </div>
 {% endblock %}
