@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 
 from settings import BASE_DIR, MEDIA_ROOT, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL
-from forms import UploadForm, UploadTorrentForm, UploadAppletForm
+from forms import UploadForm
 from lobber.share.models import Torrent, Tag, Key, ACL
 
 ####################
@@ -90,31 +90,6 @@ def upload_form(req):
                               {'announce_url': ANNOUNCE_URL,
                                'form': form})
         
-# This is ghetto, having a separate function for each upload type.
-# It's only temporary!  I swear!
-def torrent_add1(req):
-    if req.method == 'POST':          # User posted data -- handle it.
-        if not req.user.is_authenticated():
-            return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
-        form = UploadTorrentForm(req.POST, req.FILES)
-        if form.is_valid():
-            return _store_torrent(req, form)
-    else:                               # Render an empty form.
-        form = UploadForm()
-    return render_to_response('share/upload.html', {'form': form})
-
-def torrent_add2(req):
-    if req.method == 'POST':          # User posted data -- handle it.
-        if not req.user.is_authenticated():
-            return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
-        form = UploadAppletForm(req.POST, req.FILES)
-        if form.is_valid():
-            return _store_torrent(req, form)
-    else:                               # Render an empty form.
-        form = UploadForm()
-    return render_to_response('share/upload.html', {'form': form})
-
-
 def torrent_view(req, handle_id):
     if not req.user.is_authenticated():
         return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
