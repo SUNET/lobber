@@ -72,6 +72,7 @@ def upload(req):
         return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
     d = {'sessionid': req.session.session_key,
          'announce_url': ANNOUNCE_URL,
+         'baseurl': NORDUSHARE_URL,
          'apiurl': '%s/ulform/' % NORDUSHARE_URL} # ==> upload_form() via urls.py.
     d.update({'form': UploadAppletForm(d)})
     return render_to_response('share/launch.jnlp', d,
