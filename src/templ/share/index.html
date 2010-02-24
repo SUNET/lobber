@@ -3,10 +3,9 @@
 {% block title %}Lobber{% endblock %}
 
 {% block main %}
-<form method="post" action="/nordushare/upload/">
-  <input type="submit" name="torrent_ul" value="I want to upload a torrent file" />
-  <input type="submit" name="javaws_ul" value="I want to run a Java app, making a torrent file for me" />
-</form>
+<a href="upload/">Upload</a> (requires a Java enabled system)
+<a href="ulform/">Upload a torrent file</a>
+
 {% if torrents %}
 <h1>Published Torrents</h1>
 <div id="accordion">

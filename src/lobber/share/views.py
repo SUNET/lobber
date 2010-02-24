@@ -70,27 +70,28 @@ def torrent_list(req):
 def upload(req):
     if not req.user.is_authenticated():
         return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
+    return render_to_response('share/upload-applet.html',
+                              {'sessionid': req.session.session_key,
+                               'announce_url': ANNOUNCE_URL,
+                               'apiurl': '%s/ulform/' % NORDUSHARE_URL,
+                               'form': UploadAppletForm(d)})
+
+def upload_form(req):
+    if not req.user.is_authenticated():
+        return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
     if req.method == 'POST':          # User posted data -- handle it.
         form = UploadForm(req.POST, req.FILES)
         if form.is_valid():
             d = {'name': form.cleaned_data['name'],
                  'published': form.cleaned_data['published'],
                  'expires': form.cleaned_data['expires'],
-                 'sessionid': req.session.session_key,
                  'announce_url': ANNOUNCE_URL,
-                 'apiurl': '%s/upload_f/' % NORDUSHARE_URL}
-            if d['published']:
-                d['published'] = 'checked=checked'
-            if 'torrent_ul' in req.POST: # Button named 'torrent_ul' pressed.
-                d.update({'form': UploadTorrentForm(d)})
-                return render_to_response('share/upload-torrent.html', d)
-            elif 'applet_ul' in req.POST:
-                d.update({'form': UploadAppletForm(d)})
-                return render_to_response('share/upload-applet.html', d)
+                 'form': UploadTorrentForm(d)}
+            return render_to_response('share/upload-torrent.html', d)
     else:
         form = UploadForm()
     return render_to_response('share/upload.html', {'form': form})
-
+        
 # This is ghetto, having a separate function for each upload type.
 # It's only temporary!  I swear!
 def torrent_add1(req):
