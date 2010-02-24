@@ -70,11 +70,11 @@ def torrent_list(req):
 def upload(req):
     if not req.user.is_authenticated():
         return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
-    return render_to_response('share/upload-applet.html',
-                              {'sessionid': req.session.session_key,
-                               'announce_url': ANNOUNCE_URL,
-                               'apiurl': '%s/ulform/' % NORDUSHARE_URL,
-                               'form': UploadAppletForm(d)})
+    d = {'sessionid': req.session.session_key,
+         'announce_url': ANNOUNCE_URL,
+         'apiurl': '%s/ulform/' % NORDUSHARE_URL}
+    d.update('form', UploadAppletForm(d))
+    return render_to_response('share/upload-applet.html', d)
 
 def upload_form(req):
     if not req.user.is_authenticated():
@@ -85,8 +85,8 @@ def upload_form(req):
             d = {'name': form.cleaned_data['name'],
                  'published': form.cleaned_data['published'],
                  'expires': form.cleaned_data['expires'],
-                 'announce_url': ANNOUNCE_URL,
-                 'form': UploadTorrentForm(d)}
+                 'announce_url': ANNOUNCE_URL}
+            d.update('form', UploadTorrentForm(d))
             return render_to_response('share/upload-torrent.html', d)
     else:
         form = UploadForm()
