@@ -3,7 +3,7 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-BASE_DIR = '/home/linus/nordushare'
+BASE_DIR = '/home/nordushare/nordushare'
 BASE_URL = 'http://nordushare-dev.nordu.net'
 NORDUSHARE_URL = '%s/nordushare' % BASE_URL
 ANNOUNCE_URL = '%s:4711/announce' % BASE_URL
@@ -71,7 +71,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'lobber.urls'
 
 TEMPLATE_DIRS = (
-    '/home/linus/lobber/src/templ',
+    '/home/nordushare/lobber/src/templ',
 )
 
 LOGIN_URL = '/nordushare/login/'
