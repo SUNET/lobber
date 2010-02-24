@@ -72,9 +72,10 @@ def upload(req):
         return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
     d = {'sessionid': req.session.session_key,
          'announce_url': ANNOUNCE_URL,
-         'apiurl': '%s/ulform/' % NORDUSHARE_URL}
+         'apiurl': '%s/ulform/' % NORDUSHARE_URL} # ==> upload_form() via urls.py.
     d.update({'form': UploadAppletForm(d)})
-    return render_to_response('share/upload-applet.html', d)
+    return render_to_response('share/launch.jnlp', d,
+                              mimetype='application/x-java-jnlp-file')
 
 def upload_form(req):
     if not req.user.is_authenticated():
@@ -90,7 +91,7 @@ def upload_form(req):
             return render_to_response('share/upload-torrent.html', d)
     else:
         form = UploadForm()
-    return render_to_response('share/upload.html', {'form': form})
+    return render_to_response('share/upload-torrent.html', {'form': form})
         
 # This is ghetto, having a separate function for each upload type.
 # It's only temporary!  I swear!
