@@ -74,7 +74,6 @@ def upload(req):
          'announce_url': ANNOUNCE_URL,
          'baseurl': NORDUSHARE_URL,
          'apiurl': '%s/ulform/' % NORDUSHARE_URL} # ==> upload_form() via urls.py.
-    d.update({'form': UploadAppletForm(d)})
     return render_to_response('share/launch.jnlp', d,
                               mimetype='application/x-java-jnlp-file')
 
@@ -84,15 +83,12 @@ def upload_form(req):
     if req.method == 'POST':          # User posted data -- handle it.
         form = UploadForm(req.POST, req.FILES)
         if form.is_valid():
-            d = {'name': form.cleaned_data['name'],
-                 'published': form.cleaned_data['published'],
-                 'expires': form.cleaned_data['expires'],
-                 'announce_url': ANNOUNCE_URL}
-            d.update({'form': UploadTorrentForm(d)})
-            return render_to_response('share/upload-torrent.html', d)
+            return _store_torrent(req, form)
     else:
         form = UploadForm()
-    return render_to_response('share/upload-torrent.html', {'form': form})
+    return render_to_response('share/upload-torrent.html',
+                              {'announce_url': ANNOUNCE_URL,
+                               'form': form})
         
 # This is ghetto, having a separate function for each upload type.
 # It's only temporary!  I swear!
