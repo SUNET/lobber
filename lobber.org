@@ -67,6 +67,7 @@ server (20 bytes) for each new torrent and SIGHUP the tracker.
 - An upload object can have zero or more upload access objects
   (Access) associated to it.
 *** Take 2 <2009-12-02 Wed>
+#+BEGIN_EXAMPLE
 (type 'resource
   (name :text)     
   (description :text :optional)
@@ -86,6 +87,7 @@ server (20 bytes) for each new torrent and SIGHUP the tracker.
 (type 'acl       ; first match
   (id :user)
   (permisssions :int))  ; two bits -- read and write
+#+END_EXAMPLE
 *** Take 3 <2009-12-11 Fri>
 See [[file:src/lobber/share/models.py][file:~/p/lobber/src/lobber/share/models.py]] for data model.
 Some terminology:
@@ -111,10 +113,12 @@ Some terminology:
   ACL consists of regular expressions denoting which actions are
   allowed.  First match wins.
 
+#+BEGIN_EXAMPLE
   ACL -- key -- user
                  /\
                 /  \
               tag  torrent
+#+END_EXAMPLE	      
 
   - A key has zero or one ACL.
   - An ACL has one or more keys.
@@ -130,17 +134,21 @@ Some terminology:
   user with an ACL containing one entry with the value of ".*".
 ** Web
 *** Upload torrent
+#+BEGIN_EXAMPLE
 File: [input, path to file]
 Share: [check box, default true]
 Name: [input, text, optional]
 Upload: [button] ==> Torrent uploaded
+#+END_EXAMPLE
 *** Torrent uploaded
+#+BEGIN_EXAMPLE
 Your torrent has been uploaded [and shared].
 Your torrent: [URL] ==> Admin torrent
+#+END_EXAMPLE
 *** Admin torrent
 TODO
 *** List published torrents
-
+TODO
 * Notes
 ** NRKbeta and opentracker
 http://search.cpan.org/dist/WWW-Opentracker-Stats/
@@ -149,8 +157,8 @@ On nordushare-dev, the 'bittorrent' package was installed.
 *** make a torrent file
   btmakemetafile vmlinuz http://nordushare-dev.nordu.net:4711/announce
 *** view a torrent file
-linus@nordushare-dev:~/tmp$ btshowmetainfo vmlinuz.torrent /usr/bin/btshowmetainfo:8: DeprecationWarning: the sha module is deprecated; use the hashlib module instead
-  from sha import *
+#+BEGIN_EXAMPLE
+linus@nordushare-dev:~/tmp$ btshowmetainfo vmlinuz.torrent
 btshowmetainfo 20021207 - decode BitTorrent metainfo files
 
 metainfo file.: vmlinuz.torrent
@@ -158,7 +166,7 @@ info hash.....: fd5c5211671b261b289dfe12a1d657b898b75902
 file name.....: vmlinuz
 file size.....: 3907424 (14 * 262144 + 237408)
 announce url..: http://nordushare-dev.nordu.net:4711/announce
-
+#+END_EXAMPLE
 ** Check out
 - that bit in torrents the DHT article was talking about
 * Progress [4/8]
@@ -171,7 +179,7 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
   - [X] File lands on disk
   - [ ] Whitelist is updated and HUP is sent to tracker
 - [X] Client is running, seeding everything in database (that hasn't expired)
-- [ ] _Some_ authentication
+- [X] _Some_ authentication
 - [ ] Tracker sends 4xx rather than 5xx on "not allowed"
 - [ ] Save torrent files named as the hash of the torrent, present them in
       web as what was typed in as "name" (content-disposition?)
@@ -200,6 +208,7 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 - Should we flag the torrents as private?
 * Flow
 ** User fills in a web form
+#+BEGIN_EXAMPLE
 - lobber/share/urls.py
 - lobber/share/views.py (req.method != 'POST')
   render_to_response(SOME-FILE.html, lobber.share.forms.SOME-FORM)
@@ -208,5 +217,5 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 - lobber/share/urls.py
 - lobber/share/views.py (req.method == 'POST')
   if lobber.share.forms.SOME-FORM().is_valid():
+#+END_EXAMPLE
      
-  
