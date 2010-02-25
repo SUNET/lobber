@@ -170,6 +170,12 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 ** Check out
 - that bit in torrents the DHT article was talking about
 * Progress [4/8]
+** General
+- [ ] [[https://project.nordu.net/browse/LOBBERDEV-1][Federated login]]
+- [ ] Send email to selected users with link to torrent file (after upload)
+- [ ] http API (with ACL:s)
+- [ ] remove 'nordushare' from url
+- [ ] dig around in torrent file for description ("name") and more
 ** Needed for demo 2009-12-18
 - [X] Working tracker running
 - [X] Dummy page in Django
