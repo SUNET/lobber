@@ -5,8 +5,10 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    (r'^nordushare/login/$', 'django.contrib.auth.views.login'),
-    (r'^nordushare/logout/$', 'django.contrib.auth.views.logout'),
+    #(r'^nordushare/login/$', 'django.contrib.auth.views.login'),
+    #(r'^nordushare/logout/$', 'django.contrib.auth.views.logout'),
+    (r'^nordushare/login/$', 'lobber.share.auth.login'),
+    (r'^nordushare/logout/$', 'lobber.share.auth.logout'),
     (r'^nordushare/', include('lobber.share.urls')),
     (r'^admin/', include(admin.site.urls)),
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
