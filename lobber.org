@@ -237,19 +237,18 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 - Uploading torrent file
   - [X] Torrent and one Handle object is created in database
   - [X] File lands on disk
-  - [ ] Whitelist is updated and HUP is sent to tracker
+  - [X] Whitelist is updated and HUP is sent to tracker
 - [X] Client is running, seeding everything in database (that hasn't expired)
 - [X] _Some_ authentication
 - [ ] Tracker sends 4xx rather than 5xx on "not allowed"
 - [X] Save torrent files named as the hash of the torrent, present them in
       web as what was typed in as "name" (content-disposition?)
-- [ ] Send mail with links on handle creation
+- [ ] Send mail with links on torrent creation
 *** Use cases
 ** For 0.1, after 2009-12-16
 - [ ] Proper DNS names
 - [ ] Old torrent files are removed, from index (i.e. web page) and from whitelist
-- [ ] Proper Apache in front of Django
-- [ ] Federated identity
+- [X] Proper Apache in front of Django
 * Questions
 - Should we flag the torrents as private?
 * Flow
