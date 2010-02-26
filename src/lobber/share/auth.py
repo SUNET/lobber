@@ -45,7 +45,7 @@ def login(request):
 
             attrib_value = getattr(request.user, attrib_name)
             meta_value = request.META.get(meta_name)
-            if meta_value and not attrib_value:
+            if meta_value != "(null)":
                 setattr(request.user, attrib_name, meta_value)
                 update = True
 
