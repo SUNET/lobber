@@ -93,7 +93,8 @@ See [[file:src/lobber/share/models.py][file:~/p/lobber/src/lobber/share/models.p
 
 - There are four object types: torrrent, tag, user and key.
 
-- There are three object operations: get, list, create and delete.
+- There are five object operations: get, list, create, update and
+  delete.
 
   Except for the user object type, all operations are valid on all
   object types.  For user objects, only get is valid (i.e. we don't
@@ -104,12 +105,11 @@ See [[file:src/lobber/share/models.py][file:~/p/lobber/src/lobber/share/models.p
   https://HOST.DOMAIN.TLD/APPLICATION/OBJECT-TYPE/[INSTANCE][.REPRESENTATION]][?lobberkey=SECRET]
 
 
-| instance / request method | GET  | POST/PUT | DELETE |
-|---------------------------+------+----------+--------|
-| no instance given         | list | create   | -      |
-| instance given            | get  | update   | delete |
-|---------------------------+------+----------+--------|
-
+  | instance / request method | GET  | POST/PUT | DELETE |
+  |---------------------------+------+----------+--------|
+  | no instance given         | list | create   | -      |
+  | instance given            | get  | update   | delete |
+  |---------------------------+------+----------+--------|
 
 - There are four representations: raw, json, html and rss.
 
@@ -126,10 +126,11 @@ See [[file:src/lobber/share/models.py][file:~/p/lobber/src/lobber/share/models.p
   If the representation is missing, it's up to the object
   implementation to pick a suitable representation.
 
-- A URL secret is the sha256 sum of some decently random value.
+- The text representation of a key (the URL secret) is the sha256 sum
+  of some decently random value.
 
-  (We might want to use sha1 instead to get the length of the key down
-  from 64 to 40 characters but I don't know really.)
+  (We might want to use sha1 instead to get the length of the secret
+  down from 64 to 40 characters but I don't know really.)
 
 - Examples of how URL's map to database queries.
   - wget https://.../torrent/foo.torrent?lobberkey=secret0 ==>
