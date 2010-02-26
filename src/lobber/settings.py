@@ -91,3 +91,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'lobber.share',
 )
+
+LOBBER_LOG_FILE = "/var/log/lobber/web.log"
+import logging; LOBBER_LOG_LEVEL = logging.DEBUG
