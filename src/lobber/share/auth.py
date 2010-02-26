@@ -69,7 +69,7 @@ def login(request):
                                                                        req_meta(request, "REMOTE_ADDR")))
 
     # Used for both failure and some success cases (when not redirecting)
-    return render_to_response('share/login-federated.html',
+    return render_to_response('share/login.html',
                               {'user': request.user,
                                'meta': request.META,
                                })
