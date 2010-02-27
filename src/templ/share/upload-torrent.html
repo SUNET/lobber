@@ -1,4 +1,9 @@
-<h3>Please upload a torrent file (.torrent)</h3>
+{% extends "share/base_ui.html" %}
+
+{% block title %}Lobber{% endblock %}
+
+{% block main %}
+<h1>Please upload a torrent file (.torrent)</h1>
 
 <form enctype="multipart/form-data" method="post" action="/nordushare/ulform/">
   <p>When creating the torrent file, the tracker announce URL must
@@ -7,6 +12,6 @@
   {{ form.as_p }}
 
   <input type="submit" value="Share it!" />
+  <input type="button" onClick="document.location='/nordushare'" value="Cancel"/>
 </form>
-
-<p><a href="/nordushare">&lt;back to start page&gt;</a>
+{% endblock %}

@@ -88,6 +88,7 @@ def upload_form(req):
         form = UploadForm()
     return render_to_response('share/upload-torrent.html',
                               {'announce_url': ANNOUNCE_URL,
+                               'user': req.user,
                                'form': form})
         
 def torrent_view(req, handle_id):
