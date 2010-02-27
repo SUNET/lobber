@@ -29,6 +29,11 @@ class Key(models.Model):
     acl = models.ForeignKey(ACL)
     comment = models.CharField(max_length=64) # F.ex. user (for audit trail).
 
+class UserProfile(models.Model):
+    entitlements = models.TextField()
+    display_name = models.CharField(max_length=256, blank=True)
+    user = models.ForeignKey(User, unique=True)
+
 
 # class Handle(models.Model):
 #     """A handle is supposed to be published in some way, enabling

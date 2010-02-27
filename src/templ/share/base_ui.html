@@ -4,7 +4,8 @@
 <script type="text/javascript">
 $(function() {
    $("#accordion").accordion({ header: "h3" });
-   $("#logout").button();
+   $("#id_expires").datepicker({'dateFormat': 'yy-mm-dd'});
+   $("input:submit, input:button, a",".button").button();
 });
 </script>
 {% endblock %}
@@ -12,7 +13,7 @@ $(function() {
 {%block style %}
 <style type="text/css">
    body{ font: 100% "Trebuchet MS", sans-serif; margin: 50px; width: 61.8%}
-   #footer{ font: 61.8% "Trebuchet MS", sans-serif; border-top: 1px solid black; margin-top: 50px; padding-top: 10px;}
+   #footer{ clear: both; font: 61.8% "Trebuchet MS", sans-serif; border-top: 1px solid black; margin-top: 50px; padding-top: 10px;}
    #footer ul { float: center; margin-right: 50px; }
    #footer ul{ list-style: none; padding: 0; margin: 0; }
    #footer li{ float: left; margin: 0 0.15em}
@@ -20,17 +21,19 @@ $(function() {
    #linklist { float: right; margin-right: 50px; }
    #linklist ul{ list-style: none; padding: 0; margin: 0; }
    #linklist li{ float: left; margin: 0 0.15em}
+   #linklist a{ font: 100% "Trebuchet MS", sans-serif; }
    #main{ clear: both; font: 61.8% "Trebuchet MS", sans-serif; margin: 50px;}
+   code{font: 110% "Courier", fixed}
 </style>
 {% endblock %}
 
 {% block body %}
 <div id="header">
+   <div style="float: right" class="button"><a id="logout" href="/nordushare/logout">Logout</a></div>
    <div id="linklist">
    {% if user %}
       <ul>
          <li><a href="/nordushare/user">{{ user.get_full_name }}</a></li>
-         <li><a id="logout" href="/nordushare/logout">log out</a></li>
       </ul>
    {% endif %}
    </div>

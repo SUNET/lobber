@@ -1,12 +1,36 @@
-<h3>Please upload a torrent file (.torrent)</h3>
+{% extends "share/base_ui.html" %}
+{% block title %}Lobber{% endblock %}
+
+{% block main %}
+<h1>Please upload a torrent file (.torrent)</h1>
 
 <form enctype="multipart/form-data" method="post" action="/nordushare/ulform/">
-  <p>When creating the torrent file, the tracker announce URL must
-  be <code>{{ announce_url }}</code>
+  <div class="ui-widget">
+     <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;"> 
+        <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+           When creating the torrent file, the tracker announce URL must be <code>{{ announce_url }}</p>
+     </div>
+  </div>
 
-  {{ form.as_p }}
-
-  <input type="submit" value="Share it!" />
+  <div class="ui-widget-content ui-corner-all" style="margin-top: 20px;">
+     <table>
+     {% for field in form %}
+        <tr>
+           {% if field.errors %}
+              <td colspan="2">{{ field.errors }}</td>
+           {% endif %}
+           </div>
+        </tr>
+        <tr>
+           <td>{{ field.label_tag }}</td><td><div class="ui-widget">{{ field }}</div></td>
+        </tr>
+     {% endfor %}
+     </table>
+  </div>
+  <br/>
+  <div class="button">
+     <input type="submit" value="Share it!" />
+     <input type="button" onClick="document.location='/nordushare'" value="Cancel"/>
+  </div>
 </form>
-
-<p><a href="/nordushare">&lt;back to start page&gt;</a>
+{% endblock %}

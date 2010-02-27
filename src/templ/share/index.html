@@ -3,8 +3,10 @@
 {% block title %}Lobber{% endblock %}
 
 {% block main %}
-<a href="upload/">Upload</a> (requires a Java enabled system)
-<a href="ulform/">Upload a torrent file</a>
+<div class="button">
+  <a href="upload/">Upload using Java Web Start</a>
+  <a href="ulform/">Upload a torrent file</a>
+</div>
 
 {% if torrents %}
 <h1>Published Torrents</h1>
