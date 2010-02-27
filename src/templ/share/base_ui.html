@@ -5,6 +5,7 @@
 $(function() {
    $("#accordion").accordion({ header: "h3" });
    $("#id_expires").datepicker();
+   $("input:submit, input:button, a",".button").button();
 });
 </script>
 {% endblock %}
@@ -22,16 +23,17 @@ $(function() {
    #linklist li{ float: left; margin: 0 0.15em}
    #linklist a{ font: 100% "Trebuchet MS", sans-serif; }
    #main{ clear: both; font: 61.8% "Trebuchet MS", sans-serif; margin: 50px;}
+   code{font: 110% "Courier", fixed}
 </style>
 {% endblock %}
 
 {% block body %}
 <div id="header">
+   <div style="float: right" class="button"><a id="logout" href="/nordushare/logout">log out</a></div>
    <div id="linklist">
    {% if user %}
       <ul>
          <li><a href="/nordushare/user">{{ user.get_full_name }}</a></li>
-         <li><a id="logout" href="/nordushare/logout">log out</a></li>
       </ul>
    {% endif %}
    </div>
