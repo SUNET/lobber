@@ -6,8 +6,7 @@ from lobber.share import auth
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    #(r'^nordushare/login/$', 'django.contrib.auth.views.login'),
-    #(r'^nordushare/logout/$', 'django.contrib.auth.views.logout'),
+    (r'^nordushare/login-federated/$', 'lobber.share.auth.login_federated'),
     (r'^nordushare/login/$', 'lobber.share.auth.login'),
     (r'^nordushare/logout/$', 'lobber.share.auth.logout'),
     (r'^nordushare/', include('lobber.share.urls')),

@@ -14,7 +14,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 
-from lobber.settings import LOBBER_LOG_FILE
+from settings import BASE_DIR, MEDIA_ROOT, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL, LOBBER_LOG_FILE
 
 import lobber.log
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
@@ -36,6 +36,9 @@ def logout(request):
 
 @never_cache
 def login(request):
+    return render_to_response('share/login.html',{'user': request.user,'next': request.REQUEST.get("next")});
+
+def login_federated(request):
     if request.user.is_authenticated():
         update = False
 
@@ -60,17 +63,15 @@ def login(request):
                                                                       req_meta(request, "REMOTE_ADDR")))
 
         # On a sucessful login, just do the redirect if one is requested
-        next = request.session.get("after_login_redirect", None)
-        if next is not None:
+        logger.info(request)
+        next = request.REQUEST.get("next", None)
+	logger.info(next)
+        if next is None:
+	    return render_to_response("share/login.html",{"user": request.user});
+        else:
             return HttpResponseRedirect(next)
 
     else:
         logger.warning("Failed federated login for user %s from %s" % (request.user.username,
                                                                        req_meta(request, "REMOTE_ADDR")))
-
-    # Used for both failure and some success cases (when not redirecting)
-    return render_to_response('share/login.html',
-                              {'user': request.user,
-                               'meta': request.META,
-                               })
 

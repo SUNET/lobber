@@ -7,7 +7,7 @@ from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 
-from settings import BASE_DIR, MEDIA_ROOT, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL
+from settings import BASE_DIR, MEDIA_ROOT, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL
 from forms import UploadForm
 from lobber.share.models import Torrent, Tag, Key, ACL
 
@@ -72,7 +72,7 @@ def upload(req):
         return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
     d = {'sessionid': req.session.session_key,
          'announce_url': ANNOUNCE_URL,
-         'baseurl': NORDUSHARE_URL,
+         'baseurl': BASE_UI_URL,
          'apiurl': '%s/ulform/' % NORDUSHARE_URL} # ==> upload_form() via urls.py.
     return render_to_response('share/launch.jnlp', d,
                               mimetype='application/x-java-jnlp-file')

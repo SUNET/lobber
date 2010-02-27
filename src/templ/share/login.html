@@ -3,9 +3,7 @@
 {% block title %}Lobber{% endblock %}
 
 {% block main %}
-<h1>Login</h1>
-<form method="post" action="/nordushare/login/">
-   <input type="submit" value="Login using federated auth"/>
-</form>
+
+<a href="/nordushare/login-federated/?next={{next}}">Login using your eduID</a>
 
 {% endblock %}
