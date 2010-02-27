@@ -4,8 +4,9 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 BASE_DIR = '/home/nordushare'
+BASE_UI_URL = 'https://nordushare-dev.nordu.net'
 BASE_URL = 'http://nordushare-dev.nordu.net'
-NORDUSHARE_URL = '%s/nordushare' % BASE_URL
+NORDUSHARE_URL = '%s/nordushare' % BASE_UI_URL
 ANNOUNCE_URL = '%s:4711/announce' % BASE_URL
 
 ADMINS = (
