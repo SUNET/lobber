@@ -12,10 +12,18 @@
      </div>
   </div>
 
-  <div class="ui-form">
+  <div class="ui-widget-content ui-corner-all" style="margin-top: 20px;">
      <table>
      {% for field in form %}
-        <tr><td>{{ field.label_tag }}</td><td><div class="ui-widget">{{ field }}</div></td></tr>
+        <tr>
+           {% if field.errors %}
+              <td colspan="2">{{ field.errors }}</td>
+           {% endif %}
+           </div>
+        </tr>
+        <tr>
+           <td>{{ field.label_tag }}</td><td><div class="ui-widget">{{ field }}</div></td>
+        </tr>
      {% endfor %}
      </table>
   </div>

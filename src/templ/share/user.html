@@ -1,6 +1,12 @@
-<p>Hi, {{ user.first_name }}!
-<hr>
+{% extends "share/base_ui.html" %}
 
+{% block title %}Lobber{% endblock %}
+
+{% block main %}
+<table>
+   <tr><td>Name</td><td>{{user.get_full_name}}</td><tr>
+   <tr><td>Email</td><td>{{user.email}}</td><tr>
+</table>
 {% if torrents %}
   <ul>
     {% for t in torrents %}
@@ -11,6 +17,4 @@
   <p>You haven't uploaded any files yet.
     Please <a href="/nordushare/upload">share something</a>.</p>
 {% endif %}
-
-<hr>
-<p><a href="/nordushare/logout/">Log out</a>
+{% endblock %}

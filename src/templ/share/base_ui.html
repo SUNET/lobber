@@ -4,7 +4,7 @@
 <script type="text/javascript">
 $(function() {
    $("#accordion").accordion({ header: "h3" });
-   $("#id_expires").datepicker();
+   $("#id_expires").datepicker({'dateFormat': 'yy-mm-dd'});
    $("input:submit, input:button, a",".button").button();
 });
 </script>
@@ -29,7 +29,7 @@ $(function() {
 
 {% block body %}
 <div id="header">
-   <div style="float: right" class="button"><a id="logout" href="/nordushare/logout">log out</a></div>
+   <div style="float: right" class="button"><a id="logout" href="/nordushare/logout">Logout</a></div>
    <div id="linklist">
    {% if user %}
       <ul>
