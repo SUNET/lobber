@@ -9,14 +9,14 @@ class Torrent(models.Model):
     expiration = models.DateTimeField()
     data = models.FileField(upload_to='torrents') # upload_to: directory in MEDIA_ROOT.
     hashval = models.CharField(max_length=40)
-    acl = models.OneToOne(ACL)
+    acl = models.OneToOneField(ACL)
 #    tags = models.ManyToManyFields(Tag)
 
     def __unicode__(self):
         return '%s "%s" (%s)' % (self.hashval, self.name, self.owner.username)
 
 class ACL(models.Model):
-    torrent = models.OneToOne(Torrent)
+    torrent = models.OneToOneField(Torrent)
     aces = models.textField()                  # Space separated ace's.
 
     def auth(self, username, perm):
