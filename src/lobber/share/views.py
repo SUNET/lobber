@@ -49,7 +49,7 @@ def _store_torrent(req, form):
     f = file(name_on_disk, 'w')
     f.write(torrent_file_content)
     f.close()
-    t = Torrent(owner = req.user,
+    t = Torrent(acl = 'user:%s' % req.user.username,
                 name = form.cleaned_data['name'],
                 published = form.cleaned_data['published'],
                 expiration = form.cleaned_data['expires'],
@@ -97,15 +97,6 @@ def torrent_view(req, handle_id):
     t = Torrent.objects.get(id__exact = int(handle_id))
     return render_to_response('share/torrent.html', {'torrent': t})
 
-def torrent_get(req, tfile):
-    if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
-    fn = '%s/torrents/%s' % (MEDIA_ROOT, tfile)
-    response = HttpResponse(FileWrapper(file(fn)), content_type='application/x-bittorrent')
-    response['Content-Length'] = os.path.getsize(fn)
-    response['Content-Disposition'] = 'filename=%s.torrent' % tfile # FIXME: Find Torrent object and use .name instead.
-    return response
-
 # def login(req):
 #     if req.method != 'POST':
 #         return render_to_response('share/login.html', {'form': LoginForm()})
@@ -125,14 +116,44 @@ def torrent_get(req, tfile):
 #                 else:
 #                     return HttpResponse("account inactive")
 
-def user_view(req):
+def user_self(req):
     if not req.user.is_authenticated():
         return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
     MAX = 40
     lst = []
     for t in Torrent.objects.all().order_by('-creation')[:MAX]:
-        if t.owner == req.user and t.expiration > dt.now():
+        if t.acl.auth(user.username, 'r') and t.expiration > dt.now():
             lst.append(t)
-    return render_to_response('share/user.html',
-                              {'user': req.user,
-                               'torrents': lst})
+    return render_to_response('share/user.html', {'user': req.user,
+                                                  'torrents': lst})
+
+################################################################################
+# RESTful API.
+def api_torrent(req, inst):
+    """
+    GET ==> get torrent
+    PUT/POST ==> update torrent
+    DELETE ==> delete torrent
+    """
+    if not req.user.is_authenticated():
+        return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
+    response = HttpResponse('NYI: not yet implemented')
+
+    fn = '%s/torrents/%s' % (MEDIA_ROOT, inst)
+    if req.method == 'GET':
+        response = HttpResponse(FileWrapper(file(fn)), content_type='application/x-bittorrent')
+        response['Content-Length'] = os.path.getsize(fn)
+        # FIXME: Find Torrent object and use .name instead of filename.
+        response['Content-Disposition'] = 'filename=%s.torrent' % inst
+    return response
+
+def api_torrents(req):
+    """
+    GET ==> list torrents
+    PUT/POST ==> create torrent
+    """
+    if not req.user.is_authenticated():
+        return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
+    response = HttpResponse('NYI: not yet implemented')
+
+    return response
