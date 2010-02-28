@@ -3,10 +3,22 @@
 {% block title %}Lobber{% endblock %}
 
 {% block main %}
-<table>
-   <tr><td>Name</td><td>{{user.get_full_name}}</td><tr>
-   <tr><td>Email</td><td>{{user.email}}</td><tr>
-</table>
+<div class="ui-widget-header ui-corner-all infopanel">
+   <h1>{{user.get_full_name}}</h1>
+</div>
+<div class="ui-widget-content ui-corner-all infopanel">
+   <table>
+      <tr><td>Email</td><td><div id="email">{{user.email}}</div></td><tr>
+      <tr><td>Username</td><td>{{user.username}}</td></tr>
+   </table>
+   <p class="ui-widget">
+      <div id="gravatar"></div>
+   </p>
+   <p>
+      This is your <a href="http://www.gravatar.com">Gravatar</a>!
+   </p>
+</div>
+
 {% if torrents %}
   <ul>
     {% for t in torrents %}

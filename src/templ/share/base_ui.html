@@ -6,6 +6,7 @@ $(function() {
    $("#accordion").accordion({ header: "h3" });
    $("#id_expires").datepicker({'dateFormat': 'yy-mm-dd'});
    $("input:submit, input:button, a",".button").button();
+   $("#gravatar").append($.gravatar($('#email').contents().text()));
 });
 </script>
 {% endblock %}
@@ -24,12 +25,13 @@ $(function() {
    #linklist a{ font: 100% "Trebuchet MS", sans-serif; }
    #main{ clear: both; font: 61.8% "Trebuchet MS", sans-serif; margin: 50px;}
    code{font: 110% "Courier", fixed}
+   .infopanel{width: 62%; padding: 5px; margin-bottom: 10px; }
 </style>
 {% endblock %}
 
 {% block body %}
 <div id="header">
-   <div style="float: right" class="button"><a id="logout" href="/nordushare/logout">Logout</a></div>
+   <div style="float: right; margin-right: 50px;" class="button"><a id="logout" href="/nordushare/logout">Logout</a></div>
    <div id="linklist">
    {% if user %}
       <ul>
@@ -37,7 +39,7 @@ $(function() {
       </ul>
    {% endif %}
    </div>
-   <div id="branding">{% block title %}{% endblock %}</div>
+   <div id="branding"><a style="text-decoration: none" href="/nordushare/">{% block title %}{% endblock %}</a></div>
 </div>
 <div id="main">
    {% block main %}{% endblock %}
