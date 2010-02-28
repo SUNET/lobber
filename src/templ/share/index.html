@@ -16,7 +16,6 @@
          <h3><a href="#">{{ t.name }}</a></h3>
          <div>
             <a href="torrent/{{t.data.url}}">{{ t.name }}</a> (shared by {{t.owner.get_full_name}} {{t.creation}})
-            {{ t.data }}
          </div>
       </div>
     {% endfor %}
