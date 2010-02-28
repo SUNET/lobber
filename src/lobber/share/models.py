@@ -2,6 +2,18 @@ from django.db import models
 # http://docs.djangoproject.com/en/dev/topics/auth/#module-django.contrib.auth
 from django.contrib.auth.models import User
 
+class ACL(models.Model):
+    aces = models.TextEield()           # Space separated ace's.
+
+    def auth(self, username, perm):
+        for ace in self.aces.split(' '):
+            if ace.startswith('user:%s' % username):
+                if ace.endswith('#w'):  # Write permission == all.
+                    return True
+                if ace.endswith('#%c' % perm):
+                    return True
+        return False
+
 class Torrent(models.Model):
     name = models.CharField(max_length=256, blank=True)
     creation = models.DateTimeField(auto_now_add=True)
@@ -14,20 +26,6 @@ class Torrent(models.Model):
 
     def __unicode__(self):
         return '%s "%s" (%s)' % (self.hashval, self.name, self.owner.username)
-
-class ACL(models.Model):
-    torrent = models.OneToOneField(Torrent)
-    aces = models.textField()                  # Space separated ace's.
-
-    def auth(self, username, perm):
-        for ace in self.aces.split(' '):
-            if ace.startswith('user:%s' % username):
-                if ace.endswith('#w'):  # Write permission == all.
-                    return True
-                if ace.endswith('#%c' % perm):
-                    return True
-        return False
-        
 
 #class Tag(models.Model):
 #    torrents = models.ManyToManyField(Torrent)
