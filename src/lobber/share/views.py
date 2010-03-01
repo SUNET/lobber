@@ -49,7 +49,7 @@ def _store_torrent(req, form):
     f = file(name_on_disk, 'w')
     f.write(torrent_file_content)
     f.close()
-    t = Torrent(acl = 'user:%s' % req.user.username,
+    t = Torrent(acl = 'user:%s#w' % req.user.username,
                 name = form.cleaned_data['name'],
                 published = form.cleaned_data['published'],
                 expiration = form.cleaned_data['expires'],
@@ -122,7 +122,7 @@ def user_self(req):
     MAX = 40
     lst = []
     for t in Torrent.objects.all().order_by('-creation')[:MAX]:
-        if t.acl.auth(user.username, 'r') and t.expiration > dt.now():
+        if t.auth(user.username, 'r') and t.expiration > dt.now():
             lst.append(t)
     return render_to_response('share/user.html', {'user': req.user,
                                                   'torrents': lst})
