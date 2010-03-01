@@ -122,7 +122,7 @@ def user_self(req):
     MAX = 40
     lst = []
     for t in Torrent.objects.all().order_by('-creation')[:MAX]:
-        if t.auth(user.username, 'r') and t.expiration > dt.now():
+        if t.auth(req.user.username, 'r') and t.expiration > dt.now():
             lst.append(t)
     return render_to_response('share/user.html', {'user': req.user,
                                                   'torrents': lst})
