@@ -16,7 +16,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'postgresql_psycopg2'
-DATABASE_NAME = 'nordushare'
+DATABASE_NAME = 'nordushare4'
 DATABASE_USER = 'www-data'
 DATABASE_PASSWORD = 'skalleper'
 DATABASE_HOST = ''
