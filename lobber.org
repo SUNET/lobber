@@ -165,20 +165,26 @@ See [[file:src/lobber/share/models.py][file:~/p/lobber/src/lobber/share/models.p
   user with an ACL containing an entry with the value of ".*".
 *** Take 4 <2010-02-27 Sat>
 #+BEGIN_EXAMPLE
-+--------+      +-----+    +--------------+
-| url-   | ---  | key | -- | entitlements |
-| filter |      +-----+    +--------------+
++------+       1 +---------+       1 +-----+
+| tag  | ------- | torrent | ------- | acl |
++------+ 0..*    +---------+ 1       +-----+
+
++--------+       1 +-----+       1 +--------------+
+| url-   | ------- | key | ------- | entitlements |
+| filter | 1       +-----+ 1       +--------------+
 +--------+     
 
-+-------+      +---------+    +-----+
-| tags  | ---  | torrent | -- | acl |
-+-------+      +---------+    +-----+
-     
-entitlement := {a-z,0-9}[:{a-z,0-9} ...] (note: not '$')
-key := sha256(random val)
-acl := ace0, ace1, ...
-ace := entitlement '#' permission
+entitlement := [a-z0-9_-]+   # note: not '$'
 permission := 'r' | 'w'
+ace := <entitlement> '#' <permission>
+acl := <ace>+
+
+entitlements := <entitlement>+
+
+filter-re := [a-z0-9.*]+   # simplified regular expression
+url-filter := <filter-re>+
+
+key := sha256(random value)
 
 Permission #r:
   - list torrent
