@@ -317,3 +317,44 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
   if lobber.share.forms.SOME-FORM().is_valid():
 #+END_EXAMPLE
      
+* Operations
+** Apache configuration
+        <Location "/">
+           SetHandler python-program
+           PythonHandler django.core.handlers.modpython
+           SetEnv DJANGO_SETTINGS_MODULE lobber.settings
+           PythonDebug On
+           PythonPath "['/home/nordushare/lobber/src'] + sys.path"
+
+           AuthType shibboleth
+           ShibRequireSession Off
+           require shibboleth
+           RequestHeader set X_REMOTE_USER %{eppn}e
+           RequestHeader set EPPN %{eppn}e
+           RequestHeader set GIVENNAME %{givenName}e
+           RequestHeader set SN %{sn}e
+           RequestHeader set MAIL %{mail}e
+           RequestHeader set AFFILIATION %{affiliation}e
+        </Location>
+
+        <LocationMatch "Shibboleth.sso">
+           SetHandler None
+        </LocationMatch>
+
+        <Location "/nordushare/login-federated/">
+           AuthType shibboleth
+           ShibRequireSession On
+           require valid-user
+        </Location>
+
+        Alias /media /usr/share/pyshared/django/contrib/admin/media/
+        Alias /jars /var/www/jars/
+        Alias /css /var/www/css/
+        Alias /js /var/www/js/
+        # Allow indexing during development.  TODO: Remove.
+        <LocationMatch "^/(jars|css|js|media)">
+           Options Indexes FollowSymLinks
+           Order allow,deny
+           allow from all
+           SetHandler None
+        </LocationMatch>
