@@ -1,4 +1,4 @@
-from lobber.share.models import Torrent, Tag, Key, ACL
+from lobber.share.models import Torrent, Tag, Key
 from django.contrib import admin
 
 admin.site.register(Torrent)
