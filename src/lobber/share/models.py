@@ -13,7 +13,7 @@ class Torrent(models.Model):
     tags = models.ManyToManyField('Tag')
 
     def __unicode__(self):
-        return '%s "%s" (%s)' % (self.hashval, self.name, self.owner.username)
+        return '%s "%s" (acl=%s)' % (self.hashval, self.name, self.acl)
 
     def auth(self, username, perm):
         for ace in self.acl.split(' '):
