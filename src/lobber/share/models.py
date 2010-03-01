@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class ACL(models.Model):
-    aces = models.TextEield()           # Space separated ace's.
+    aces = models.TextField()           # Space separated ace's.
 
     def auth(self, username, perm):
         for ace in self.aces.split(' '):
