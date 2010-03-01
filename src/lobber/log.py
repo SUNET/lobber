@@ -10,7 +10,7 @@ class Logger:
         self.subsystem = subsystem
         self.filename = filename
         
-        self.logger = logging.getLogger("tcs." + self.subsystem)
+        self.logger = logging.getLogger("lobber." + self.subsystem)
         self.logger.setLevel(LOBBER_LOG_LEVEL)
 
         self.filehandler = logging.FileHandler(self.filename)
