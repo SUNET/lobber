@@ -7,9 +7,9 @@ from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 
-from settings import BASE_DIR, MEDIA_ROOT, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL
-from forms import UploadForm
+from lobber.settings import BASE_DIR, MEDIA_ROOT, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL
 from lobber.share.models import Torrent, Tag, Key
+from forms import UploadForm
 
 ####################
 # Helper functions. FIXME: Move to some other file.
