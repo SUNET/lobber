@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class Torrent(models.Model):
     name = models.CharField(max_length=256, blank=True)
     description = models.TextField()
-    creator = models.ForeignKey(User, unique=True)
+    creator = models.ForeignKey(User)
     creation_date = models.DateTimeField(auto_now_add=True)
     expiration_date = models.DateTimeField() # FIXME: Default to something reasonable.
     data = models.FileField(upload_to='torrents') # upload_to: directory in MEDIA_ROOT.
@@ -30,6 +30,7 @@ class Tag(models.Model):
 
 class UserProfile(models.Model):
     user = models.ForeignKey(User, unique=True, related_name='profile')
+    creator = models.ForeignKey(User)
     display_name = models.CharField(max_length=256, blank=True)
     entitlements = models.TextField(blank=True) # Space separated entls.
     urlfilter = models.TextField() # Space separated simplified regexps.
