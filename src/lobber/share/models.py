@@ -29,7 +29,7 @@ class Tag(models.Model):
     value = models.CharField(max_length=128, blank=True, primary_key=True)
 
 class UserProfile(models.Model):
-    user = models.ForeignKey(User, unique=True)
+    user = models.ForeignKey(User, unique=True, related_name='profile')
     display_name = models.CharField(max_length=256, blank=True)
     entitlements = models.TextField()   # Space separated entls.
     urlfilter = models.TextField() # Space separated simplified regexps.

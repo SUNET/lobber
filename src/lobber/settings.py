@@ -6,7 +6,8 @@ TEMPLATE_DEBUG = DEBUG
 BASE_DIR = '/home/nordushare'
 BASE_UI_URL = 'https://nordushare-dev.nordu.net'
 BASE_URL = 'http://nordushare-dev.nordu.net'
-NORDUSHARE_URL = '%s/nordushare' % BASE_UI_URL
+APPLICATION_URL = 'nordushare'          # FIXME: Make this empty.
+NORDUSHARE_URL = '%s/%s' % (BASE_UI_URL, APPLICATION_URL)
 ANNOUNCE_URL = '%s:4711/announce' % BASE_URL
 
 ADMINS = (
@@ -67,6 +68,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'lobber.middleware.KeyMiddleware',
     'django.contrib.auth.middleware.RemoteUserMiddleware'
 )
 
