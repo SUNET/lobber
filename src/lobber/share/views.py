@@ -125,6 +125,7 @@ def user_self(req):
         if t.auth(req.user.username, 'r') and t.expiration_date > dt.now():
             lst.append(t)
     return render_to_response('share/user.html', {'user': req.user,
+                                                  'profile': req.user.profile.get(),
                                                   'torrents': lst})
 
 ################################################################################
