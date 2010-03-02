@@ -31,6 +31,13 @@ class Tag(models.Model):
 class UserProfile(models.Model):
     user = models.ForeignKey(User, unique=True, related_name='profile')
     display_name = models.CharField(max_length=256, blank=True)
-    entitlements = models.TextField()   # Space separated entls.
+    entitlements = models.TextField(blank=True) # Space separated entls.
     urlfilter = models.TextField() # Space separated simplified regexps.
-    expiration_date = models.DateTimeField()
+    expiration_date = models.DateTimeField(null=True)
+
+    def __unicode__(self):
+        return '%s (%s), entl="%s", filter="%s"' % (self.display_name,
+                                                    self.user,
+                                                    self.entitlements,
+                                                    self.urlfilter)
+                                                
