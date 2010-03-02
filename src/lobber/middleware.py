@@ -24,13 +24,6 @@ class KeyMiddleware(object):
                 " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
                 " before the KeyMiddleware class.")
         # Look for 'lkey' in query part of URL.
-        """
-        qd = None
-        if request.method == 'GET':
-            qd = request.GET
-        elif request.method == 'POST':
-            qd = request.POST
-        """
         secret = request.REQUEST.get('lkey', None)
         if not secret:
             return
