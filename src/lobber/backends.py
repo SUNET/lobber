@@ -1,6 +1,9 @@
 from django.contrib.auth.backends import ModelBackend
-
 from django.contrib.auth.models import User
+
+from lobber.settings import LOBBER_LOG_FILE
+import lobber.log
+logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 
 # The RemoteUserBackend is copied from Django 1.1 django/contrib/auth/backends.py
@@ -48,6 +51,8 @@ class RemoteUserBackend(ModelBackend):
         # built-in safeguards for multiple threads.
         if self.create_unknown_user:
             if len(username) > 30:
+                logger.warning("%s: username too long (remote_user=%s)"
+                               % (username, remote_user))
                 return                  # Fail.
             user, created = User.objects.get_or_create(username=username)
             if created:
@@ -71,7 +76,8 @@ class RemoteUserBackend(ModelBackend):
 
         By default, returns the username unchanged.
         """
-        return username
+        # Ugly hack for avoiding len(username) > 30.
+        return username.replace('@idp.protectnetwork.org', '@PNW.org')
 
     def configure_user(self, user):
         """

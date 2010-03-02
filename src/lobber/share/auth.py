@@ -62,10 +62,10 @@ def login_federated(request):
         logger.info("Accepted federated login for user %s from %s" % (request.user.username,
                                                                       req_meta(request, "REMOTE_ADDR")))
 
+        #FIXME: 'HTTP_ENTITLEMENT'
+
         # On a sucessful login, just do the redirect if one is requested
-        logger.info(request)
         next = request.REQUEST.get("next", None)
-	logger.info(next)
         if next is None:
 	    return render_to_response("share/login.html",{"user": request.user});
         else:

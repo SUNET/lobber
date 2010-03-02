@@ -121,7 +121,7 @@ def user_self(req):
         return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
     MAX = 40
     lst = []
-    for t in Torrent.objects.all().order_by('-creation')[:MAX]:
+    for t in Torrent.objects.all().order_by('-creation_date')[:MAX]:
         if t.auth(req.user.username, 'r') and t.expiration_date > dt.now():
             lst.append(t)
     return render_to_response('share/user.html', {'user': req.user,
