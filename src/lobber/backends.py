@@ -47,6 +47,8 @@ class RemoteUserBackend(ModelBackend):
         # instead we use get_or_create when creating unknown users since it has
         # built-in safeguards for multiple threads.
         if self.create_unknown_user:
+            if len(username) > 30:
+                return                  # Fail.
             user, created = User.objects.get_or_create(username=username)
             if created:
                 user = self.configure_user(user)
