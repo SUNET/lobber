@@ -6,31 +6,32 @@
 
 <form enctype="multipart/form-data" method="post" action="/nordushare/ulform/">
   <div class="ui-widget infopanel">
-     <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;"> 
-        <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
-           When creating the torrent file, the tracker announce URL must be: <br/> <code>{{ announce_url }}</p>
-     </div>
+    <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;"> 
+      <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+        When creating the torrent file, the tracker announce URL must be: <br/> <code>{{ announce_url }}</p>
+    </div>
   </div>
 
   <div class="ui-widget-content ui-corner-all infopanel" style="margin-top: 20px;">
-     <table>
-     {% for field in form %}
+    <table>
+      {% for field in form %}
         <tr>
-           {% if field.errors %}
-              <td colspan="2">{{ field.errors }}</td>
-           {% endif %}
-           </div>
+          {% if field.errors %}
+            <td colspan="2">{{ field.errors }}</td>
+          {% endif %}
         </tr>
         <tr>
-           <td>{{ field.label_tag }}</td><td><div class="ui-widget">{{ field }}</div></td>
+          <td>{{ field.label_tag }}</td>
+	  <td><div class="ui-widget">{{ field }}</div></td>
         </tr>
-     {% endfor %}
-     </table>
+      {% endfor %}
+    </table>
   </div>
+
   <br/>
   <div class="button">
-     <input type="submit" value="Share it!" />
-     <input type="button" onClick="document.location='/nordushare'" value="Cancel"/>
+    <input type="submit" value="Share it!" />
+    <input type="button" onClick="document.location='/nordushare'" value="Cancel"/>
   </div>
 </form>
 {% endblock %}
