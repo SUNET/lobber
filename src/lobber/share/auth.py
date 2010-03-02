@@ -62,6 +62,7 @@ def login_federated(request):
         # User profile.
         update_profile = False
         default_profile = {'user': request.user,
+                           'creator': request.user,
                            'display_name': '',
                            'entitlements': '',
                            'urlfilter': '.*',
