@@ -4,9 +4,10 @@ from django.contrib.auth.models import User
 
 class Torrent(models.Model):
     name = models.CharField(max_length=256, blank=True)
-    creation = models.DateTimeField(auto_now_add=True)
-    published = models.BooleanField(default=True)
-    expiration = models.DateTimeField()
+    description = models.TextField()
+    creator = models.ForeignKey(User, unique=True)
+    creation_date = models.DateTimeField(auto_now_add=True)
+    expiration_date = models.DateTimeField() # FIXME: Default to something reasonable.
     data = models.FileField(upload_to='torrents') # upload_to: directory in MEDIA_ROOT.
     hashval = models.CharField(max_length=40)
     acl = models.TextField()
@@ -25,15 +26,11 @@ class Torrent(models.Model):
         return False
 
 class Tag(models.Model):
-    value = models.CharField(max_length=64, blank=True, primary_key=True)
-
-class Key(models.Model):
-    secret = models.CharField(max_length=64, primary_key=True)
-    entitlements = models.TextField()         # Space separated entls.
-    urlfilter = models.TextField()            # Space separated simplified regexps.
-    comment = models.CharField(max_length=64) # F.ex. user (for audit trail).
+    value = models.CharField(max_length=128, blank=True, primary_key=True)
 
 class UserProfile(models.Model):
-    entitlements = models.TextField()
-    display_name = models.CharField(max_length=256, blank=True)
     user = models.ForeignKey(User, unique=True)
+    display_name = models.CharField(max_length=256, blank=True)
+    entitlements = models.TextField()   # Space separated entls.
+    urlfilter = models.TextField() # Space separated simplified regexps.
+    expiration_date = models.DateTimeField()
