@@ -7,11 +7,12 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
 from lobber.settings import BASE_DIR, MEDIA_ROOT, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL
-from lobber.share.models import Torrent, Tag
-from forms import UploadForm
+from lobber.share.models import Torrent, Tag, UserProfile
+from forms import UploadForm, CreateKeyForm
 
 ####################
 # Helper functions. FIXME: Move to some other file.
@@ -160,29 +161,29 @@ def api_keys(req):
                 lst.append(p)
         return lst
 
-    d = {'keys': _list(),
-         'user': req.user})
-    response = render_to_response('share/keys.html', d)
+    d = {'user': req.user}
         
     if req.method == 'GET':
-        pass                            # Default response is fine.
+        d.update({'keys': _list(req.user)})
+        response = render_to_response('share/keys.html', d)
     elif req.method == 'POST':
         form = CreateKeyForm(req.POST)
         if form.is_valid():
             # FIXME: Do random.seed() somewhere.
             # FIXME: Is 256 bits of random data proper?
-            user = User(username='key:%s' % sha256(getrandbits(256)),
+            user = User(username='key:%s' % sha256(str(getrandbits(256))).hexdigest()[:26],
                         password='')
             user.save()
-            profile = Profile(user=user,
-                              creator=req.user,
-                              urlfilter=form.cleaned_data['urlfilter'],
-                              entitlements=form.cleaned_data['entitlements'],
-                              expires=form.cleaned_data['expires'])
+            profile = UserProfile(user=user,
+                                  creator=req.user,
+                                  urlfilter=form.cleaned_data['urlfilter'],
+                                  entitlements=form.cleaned_data['entitlements'],
+                                  expiration_date=form.cleaned_data['expires'])
             profile.save()
-            d.update({'keys': _list()})
+            d.update({'keys': _list(req.user)})
+            response = render_to_response('share/keys.html', d)
         else:
-            response = render_to_response('share/create_key.html'
+            response = render_to_response('share/create_key.html',
                                           {'form': CreateKeyForm(),
                                            'user': req.user})
     return response
@@ -198,6 +199,6 @@ def api_key(req, inst):
     return response
 
 def key_form(req):
-    return render_to_response('share/create_key.html'
+    return render_to_response('share/create_key.html',
                               {'form': CreateKeyForm(),
                                'user': req.user})
