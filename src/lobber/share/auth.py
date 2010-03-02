@@ -59,10 +59,37 @@ def login_federated(request):
         if update:
             request.user.save()
 
+        # User profile.
+        update_profile = False
+        default_profile = {'user': request.user,
+                           'displayname': None,
+                           'entitlements': '',
+                           'urlfilter': '.*',
+                           'expiration_date': None}
+        profile, created = request.user.profile.get_or_create(defaults=default_profile)
+        if not created:
+            logger.error("Failed creating user profile for %s" % request.user.username)
+            return HttpResponseRedirect('/internal-error.html')
+
+        entitlement_in = request.META.get('HTTP_ENTITLEMENT')
+        if entitlement_in != "(null)":
+            profile.entitlements = entitlement_in
+            update_profile = True
+
+        if profile.displayname is None:
+            # FIXME: What was the idea with displayname again?
+            profile.displayname = '%s %s' % (request.user.first_name,
+                                             request.user.last_name)
+            update_profile = True
+
+        if update_profile:
+            profile.save()
+
+        logger.debug("User %s has profile %s" % (request.user.username, repr(profile)))
+        logger.debug("User %s has entls %s" % (request.user.username, profile.entitlements))
+
         logger.info("Accepted federated login for user %s from %s" % (request.user.username,
                                                                       req_meta(request, "REMOTE_ADDR")))
-
-        #FIXME: 'HTTP_ENTITLEMENT'
 
         # On a sucessful login, just do the redirect if one is requested
         next = request.REQUEST.get("next", None)
