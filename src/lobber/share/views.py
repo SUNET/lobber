@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 
 from lobber.settings import BASE_DIR, MEDIA_ROOT, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL
-from lobber.share.models import Torrent, Tag, Key
+from lobber.share.models import Torrent, Tag
 from forms import UploadForm
 
 ####################
@@ -34,8 +34,8 @@ def add_hash_to_whitelist(thash):
     
 def list_torrents(max=40):
     lst = []
-    for t in Torrent.objects.all().order_by('-creation')[:max]:
-        if t.published and t.expiration > dt.now():
+    for t in Torrent.objects.all().order_by('-creation_date')[:max]:
+        if t.expiration_date > dt.now(): # FIXME: auth()
             lst.append(t)
     return lst
 
@@ -50,9 +50,9 @@ def _store_torrent(req, form):
     f.write(torrent_file_content)
     f.close()
     t = Torrent(acl = 'user:%s#w' % req.user.username,
+                creator = req.user,
                 name = form.cleaned_data['name'],
-                published = form.cleaned_data['published'],
-                expiration = form.cleaned_data['expires'],
+                expiration_date = form.cleaned_data['expires'],
                 data = '%s.torrent' % torrent_hash,
                 hashval = torrent_hash)
     t.save()
@@ -122,7 +122,7 @@ def user_self(req):
     MAX = 40
     lst = []
     for t in Torrent.objects.all().order_by('-creation')[:MAX]:
-        if t.auth(req.user.username, 'r') and t.expiration > dt.now():
+        if t.auth(req.user.username, 'r') and t.expiration_date > dt.now():
             lst.append(t)
     return render_to_response('share/user.html', {'user': req.user,
                                                   'torrents': lst})
