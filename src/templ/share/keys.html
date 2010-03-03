@@ -9,15 +9,13 @@
 <div id="accordion">
   {% for profile in keys %}
     <div>
-      <h3><a href="#">{{ profile.user.username }}</a></h3>
+      <h3><a href="#">{{ profile.get_username }}</a></h3>
       <div>
-        Entitlements: {{ profile.entitlements }}
-      </div>
-      <div>
-	URL filter: {{ profile.urlfilter }}
-      </div>
-      <div>
-	Expiration date: {{ profile.expiration_date }}
+	<table>
+          <tr><td>Entitlements: {{ profile.entitlements }}</td></tr>
+	  <tr><td>URL filter: {{ profile.urlfilter }}</td></tr>
+	  <tr><td>Expiration date: {{ profile.expiration_date }}</td></tr>
+	</table>
       </div>
     </div>
   {% endfor %}
