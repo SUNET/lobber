@@ -65,24 +65,25 @@ def _store_torrent(req, form):
     # FIXME: Go to user page, with newly created torrent highlighted.
     return HttpResponseRedirect('../%s' % t.id)
 
-def _create_key_user(urlfilter, entitlements, expires=None):
+def _create_key_user(creator, urlfilter, entitlements, expires=None):
     # FIXME: Do random.seed() somewhere.
     # FIXME: Is 256 bits of random data proper?
     # FIXME: Don't chop the digest!!!  Necessary for now, since
     # Djangos User class allows for max 30 characters user names.
-    username = 'key:%s' % sha256(str(getrandbits(256))).hexdigest()[:26]
+    secret = sha256(str(getrandbits(256))).hexdigest()[:26]
+    username = 'key:%s' % secret
     user = User(username=username, password='')
     user.save()
 
     lst = map(lambda s: s.replace('$self', username), entitlements.split())
-    entls = ' '.join(map(lambda e: 'user:%s:%s' % (req.user.username, e), lst))
+    entls = ' '.join(map(lambda e: 'user:%s:%s' % (creator.username, e), lst))
     profile = UserProfile(user=user,
-                          creator=req.user,
+                          creator=creator,
                           urlfilter=' '.join(urlfilter.split()),
                           entitlements=entls,
                           expiration_date=expires)
     profile.save()
-    return username
+    return secret
     
 ####################
 # External functions, called from urls.py.
@@ -138,10 +139,16 @@ def gimme_url_for_reading_torrent(req, tid):
     try:
         t = Torrent.objects.get(id=int(tid))
     except ObjectDoesNotExist:
-        return HttpResponse('Sorry, torrent %d not found<p><a href="/">Start page</a>')
-    key = _create_key_user(urlfilter='torrent/%s' % tid, # FIXME: Append '$'?
+        return HttpResponse('Sorry, torrent %d not found<p><a href="%s">Start page</a>'  %
+                            NORDUSHARE_URL)
+    key = _create_key_user(creator=req.user,
+                           urlfilter='torrent/%s' % tid, # FIXME: Append '$'?
                            entitlements='user:%s:$self' % req.user.username)
     t.add_ace('user:%s:%s#r' % (req.user.username, key))
+    #link = '%s/%s?lkey=%s' % (NORDUSHARE_URL, tid, key)
+    link = '%s/torrent/%s.torrent?lkey=%s' % (NORDUSHARE_URL, t.hashval, key)
+    return HttpResponse('Here\'s your link to share: <a href=%s>%s</a><p><a href="%s">Start page</a>' %
+                        (link, link, NORDUSHARE_URL))
 
 ################################################################################
 # RESTful API.
@@ -213,7 +220,8 @@ def api_keys(req):
     elif req.method == 'POST':
         form = CreateKeyForm(req.POST)
         if form.is_valid():
-            _create_key_user(form.cleaned_data['urlfilter'],
+            _create_key_user(req.user,
+                             form.cleaned_data['urlfilter'],
                              form.cleaned_data['entitlements'],
                              form.cleaned_data['expires'])
             d.update({'keys': _list(req.user)})
