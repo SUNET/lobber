@@ -40,8 +40,12 @@ def add_hash_to_whitelist(thash):
     os.kill(pid, 1)
     
 def _store_torrent(req, form):
-    # Store torrent file in the file system and add its hash
-    # to the trackers whitelist.
+    # FIXME: Move to api_torrents() -- this is (part of) POST torrent/
+    # (create).
+    """
+    Store torrent file in the file system and add its hash to the
+    trackers whitelist.
+    """
     torrent_file = req.FILES['file']
     torrent_file_content = torrent_file.read()
     torrent_hash = do_hash(torrent_file_content)
@@ -87,14 +91,17 @@ def upload_form(req):
         
 @login_required
 def torrent_view(req, handle_id):
+    # FIXME: Move to api_torrents() -- this is GET torrent/T with
+    # representation html.
     t = Torrent.objects.get(id__exact = int(handle_id))
     return render_to_response('share/torrent.html', {'torrent': t})
 
 @login_required
 def user_self(req):
-    MAX = 40
+    # FIXME: Move to api_user() -- this is GET user/U with
+    # representation html.
     lst = []
-    for t in Torrent.objects.all().order_by('-creation_date')[:MAX]:
+    for t in Torrent.objects.all().order_by('-creation_date')[:40]:
         if t.auth(req.user.username, 'r') and t.expiration_date > dt.now():
             lst.append(t)
     return render_to_response('share/user.html', {'user': req.user,
@@ -110,7 +117,7 @@ def user_self(req):
 def api_torrents(req):
     """
     GET ==> list torrents
-    PUT/POST ==> create torrent
+    POST ==> create torrent
     """
     response = HttpResponse('NYI: not yet implemented')
 
@@ -138,6 +145,7 @@ def api_torrent(req, inst):
 
     fn = '%s/torrents/%s' % (MEDIA_ROOT, inst)
     if req.method == 'GET':
+        # FIXME: Do this only if representation is raw.
         response = HttpResponse(FileWrapper(file(fn)), content_type='application/x-bittorrent')
         response['Content-Length'] = os.path.getsize(fn)
         # FIXME: Find Torrent object and use .name instead of filename.
