@@ -24,6 +24,10 @@ def do_hash(data):
     return sha1(bencode(info)).hexdigest()
 
 def add_hash_to_whitelist(thash):
+    """
+    Add THASH to tracker whitelist file and send signal HUP to the
+    tracker.
+    """
     # Append hash to whitelist file.
     wlf = file('%s/%s' % (BASE_DIR, 'tracker/whitelist'), 'a')
     wlf.write(thash + '\n')
