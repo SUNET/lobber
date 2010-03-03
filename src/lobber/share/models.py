@@ -41,4 +41,10 @@ class UserProfile(models.Model):
                                                     self.user,
                                                     self.entitlements,
                                                     self.urlfilter)
-                                                
+    def get_username(self):
+        username = self.user.username
+        if username.startswith('key:'):
+            username = username[4:]
+        return username
+    
+            
