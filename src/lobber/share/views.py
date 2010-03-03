@@ -155,8 +155,9 @@ def api_keys(req):
     def _list(user):
         lst = []
         for p in UserProfile.objects.filter(creator=user):
-            if p.expiration_date > dt.now():
-                lst.append(p)
+            if p.expiration_date and p.expiration_date <= dt.now():
+                continue
+            lst.append(p)
         return lst
 
     d = {'user': req.user}
@@ -175,11 +176,12 @@ def api_keys(req):
             user = User(username='key:%s' % sha256(str(getrandbits(256))).hexdigest()[:26],
                         password='')
             user.save()
-            entls = map(lambda e: 'user:%s:%s' % (req.user.username, e),
-                        form.cleaned_data['entitlements'])
+            urlfilter = ' '.join(form.cleaned_data['urlfilter'].split())
+            entls = ' '.join(map(lambda e: 'user:%s:%s' % (req.user.username, e),
+                                 form.cleaned_data['entitlements'].split()))
             profile = UserProfile(user=user,
                                   creator=req.user,
-                                  urlfilter=form.cleaned_data['urlfilter'],
+                                  urlfilter=urlfilter,
                                   entitlements=entls,
                                   expiration_date=form.cleaned_data['expires'])
             profile.save()
