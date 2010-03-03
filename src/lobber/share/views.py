@@ -63,9 +63,8 @@ def _store_torrent(req, form):
 ####################
 # External functions, called from urls.py.
 
+@login_required
 def upload(req):
-    if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
     d = {'sessionid': req.session.session_key,
          'announce_url': ANNOUNCE_URL,
          'baseurl': BASE_UI_URL,
@@ -73,9 +72,8 @@ def upload(req):
     return render_to_response('share/launch.jnlp', d,
                               mimetype='application/x-java-jnlp-file')
 
+@login_required
 def upload_form(req):
-    if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
     if req.method == 'POST':          # User posted data -- handle it.
         form = UploadForm(req.POST, req.FILES)
         if form.is_valid():
@@ -87,15 +85,13 @@ def upload_form(req):
                                'user': req.user,
                                'form': form})
         
+@login_required
 def torrent_view(req, handle_id):
-    if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
     t = Torrent.objects.get(id__exact = int(handle_id))
     return render_to_response('share/torrent.html', {'torrent': t})
 
+@login_required
 def user_self(req):
-    if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
     MAX = 40
     lst = []
     for t in Torrent.objects.all().order_by('-creation_date')[:MAX]:
@@ -110,13 +106,12 @@ def user_self(req):
 
 ####################
 # Torrents.
+@login_required
 def api_torrents(req):
     """
     GET ==> list torrents
     PUT/POST ==> create torrent
     """
-    if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
     response = HttpResponse('NYI: not yet implemented')
 
     def _list(user, max=40):
@@ -132,14 +127,13 @@ def api_torrents(req):
                                        'user': req.user})
     return response
 
+@login_required
 def api_torrent(req, inst):
     """
     GET ==> get torrent
     ??? PUT/POST ==> update torrent ???
     DELETE ==> delete torrent
     """
-    if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
     response = HttpResponse('NYI: not yet implemented')
 
     fn = '%s/torrents/%s' % (MEDIA_ROOT, inst)
@@ -152,14 +146,12 @@ def api_torrent(req, inst):
 
 ####################
 # Keys.
+@login_required
 def api_keys(req):
     """
     GET ==> list keys
     POST ==> create key
     """
-    if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
-
     def _list(user):
         lst = []
         for p in UserProfile.objects.filter(creator=user):
@@ -199,13 +191,12 @@ def api_keys(req):
                                            'user': req.user})
     return response
 
+@login_required
 def api_key(req, inst):
     """
     GET ==> get key
     DELETE ==> delete key
     """
-    if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
     response = HttpResponse('NYI: not yet implemented')
     return response
 
