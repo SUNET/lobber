@@ -116,7 +116,9 @@ def torrent_view(req, tid):
     try:
         t = Torrent.objects.get(id=int(tid))
     except ObjectDoesNotExist:
-        return HttpResponse('Sorry, torrent %d not found<p><a href="/">Start page</a>')
+        return HttpResponse(
+            'Sorry, torrent %s not found<p><a href="%s">Start page</a>' %
+            (tid, NORDUSHARE_URL))
     return render_to_response('share/torrent.html', {'torrent': t})
 
 @login_required
