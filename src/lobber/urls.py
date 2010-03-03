@@ -11,6 +11,8 @@ urlpatterns = patterns('',
     (r'^nordushare/logout/$', 'lobber.share.auth.logout'),
     (r'^nordushare/', include('lobber.share.urls')),
     (r'^admin/', include(admin.site.urls)),
+    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
+        {'document_root': '/home/nordushare/web/static'}),
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
