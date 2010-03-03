@@ -64,6 +64,24 @@ def _store_torrent(req, form):
     # FIXME: Go to user page, with newly created torrent highlighted.
     return HttpResponseRedirect('../%s' % t.id)
 
+def _create_key_user(urlfilter, entitlements, expires):
+    # FIXME: Do random.seed() somewhere.
+    # FIXME: Is 256 bits of random data proper?
+    # FIXME: Don't chop the digest!!!  Necessary for now, since
+    # Djangos User class allows for max 30 characters user names.
+    username = 'key:%s' % sha256(str(getrandbits(256))).hexdigest()[:26]
+    user = User(username=username, password='')
+    user.save()
+
+    lst = map(lambda s: s.replace('$self', username), entitlements.split())
+    entls = ' '.join(map(lambda e: 'user:%s:%s' % (req.user.username, e), lst))
+    profile = UserProfile(user=user,
+                          creator=req.user,
+                          urlfilter=' '.join(urlfilter.split()),
+                          entitlements=entls,
+                          expiration_date=expires)
+    profile.save()
+    
 ####################
 # External functions, called from urls.py.
 
@@ -107,6 +125,7 @@ def user_self(req):
     return render_to_response('share/user.html', {'user': req.user,
                                                   'profile': req.user.profile.get(),
                                                   'torrents': lst})
+
 
 ################################################################################
 # RESTful API.
@@ -178,24 +197,9 @@ def api_keys(req):
     elif req.method == 'POST':
         form = CreateKeyForm(req.POST)
         if form.is_valid():
-            # FIXME: Do random.seed() somewhere.
-            # FIXME: Is 256 bits of random data proper?
-            # FIXME: Don't chop the digest!!!  Necessary for now,
-            # since Djangos User class allows for max 30 characters
-            # user names.
-            username = 'key:%s' % sha256(str(getrandbits(256))).hexdigest()[:26]
-            user = User(username=username, password='')
-            user.save()
-            urlfilter = ' '.join(form.cleaned_data['urlfilter'].split())
-            lst = map(lambda s: s.replace('$self', username),
-                      form.cleaned_data['entitlements'].split())
-            entls = ' '.join(map(lambda e: 'user:%s:%s' % (req.user.username, e), lst))
-            profile = UserProfile(user=user,
-                                  creator=req.user,
-                                  urlfilter=urlfilter,
-                                  entitlements=entls,
-                                  expiration_date=form.cleaned_data['expires'])
-            profile.save()
+            _create_key_user(form.cleaned_data['urlfilter'],
+                             form.cleaned_data['entitlements'],
+                             form.cleaned_data['expires'])
             d.update({'keys': _list(req.user)})
             response = render_to_response('share/keys.html', d)
         else:
