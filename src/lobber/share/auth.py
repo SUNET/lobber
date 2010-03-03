@@ -14,7 +14,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 
-from lobber.settings import BASE_DIR, MEDIA_ROOT, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL, LOBBER_LOG_FILE
+from lobber.settings import LOBBER_LOG_FILE
 
 import lobber.log
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
