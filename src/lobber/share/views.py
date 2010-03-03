@@ -183,12 +183,13 @@ def api_keys(req):
             # FIXME: Don't chop the digest!!!  Necessary for now,
             # since Djangos User class allows for max 30 characters
             # user names.
-            user = User(username='key:%s' % sha256(str(getrandbits(256))).hexdigest()[:26],
-                        password='')
+            username = 'key:%s' % sha256(str(getrandbits(256))).hexdigest()[:26]
+            user = User(username=username, password='')
             user.save()
             urlfilter = ' '.join(form.cleaned_data['urlfilter'].split())
-            entls = ' '.join(map(lambda e: 'user:%s:%s' % (req.user.username, e),
-                                 form.cleaned_data['entitlements'].split()))
+            lst = map(lambda e: 'user:%s:%s' % (req.user.username, e),
+                      form.cleaned_data['entitlements'].split())
+            entls = ' '.join(map(lambda s: s.replace('$self', username), lst))
             profile = UserProfile(user=user,
                                   creator=req.user,
                                   urlfilter=urlfilter,
