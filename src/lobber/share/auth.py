@@ -13,6 +13,7 @@ from django.contrib import auth
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.db import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
 
 from lobber.settings import LOBBER_LOG_FILE
 

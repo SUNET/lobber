@@ -5,7 +5,7 @@ import re
 
 from django.contrib import auth
 from django.contrib.auth.models import User
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 
 from lobber.share.models import UserProfile
 from lobber.settings import LOBBER_LOG_FILE, APPLICATION_URL
