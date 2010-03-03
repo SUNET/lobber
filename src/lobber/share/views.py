@@ -167,7 +167,7 @@ def api_keys(req):
                 continue
             if not p.user.username.startswith('key:'):
                 continue
-            lst.append(p[4:])
+            lst.append(p)
         return lst
 
     d = {'user': req.user}
