@@ -186,6 +186,20 @@ url-filter := <filter-re>+
 
 key := sha256(random value)
 
+**** Default ACL's and default entitlements
+- When creating a torrent, its ACL is set to 'user:<login>#w'.
+
+The question is: What's the 'login' when not logged in but coming in
+via a key?  And the answer to that is that the user name is
+'key:<secret>'.  So when creating a torrent using a key, it's
+important that the ACL is extended with
+f.ex. 'user:<user.creator.username>#w', if the creator of the key
+should own the torrent created using the key.
+
+- When creating a key, the entitlement is set and never changed after
+  that.  This is important for tracking ownership of torrents, audit
+  aside.
+**** Permissions
 Permission #r:
   - list torrent
   - read torrent
@@ -195,12 +209,13 @@ Permission #w:
   - write acl on torrent (ace := entitlement carried (or "below"?))
   - tag torrent (tag := entitlement carried or below)
 
+**** Use cases
 Use case #1: User U sharing torrent T with non-authenticated user
              (prereq: T has an ace 'user:<U>#w')
 1. POST https://.../key   # key with 'key/' and 'user:<U>' required
         filter = 'torrent/<T>'
         entls = 'user:<U>:$self'   # note: '$self' is magic and expands to
-                                   # the created key
+                                   # the newly created key
    ==> K   # new key
 2. POST https:/.../acl/T   # key with 'acl/T' and 'user:<U>:<K>' required
         ace = 'user:<U>:<K>#r'
