@@ -61,6 +61,8 @@ def _store_torrent(req, form):
     return HttpResponseRedirect('../%s' % t.id)
 
 ####################
+# External functions, called from urls.py.
+
 def upload(req):
     if not req.user.is_authenticated():
         return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
