@@ -102,7 +102,7 @@ See [[file:src/lobber/share/models.py][file:~/p/lobber/src/lobber/share/models.p
 
 - The canonical form of a URL is
 
-  https://HOST.DOMAIN.TLD/APPLICATION/OBJECT-TYPE/[INSTANCE][.REPRESENTATION]][?lobberkey=SECRET]
+  https://HOST.DOMAIN.TLD/APPLICATION/OBJECT-TYPE/[INSTANCE][.REPRESENTATION]][?lkey=SECRET]
 
 
   | instance / request method | GET  | POST/PUT | DELETE |

@@ -59,13 +59,38 @@ def login_federated(request):
         if update:
             request.user.save()
 
+        # User profile.
+        update_profile = False
+        default_profile = {'user': request.user,
+                           'creator': request.user,
+                           'display_name': '',
+                           'entitlements': '',
+                           'urlfilter': '.*',
+                           'expiration_date': None}
+        profile, created = request.user.profile.get_or_create(defaults=default_profile)
+        if created:
+            logger.info("Created user profile for user %s" % request.user.username)
+
+        entitlement_in = request.META.get('HTTP_ENTITLEMENT')
+        if entitlement_in:
+            profile.entitlements = entitlement_in
+            update_profile = True
+
+        if not profile.display_name:
+            # FIXME: What was the idea with display_name again?
+            profile.display_name = '%s %s' % (request.user.first_name,
+                                              request.user.last_name)
+            update_profile = True
+
+        if update_profile:
+            profile.save()
+
+        logger.debug("User %s profile: %s" % (request.user.username, repr(profile)))
         logger.info("Accepted federated login for user %s from %s" % (request.user.username,
                                                                       req_meta(request, "REMOTE_ADDR")))
 
         # On a sucessful login, just do the redirect if one is requested
-        logger.info(request)
         next = request.REQUEST.get("next", None)
-	logger.info(next)
         if next is None:
 	    return render_to_response("share/login.html",{"user": request.user});
         else:

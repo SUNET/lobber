@@ -1,15 +1,18 @@
 import os
 from datetime import datetime as dt
+from hashlib import sha256
+from random import getrandbits
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
 from lobber.settings import BASE_DIR, MEDIA_ROOT, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL
-from lobber.share.models import Torrent, Tag, Key
-from forms import UploadForm
+from lobber.share.models import Torrent, Tag, UserProfile
+from forms import UploadForm, CreateKeyForm
 
 ####################
 # Helper functions. FIXME: Move to some other file.
@@ -32,13 +35,6 @@ def add_hash_to_whitelist(thash):
     # HUP tracker.
     os.kill(pid, 1)
     
-def list_torrents(max=40):
-    lst = []
-    for t in Torrent.objects.all().order_by('-creation')[:max]:
-        if t.published and t.expiration > dt.now():
-            lst.append(t)
-    return lst
-
 def _store_torrent(req, form):
     # Store torrent file in the file system and add its hash
     # to the trackers whitelist.
@@ -50,23 +46,17 @@ def _store_torrent(req, form):
     f.write(torrent_file_content)
     f.close()
     t = Torrent(acl = 'user:%s#w' % req.user.username,
+                creator = req.user,
                 name = form.cleaned_data['name'],
-                published = form.cleaned_data['published'],
-                expiration = form.cleaned_data['expires'],
+                expiration_date = form.cleaned_data['expires'],
                 data = '%s.torrent' % torrent_hash,
                 hashval = torrent_hash)
     t.save()
     add_hash_to_whitelist(torrent_hash)
+    # FIXME: Go to user page, with newly created torrent highlighted.
     return HttpResponseRedirect('../%s' % t.id)
 
 ####################
-def torrent_list(req):
-    if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
-    return render_to_response('share/index.html',
-                              {'torrents': list_torrents(),
-				'user': req.user})
-
 def upload(req):
     if not req.user.is_authenticated():
         return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
@@ -97,42 +87,49 @@ def torrent_view(req, handle_id):
     t = Torrent.objects.get(id__exact = int(handle_id))
     return render_to_response('share/torrent.html', {'torrent': t})
 
-# def login(req):
-#     if req.method != 'POST':
-#         return render_to_response('share/login.html', {'form': LoginForm()})
-#     else:
-#         form = LoginForm(req.POST)
-#         if form.is_valid():
-#             username = form.cleaned_data['username']
-#             pw = form.cleaned_data['pw']
-#             print username, pw
-#             user = authenticate(username=username, passsword=pw)
-#             if not user:
-#                 return HttpResponse("bad username or password")
-#             else:
-#                 if user.is_active:
-#                     login(req, user)
-#                     return HttpResponseRedirect('/') # FIXME0: Redirect to "my torrents".  FIXME1: Find out where user came from and redirect there.
-#                 else:
-#                     return HttpResponse("account inactive")
-
 def user_self(req):
     if not req.user.is_authenticated():
         return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
     MAX = 40
     lst = []
-    for t in Torrent.objects.all().order_by('-creation')[:MAX]:
-        if t.auth(req.user.username, 'r') and t.expiration > dt.now():
+    for t in Torrent.objects.all().order_by('-creation_date')[:MAX]:
+        if t.auth(req.user.username, 'r') and t.expiration_date > dt.now():
             lst.append(t)
     return render_to_response('share/user.html', {'user': req.user,
+                                                  'profile': req.user.profile.get(),
                                                   'torrents': lst})
 
 ################################################################################
 # RESTful API.
+
+####################
+# Torrents.
+def api_torrents(req):
+    """
+    GET ==> list torrents
+    PUT/POST ==> create torrent
+    """
+    if not req.user.is_authenticated():
+        return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
+    response = HttpResponse('NYI: not yet implemented')
+
+    def _list(user, max=40):
+        lst = []
+        for t in Torrent.objects.all().order_by('-creation_date')[:max]:
+            if t.auth(user.username, 'r') and t.expiration_date > dt.now():
+                lst.append(t)
+        return lst
+
+    if req.method == 'GET':
+        response = render_to_response('share/index.html',
+                                      {'torrents': _list(req.user),
+                                       'user': req.user})
+    return response
+
 def api_torrent(req, inst):
     """
     GET ==> get torrent
-    PUT/POST ==> update torrent
+    ??? PUT/POST ==> update torrent ???
     DELETE ==> delete torrent
     """
     if not req.user.is_authenticated():
@@ -147,13 +144,61 @@ def api_torrent(req, inst):
         response['Content-Disposition'] = 'filename=%s.torrent' % inst
     return response
 
-def api_torrents(req):
+####################
+# Keys.
+def api_keys(req):
     """
-    GET ==> list torrents
-    PUT/POST ==> create torrent
+    GET ==> list keys
+    POST ==> create key
+    """
+    if not req.user.is_authenticated():
+        return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
+
+    def _list(user):
+        lst = []
+        for p in UserProfile.objects.filter(creator=user):
+            if p.expiration_date > dt.now():
+                lst.append(p)
+        return lst
+
+    d = {'user': req.user}
+        
+    if req.method == 'GET':
+        d.update({'keys': _list(req.user)})
+        response = render_to_response('share/keys.html', d)
+    elif req.method == 'POST':
+        form = CreateKeyForm(req.POST)
+        if form.is_valid():
+            # FIXME: Do random.seed() somewhere.
+            # FIXME: Is 256 bits of random data proper?
+            user = User(username='key:%s' % sha256(str(getrandbits(256))).hexdigest()[:26],
+                        password='')
+            user.save()
+            profile = UserProfile(user=user,
+                                  creator=req.user,
+                                  urlfilter=form.cleaned_data['urlfilter'],
+                                  entitlements=form.cleaned_data['entitlements'],
+                                  expiration_date=form.cleaned_data['expires'])
+            profile.save()
+            d.update({'keys': _list(req.user)})
+            response = render_to_response('share/keys.html', d)
+        else:
+            response = render_to_response('share/create_key.html',
+                                          {'form': CreateKeyForm(),
+                                           'user': req.user})
+    return response
+
+def api_key(req, inst):
+    """
+    GET ==> get key
+    DELETE ==> delete key
     """
     if not req.user.is_authenticated():
         return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
     response = HttpResponse('NYI: not yet implemented')
-
     return response
+
+def key_form(req):
+    return render_to_response('share/create_key.html',
+                              {'form': CreateKeyForm(),
+                               'user': req.user})
