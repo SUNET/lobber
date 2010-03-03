@@ -187,9 +187,9 @@ def api_keys(req):
             user = User(username=username, password='')
             user.save()
             urlfilter = ' '.join(form.cleaned_data['urlfilter'].split())
-            lst = map(lambda e: 'user:%s:%s' % (req.user.username, e),
+            lst = map(lambda s: s.replace('$self', username),
                       form.cleaned_data['entitlements'].split())
-            entls = ' '.join(map(lambda s: s.replace('$self', username), lst))
+            entls = ' '.join(map(lambda e: 'user:%s:%s' % (req.user.username, e), lst))
             profile = UserProfile(user=user,
                                   creator=req.user,
                                   urlfilter=urlfilter,
