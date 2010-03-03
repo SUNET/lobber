@@ -171,13 +171,18 @@ def api_keys(req):
         if form.is_valid():
             # FIXME: Do random.seed() somewhere.
             # FIXME: Is 256 bits of random data proper?
+            # FIXME: Don't chop the digest!!!  Necessary for now,
+            # since Djangos User class allows for max 30 characters
+            # user names.
             user = User(username='key:%s' % sha256(str(getrandbits(256))).hexdigest()[:26],
                         password='')
             user.save()
+            entls = map(lambda e: 'user:%s:%s' % (req.user.username, e),
+                        form.cleaned_data['entitlements'])
             profile = UserProfile(user=user,
                                   creator=req.user,
                                   urlfilter=form.cleaned_data['urlfilter'],
-                                  entitlements=form.cleaned_data['entitlements'],
+                                  entitlements=entls,
                                   expiration_date=form.cleaned_data['expires'])
             profile.save()
             d.update({'keys': _list(req.user)})
