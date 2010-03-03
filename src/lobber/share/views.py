@@ -59,7 +59,7 @@ def _store_torrent(req, form):
 ####################
 def upload(req):
     if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
+        return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
     d = {'sessionid': req.session.session_key,
          'announce_url': ANNOUNCE_URL,
          'baseurl': BASE_UI_URL,
@@ -69,7 +69,7 @@ def upload(req):
 
 def upload_form(req):
     if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
+        return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
     if req.method == 'POST':          # User posted data -- handle it.
         form = UploadForm(req.POST, req.FILES)
         if form.is_valid():
@@ -83,13 +83,13 @@ def upload_form(req):
         
 def torrent_view(req, handle_id):
     if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
+        return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
     t = Torrent.objects.get(id__exact = int(handle_id))
     return render_to_response('share/torrent.html', {'torrent': t})
 
 def user_self(req):
     if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
+        return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
     MAX = 40
     lst = []
     for t in Torrent.objects.all().order_by('-creation_date')[:MAX]:
@@ -110,7 +110,7 @@ def api_torrents(req):
     PUT/POST ==> create torrent
     """
     if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
+        return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
     response = HttpResponse('NYI: not yet implemented')
 
     def _list(user, max=40):
@@ -133,7 +133,7 @@ def api_torrent(req, inst):
     DELETE ==> delete torrent
     """
     if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
+        return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
     response = HttpResponse('NYI: not yet implemented')
 
     fn = '%s/torrents/%s' % (MEDIA_ROOT, inst)
@@ -152,7 +152,7 @@ def api_keys(req):
     POST ==> create key
     """
     if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
+        return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
 
     def _list(user):
         lst = []
@@ -194,7 +194,7 @@ def api_key(req, inst):
     DELETE ==> delete key
     """
     if not req.user.is_authenticated():
-        return HttpResponseRedirect('%s/?next=%s' % (LOGIN_URL, req.path))
+        return HttpResponseRedirect('%s?next=%s' % (LOGIN_URL, req.path))
     response = HttpResponse('NYI: not yet implemented')
     return response
 

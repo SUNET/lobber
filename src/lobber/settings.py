@@ -84,7 +84,6 @@ TEMPLATE_DIRS = (
 )
 
 LOGIN_URL = '/nordushare/login/'
-LOGIN_REDIRECT_URL = '/nordushare/'
 
 INSTALLED_APPS = (
     'django.contrib.auth',
