@@ -14,5 +14,6 @@ urlpatterns = patterns(
     (r'^user/$', 'user_self'),          # Short for self.
     (r'^upload/$', 'upload'),
     (r'^ulform/$', 'upload_form'),
-    (r'^(?P<handle_id>\d+)$', 'torrent_view'),
+    (r'^gufrt/(?P<tid>.+)$', 'gimme_url_for_reading_torrent'),
+    (r'^(?P<tid>\d+)$', 'torrent_view'),
     )

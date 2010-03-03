@@ -9,6 +9,7 @@ from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 
 from lobber.settings import BASE_DIR, MEDIA_ROOT, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL
 from lobber.share.models import Torrent, Tag, UserProfile
@@ -64,7 +65,7 @@ def _store_torrent(req, form):
     # FIXME: Go to user page, with newly created torrent highlighted.
     return HttpResponseRedirect('../%s' % t.id)
 
-def _create_key_user(urlfilter, entitlements, expires):
+def _create_key_user(urlfilter, entitlements, expires=None):
     # FIXME: Do random.seed() somewhere.
     # FIXME: Is 256 bits of random data proper?
     # FIXME: Don't chop the digest!!!  Necessary for now, since
@@ -81,6 +82,7 @@ def _create_key_user(urlfilter, entitlements, expires):
                           entitlements=entls,
                           expiration_date=expires)
     profile.save()
+    return username
     
 ####################
 # External functions, called from urls.py.
@@ -108,10 +110,13 @@ def upload_form(req):
                                'form': form})
         
 @login_required
-def torrent_view(req, handle_id):
+def torrent_view(req, tid):
     # FIXME: Move to api_torrents() -- this is GET torrent/T with
     # representation html.
-    t = Torrent.objects.get(id__exact = int(handle_id))
+    try:
+        t = Torrent.objects.get(id=int(tid))
+    except ObjectDoesNotExist:
+        return HttpResponse('Sorry, torrent %d not found<p><a href="/">Start page</a>')
     return render_to_response('share/torrent.html', {'torrent': t})
 
 @login_required
@@ -126,6 +131,15 @@ def user_self(req):
                                                   'profile': req.user.profile.get(),
                                                   'torrents': lst})
 
+@login_required
+def gimme_url_for_reading_torrent(req, tid):
+    try:
+        t = Torrent.objects.get(id=int(tid))
+    except ObjectDoesNotExist:
+        return HttpResponse('Sorry, torrent %d not found<p><a href="/">Start page</a>')
+    key = _create_key_user(urlfilter='torrent/%s' % tid, # FIXME: Append '$'?
+                           entitlements='user:%s:$self' % req.user.username)
+    t.add_ace('user:%s:%s#r' % (req.user.username, key))
 
 ################################################################################
 # RESTful API.

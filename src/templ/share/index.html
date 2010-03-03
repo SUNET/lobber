@@ -13,10 +13,14 @@
 <div id="accordion">
     {% for t in torrents %}
       <div>
-         <h3><a href="#">{{ t.name }}</a></h3>
-         <div>
-            <a href="torrent/{{t.data.url}}">{{ t.name }}</a> (shared at {{t.creation_date}})
-         </div>
+	<h3><a href="#">{{ t.name }}</a></h3>
+	<div>
+	  <table>
+	    <tr><td><a href="torrent/{{t.data.url}}">{{ t.name }}</a></td></tr>
+	    <tr><td>Shared at {{t.creation_date}}</td></tr>
+	    <tr><td><a href="gufrt/{{t.id}}">create link</a></td></tr>
+	  </table>
+	</div>
       </div>
     {% endfor %}
 </div>

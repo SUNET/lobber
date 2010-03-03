@@ -25,6 +25,9 @@ class Torrent(models.Model):
                     return True
         return False
 
+    def add_ace(self, ace):
+        self.acl += ace
+
 class Tag(models.Model):
     value = models.CharField(max_length=128, blank=True, primary_key=True)
 
