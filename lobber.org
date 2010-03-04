@@ -287,9 +287,9 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 ** For Uutrecht
 - [ ] web api
       - GET torrent/<inst>
-- [ ] more web: create keys
+- [X] more web: create keys
 ** General (also listed in Jira)
-- [ ] [[https://project.nordu.net/browse/LOBBERDEV-1][Federated login]]
+- [X] [[https://project.nordu.net/browse/LOBBERDEV-1][Federated login]]
 - [ ] Send email to selected users with link to torrent file (after upload)
 - [ ] http API (with ACL:s)
 - [ ] remove 'nordushare' from url
