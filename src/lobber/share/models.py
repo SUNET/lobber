@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 class Torrent(models.Model):
     name = models.CharField(max_length=256, blank=True)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     creator = models.ForeignKey(User)
     creation_date = models.DateTimeField(auto_now_add=True)
     expiration_date = models.DateTimeField() # FIXME: Default to something reasonable.

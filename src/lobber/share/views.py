@@ -19,10 +19,12 @@ from forms import UploadForm, CreateKeyForm
 # Helper functions. FIXME: Move to some other file.
 from BitTorrent.bencode import bdecode, bencode
 from hashlib import sha1
-def do_hash(data):
-    cont = bdecode(data)
-    info = cont['info']
-    return sha1(bencode(info)).hexdigest()
+def _torrent_info(data):
+    """
+    Return (name, hash) of torrent file.
+    """
+    info = bdecode(data)['info']
+    return info['name'], sha1(bencode(info)).hexdigest()
 
 def add_hash_to_whitelist(thash):
     """
@@ -48,15 +50,18 @@ def _store_torrent(req, form):
     trackers whitelist.
     """
     torrent_file = req.FILES['file']
+    # FIXME: Limit amount read and check length of returned data.
     torrent_file_content = torrent_file.read()
-    torrent_hash = do_hash(torrent_file_content)
+    torrent_file.close()
+    torrent_name, torrent_hash = _torrent_info(torrent_file_content)
     name_on_disk = '%s/torrents/%s' % (MEDIA_ROOT, '%s.torrent' % torrent_hash)
     f = file(name_on_disk, 'w')
     f.write(torrent_file_content)
     f.close()
     t = Torrent(acl = 'user:%s#w' % req.user.username,
                 creator = req.user,
-                name = form.cleaned_data['name'],
+                name = torrent_name,
+                description = form.cleaned_data['description'],
                 expiration_date = form.cleaned_data['expires'],
                 data = '%s.torrent' % torrent_hash,
                 hashval = torrent_hash)
