@@ -72,8 +72,7 @@ def _create_key_user(creator, urlfilter, entitlements, expires=None):
     # Djangos User class allows for max 30 characters user names.
     secret = sha256(str(getrandbits(256))).hexdigest()[:26]
     username = 'key:%s' % secret
-    user = User(username=username, password='')
-    user.save()
+    user = User.objects.create_user(username, 'nomail@dev.null', username)
 
     lst = map(lambda s: s.replace('$self', username), entitlements.split())
     entls = ' '.join(map(lambda e: 'user:%s:%s' % (creator.username, e), lst))
