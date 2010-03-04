@@ -62,12 +62,14 @@ class KeyMiddleware(object):
             if request.user.username == self.clean_username(username, request):
                 logger.info("user %s already authenticated" % username)
                 return                  # All ok.
-        xxx = auth.authenticate(remote_user=username)
-        logger.info("authenticated %s, got %s" % (username, xxx))
-        if xxx:
+
+        auth_user = auth.authenticate(username=username, password=username)
+        if auth_user:
             profile.displayname = username
-            request.user = xxx
-            auth.login(request, xxx)
+            request.user = auth_user
+            auth.login(request, auth_user)
+        else:
+            logger.debug("%s: failed authentication" % username)
         
     # TODO: Add a configure_user(user) method?
     
