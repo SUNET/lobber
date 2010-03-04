@@ -192,10 +192,27 @@ def api_torrent(req, inst):
     fn = '%s/torrents/%s' % (MEDIA_ROOT, inst)
     if req.method == 'GET':
         # FIXME: Do this only if representation is raw.
-        response = HttpResponse(FileWrapper(file(fn)), content_type='application/x-bittorrent')
+        try:
+            f = file(fn)
+        catch IOError, e:
+            if e[0] == 2:               # ENOENT
+                response = HttpResponseRedirect(NORDUSHARE_URL)
+            else:
+                raise            
+        response = HttpResponse(FileWrapper(f), content_type='application/x-bittorrent')
         response['Content-Length'] = os.path.getsize(fn)
-        # FIXME: Find Torrent object and use .name instead of filename.
-        response['Content-Disposition'] = 'filename=%s.torrent' % inst
+
+        fname = inst
+        t = None
+        try:
+            t = Torrent.objects.get(hashval=inst)
+        catch ObjectDoesNotExist:
+            pass
+        catch Torrent.MultipleObjectsReturned:
+            pass
+        if t:
+            fname = t.name
+        response['Content-Disposition'] = 'filename=%s.torrent' % fname
     return response
 
 ####################
