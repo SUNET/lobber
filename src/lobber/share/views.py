@@ -192,27 +192,29 @@ def api_torrent(req, inst):
     fn = '%s/torrents/%s' % (MEDIA_ROOT, inst)
     if req.method == 'GET':
         # FIXME: Do this only if representation is raw.
+        f = None
         try:
             f = file(fn)
-        catch IOError, e:
+        except IOError, e:
             if e[0] == 2:               # ENOENT
                 response = HttpResponseRedirect(NORDUSHARE_URL)
             else:
-                raise            
-        response = HttpResponse(FileWrapper(f), content_type='application/x-bittorrent')
-        response['Content-Length'] = os.path.getsize(fn)
+                raise
+        if f is not None:
+            response = HttpResponse(FileWrapper(f), content_type='application/x-bittorrent')
+            response['Content-Length'] = os.path.getsize(fn)
 
-        fname = inst
-        t = None
-        try:
-            t = Torrent.objects.get(hashval=inst)
-        catch ObjectDoesNotExist:
-            pass
-        catch Torrent.MultipleObjectsReturned:
-            pass
-        if t:
-            fname = t.name
-        response['Content-Disposition'] = 'filename=%s.torrent' % fname
+            fname = inst
+            t = None
+            try:
+                t = Torrent.objects.get(hashval=inst)
+            except ObjectDoesNotExist:
+                pass
+            except Torrent.MultipleObjectsReturned:
+                pass
+            if t:
+                fname = t.name
+                response['Content-Disposition'] = 'filename=%s.torrent' % fname
     return response
 
 ####################
