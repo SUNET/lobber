@@ -52,6 +52,7 @@ def login_federated(request):
     
     # Key users ('key:<secret>') must already have a profile -- for
     # url filtering.
+    profile = None
     try:
         profile = request.user.profile.get()
     except ObjectDoesNotExist:
@@ -79,17 +80,18 @@ def login_federated(request):
         request.user.save()
 
     # Get or create user profile.
-    update_profile = False
-    default_profile = {'user': request.user,
-                       'creator': request.user,
-                       'display_name': '',
-                       'entitlements': '',
-                       'urlfilter': '.*', # Logged in users can do everything.
-                       'expiration_date': None}
-    profile, created = request.user.profile.get_or_create(defaults=default_profile)
-    if created:
-        logger.info("Created user profile for user %s" % username)
+    if profile is None:
+        default_profile = {'user': request.user,
+                           'creator': request.user,
+                           'display_name': '',
+                           'entitlements': '',
+                           'urlfilter': '.*', # Logged in users can do everything.
+                           'expiration_date': None}
+        profile, created = request.user.profile.get_or_create(defaults=default_profile)
+        if created:
+            logger.info("Created user profile for user %s" % username)
 
+    update_profile = False
     entitlement_in = request.META.get('HTTP_ENTITLEMENT')
     if entitlement_in != "(null)":
         profile.entitlements = entitlement_in.replace(';', ' ')
