@@ -226,6 +226,7 @@ import resource
 class TorrentView(Resource):
 
     def get(self,request,inst):
+        fn = '%s/torrents/%s' % (MEDIA_ROOT, inst)
 	f = None
         try:
             f = file(fn)
