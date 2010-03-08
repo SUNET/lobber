@@ -224,7 +224,7 @@ def api_torrent(req, inst):
 import resource
 class Torrent(Resource):
 
-    def get(self,request,inst)
+    def get(self,request,inst):
 	f = None
         try:
             f = file(fn)
