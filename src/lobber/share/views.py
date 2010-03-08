@@ -221,6 +221,34 @@ def api_torrent(req, inst):
                 response['Content-Disposition'] = 'filename=%s.torrent' % fname
     return response
 
+import resource
+class Torrent(Resource):
+
+    def get(self,request,inst)
+	f = None
+        try:
+            f = file(fn)
+        except IOError, e:
+            if e[0] == 2:               # ENOENT
+                response = HttpResponseRedirect(NORDUSHARE_URL)
+            else:
+                raise
+        if f is not None:
+            response = HttpResponse(FileWrapper(f), content_type='application/x-bittorrent')
+            response['Content-Length'] = os.path.getsize(fn)
+
+            fname = inst
+            t = None
+            try:
+                t = Torrent.objects.get(hashval=inst)
+            except ObjectDoesNotExist:
+                pass
+            except Torrent.MultipleObjectsReturned:
+                pass
+            if t:
+                fname = t.name
+                response['Content-Disposition'] = 'filename=%s.torrent' % fname
+
 ####################
 # Keys.
 @login_required
