@@ -15,6 +15,7 @@ from lobber.settings import BASE_DIR, MEDIA_ROOT, LOGIN_URL, ANNOUNCE_URL, NORDU
 from lobber.share.models import Torrent, Tag, UserProfile
 from forms import UploadForm, CreateKeyForm
 
+import lobber.resource
 import lobber.log
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
