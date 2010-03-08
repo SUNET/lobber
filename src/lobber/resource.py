@@ -45,18 +45,18 @@ class Resource(HttpResponse):
 		            allowed_methods.append(attr.upper())
                             self._update(HttpResponseNotAllowed(sorted(allowed_methods)))
 
-        def _update(self, response):
-            """Merge the info from another response with this instance.
-            
-            This method simply copies the attributes from the given response to
-            this instance, with the exceptions of the ``_headers`` and ``cookies``
-            dictionaries, whose ``update`` methods are called. This means that any
-            headers or cookies which are present in this response but not the
-	    argument are preserved."""
-            self._charset = response._charset
-            self._is_string = response._is_string
-            self._container = response._container
-            self._headers.update(response._headers)
-            self.cookies.update(response.cookies)
-            self.status_code = response.status_code
+    def _update(self, response):
+        """Merge the info from another response with this instance.
+        
+        This method simply copies the attributes from the given response to
+        this instance, with the exceptions of the ``_headers`` and ``cookies``
+        dictionaries, whose ``update`` methods are called. This means that any
+        headers or cookies which are present in this response but not the
+        argument are preserved."""
+        self._charset = response._charset
+        self._is_string = response._is_string
+        self._container = response._container
+        self._headers.update(response._headers)
+        self.cookies.update(response.cookies)
+        self.status_code = response.status_code
 
