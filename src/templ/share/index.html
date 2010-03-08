@@ -18,7 +18,8 @@
 	  <table>
 	    <tr><td><a href="torrent/{{t.data.url}}">{{ t.name }}</a></td></tr>
 	    <tr><td>Shared at {{t.creation_date}}</td></tr>
-	    <tr><td><a href="gufrt/{{t.id}}">create link</a></td></tr>
+	    <tr><td><div id="id{{t.id}}" class="hidden"></div>
+                    <button onClick="gufrt('{{t.id}}')" class="button">give me a link</button></td></tr>
 	  </table>
 	</div>
       </div>

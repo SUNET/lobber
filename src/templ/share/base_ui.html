@@ -8,6 +8,11 @@ $(function() {
    $("input:submit, input:button, a",".button").button();
    $("#gravatar").append($.gravatar($('#email').contents().text()));
 });
+function gufrt(id) {
+      $("#id"+id).load("gufrt/"+id);
+      $("#id"+id).removeClass("hidden");
+      $(this).button("disable");
+   }
 </script>
 {% endblock %}
 
@@ -26,6 +31,7 @@ $(function() {
    #main{ clear: both; font: 61.8% "Trebuchet MS", sans-serif; margin: 50px;}
    code{font: 110% "Courier", fixed}
    .infopanel{width: 62%; padding: 5px; margin-bottom: 10px; }
+   div .hidden{visibility:hidden;}
 </style>
 {% endblock %}
 

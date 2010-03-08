@@ -11,9 +11,12 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 
-from lobber.settings import BASE_DIR, MEDIA_ROOT, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL
+from lobber.settings import BASE_DIR, MEDIA_ROOT, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE
 from lobber.share.models import Torrent, Tag, UserProfile
 from forms import UploadForm, CreateKeyForm
+
+import lobber.log
+logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 ####################
 # Helper functions. FIXME: Move to some other file.
@@ -107,6 +110,8 @@ def upload_form(req):
         form = UploadForm(req.POST, req.FILES)
         if form.is_valid():
             return _store_torrent(req, form)
+        else:
+            logger.info("upload_form: received invalid form")
     else:
         form = UploadForm()
     return render_to_response('share/upload-torrent.html',
@@ -143,16 +148,15 @@ def gimme_url_for_reading_torrent(req, tid):
     try:
         t = Torrent.objects.get(id=int(tid))
     except ObjectDoesNotExist:
-        return HttpResponse('Sorry, torrent %d not found<p><a href="%s">Start page</a>'  %
-                            NORDUSHARE_URL)
+        return HttpResponse('Sorry, torrent %s not found'  % tid)
     key = _create_key_user(creator=req.user,
                            urlfilter='torrent/%s' % tid, # FIXME: Append '$'?
                            entitlements='user:%s:$self' % req.user.username)
     t.add_ace('user:%s:%s#r' % (req.user.username, key))
     #link = '%s/%s?lkey=%s' % (NORDUSHARE_URL, tid, key)
     link = '%s/torrent/%s.torrent?lkey=%s' % (NORDUSHARE_URL, t.hashval, key)
-    return HttpResponse('Here\'s your link to share: <a href=%s>%s</a><p><a href="%s">Start page</a>' %
-                        (link, link, NORDUSHARE_URL))
+    return HttpResponse('Here\'s your link to share: <a href=%s>%s</a>' %
+                        (link, link))
 
 ################################################################################
 # RESTful API.
