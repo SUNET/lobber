@@ -46,30 +46,30 @@ def add_hash_to_whitelist(thash):
     # HUP tracker.
     os.kill(pid, 1)
 
-    def _store_torrent(req, form):
-        """
-        Store torrent file in the file system and add its hash to the
-        trackers whitelist.
-        """
-        torrent_file = req.FILES['file']
-        # FIXME: Limit amount read and check length of returned data.
-        torrent_file_content = torrent_file.read()
-        torrent_file.close()
-        torrent_name, torrent_hash = _torrent_info(torrent_file_content)
-        name_on_disk = '%s/torrents/%s' % (MEDIA_ROOT, '%s.torrent' % torrent_hash)
-        f = file(name_on_disk, 'w')
-        f.write(torrent_file_content)
-        f.close()
-        t = Torrent(acl = 'user:%s#w' % req.user.username,
-                    creator = req.user,
-                    name = torrent_name,
-                    description = form.cleaned_data['description'],
-                    expiration_date = form.cleaned_data['expires'],
-                    data = '%s.torrent' % torrent_hash,
-                    hashval = torrent_hash)
-        t.save()
-        add_hash_to_whitelist(torrent_hash)
-        return t.id
+def _store_torrent(req, form):
+    """
+    Store torrent file in the file system and add its hash to the
+    trackers whitelist.
+    """
+    torrent_file = req.FILES['file']
+    # FIXME: Limit amount read and check length of returned data.
+    torrent_file_content = torrent_file.read()
+    torrent_file.close()
+    torrent_name, torrent_hash = _torrent_info(torrent_file_content)
+    name_on_disk = '%s/torrents/%s' % (MEDIA_ROOT, '%s.torrent' % torrent_hash)
+    f = file(name_on_disk, 'w')
+    f.write(torrent_file_content)
+    f.close()
+    t = Torrent(acl = 'user:%s#w' % req.user.username,
+                creator = req.user,
+                name = torrent_name,
+                description = form.cleaned_data['description'],
+                expiration_date = form.cleaned_data['expires'],
+                data = '%s.torrent' % torrent_hash,
+                hashval = torrent_hash)
+    t.save()
+    add_hash_to_whitelist(torrent_hash)
+    return t.id
     
 def _create_key_user(creator, urlfilter, entitlements, expires=None):
     # FIXME: Do random.seed() somewhere.
@@ -148,6 +148,9 @@ def gimme_url_for_reading_torrent(req, tid):
 # Torrents.
 
 class TorrentViewBase(Resource):
+    """
+    POST and PUT creates/updates a torrent
+    """
 
     @login_required
     def post(self,req):
@@ -170,7 +173,6 @@ class TorrentViewBase(Resource):
 class TorrentsView(TorrentViewBase):
     """
     GET ==> list torrents
-    PUT ==> create torrent
     """
     
     def _list(self,user,max=40):
@@ -198,7 +200,7 @@ class TorrentForm(TorrentViewBase):
 class TorrentView(TorrentViewBase):
      
     @login_required
-    def get(self,request,inst):
+    def get(self,request,inst=None):
         response = HttpResponse('NYI: not yet implemented')
         fn = '%s/torrents/%s' % (MEDIA_ROOT, inst)
 	f = None
