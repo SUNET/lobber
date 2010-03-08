@@ -7,8 +7,8 @@ urlpatterns = patterns(
     # RESTful API.
     #(r'^torrent/$', 'api_torrents'),
     #(r'^torrent/(?P<inst>.+)$', 'api_torrent'),
-    (r'^torrent/$', 'Torrent'),
-    (r'^torrent/(?P<inst>.+)$', 'Torrent'),
+    (r'^torrent/$', 'TorrentView'),
+    (r'^torrent/(?P<inst>.+)$', 'TorrentView'),
     (r'^key/$', 'api_keys'),
     (r'^key/(?P<inst>.+)$', 'api_key'),
     (r'^key.html', 'key_form'),

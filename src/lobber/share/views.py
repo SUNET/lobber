@@ -223,7 +223,7 @@ def api_torrent(req, inst):
     return response
 
 import resource
-class Torrent(Resource):
+class TorrentView(Resource):
 
     def get(self,request,inst):
 	f = None
