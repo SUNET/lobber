@@ -45,35 +45,32 @@ def add_hash_to_whitelist(thash):
     pidf.close()
     # HUP tracker.
     os.kill(pid, 1)
-    
-def _store_torrent(req, form):
-    # FIXME: Move to api_torrents() -- this is (part of) POST torrent/
-    # (create).
-    """
-    Store torrent file in the file system and add its hash to the
-    trackers whitelist.
-    """
-    torrent_file = req.FILES['file']
-    # FIXME: Limit amount read and check length of returned data.
-    torrent_file_content = torrent_file.read()
-    torrent_file.close()
-    torrent_name, torrent_hash = _torrent_info(torrent_file_content)
-    name_on_disk = '%s/torrents/%s' % (MEDIA_ROOT, '%s.torrent' % torrent_hash)
-    f = file(name_on_disk, 'w')
-    f.write(torrent_file_content)
-    f.close()
-    t = Torrent(acl = 'user:%s#w' % req.user.username,
-                creator = req.user,
-                name = torrent_name,
-                description = form.cleaned_data['description'],
-                expiration_date = form.cleaned_data['expires'],
-                data = '%s.torrent' % torrent_hash,
-                hashval = torrent_hash)
-    t.save()
-    add_hash_to_whitelist(torrent_hash)
-    # FIXME: Go to user page, with newly created torrent highlighted.
-    return HttpResponseRedirect('../%s' % t.id)
 
+    def _store_torrent(req, form):
+        """
+        Store torrent file in the file system and add its hash to the
+        trackers whitelist.
+        """
+        torrent_file = req.FILES['file']
+        # FIXME: Limit amount read and check length of returned data.
+        torrent_file_content = torrent_file.read()
+        torrent_file.close()
+        torrent_name, torrent_hash = _torrent_info(torrent_file_content)
+        name_on_disk = '%s/torrents/%s' % (MEDIA_ROOT, '%s.torrent' % torrent_hash)
+        f = file(name_on_disk, 'w')
+        f.write(torrent_file_content)
+        f.close()
+        t = Torrent(acl = 'user:%s#w' % req.user.username,
+                    creator = req.user,
+                    name = torrent_name,
+                    description = form.cleaned_data['description'],
+                    expiration_date = form.cleaned_data['expires'],
+                    data = '%s.torrent' % torrent_hash,
+                    hashval = torrent_hash)
+        t.save()
+        add_hash_to_whitelist(torrent_hash)
+        return t.id
+    
 def _create_key_user(creator, urlfilter, entitlements, expires=None):
     # FIXME: Do random.seed() somewhere.
     # FIXME: Is 256 bits of random data proper?
@@ -105,21 +102,6 @@ def upload(req):
     return render_to_response('share/launch.jnlp', d,
                               mimetype='application/x-java-jnlp-file')
 
-@login_required
-def upload_form(req):
-    if req.method == 'POST':          # User posted data -- handle it.
-        form = UploadForm(req.POST, req.FILES)
-        if form.is_valid():
-            return _store_torrent(req, form)
-        else:
-            logger.info("upload_form: received invalid form")
-    else:
-        form = UploadForm()
-    return render_to_response('share/upload-torrent.html',
-                              {'announce_url': ANNOUNCE_URL,
-                               'user': req.user,
-                               'form': form})
-        
 @login_required
 def torrent_view(req, tid):
     # FIXME: Move to api_torrents() -- this is GET torrent/T with
@@ -164,67 +146,38 @@ def gimme_url_for_reading_torrent(req, tid):
 
 ####################
 # Torrents.
-@login_required
-def api_torrents(req):
+
+class TorrentsView(Resource):
     """
     GET ==> list torrents
-    POST ==> create torrent
+    PUT ==> create torrent
     """
-    response = HttpResponse('NYI: not yet implemented')
-
-    def _list(user, max=40):
+    
+    def _list(self,user,max=40):
         lst = []
         for t in Torrent.objects.all().order_by('-creation_date')[:max]:
             if t.auth(user.username, 'r') and t.expiration_date > dt.now():
                 lst.append(t)
         return lst
+    
+    @login_required
+    def get(self,req):
+        return render_to_response('share/index.html',
+                                  {'torrents': self._list(req.user),
+                                   'user': req.user})
 
-    if req.method == 'GET':
-        response = render_to_response('share/index.html',
-                                      {'torrents': _list(req.user),
-                                       'user': req.user})
-    return response
+    @login_required
+    def put(self,req):
+        form = UploadForm(req.POST, req.FILES)
+        if form.is_valid():
+            tid = _store_torrent(req,form)
+            return HttpResponseRedirect('../%s' % tid)
+        else:
+            logger.info("upload_form: received invalid form")
 
-@login_required
-def api_torrent(req, inst):
-    """
-    GET ==> get torrent
-    ??? PUT/POST ==> update torrent ???
-    DELETE ==> delete torrent
-    """
-    response = HttpResponse('NYI: not yet implemented')
-
-    fn = '%s/torrents/%s' % (MEDIA_ROOT, inst)
-    if req.method == 'GET':
-        # FIXME: Do this only if representation is raw.
-        f = None
-        try:
-            f = file(fn)
-        except IOError, e:
-            if e[0] == 2:               # ENOENT
-                response = HttpResponseRedirect(NORDUSHARE_URL)
-            else:
-                raise
-        if f is not None:
-            response = HttpResponse(FileWrapper(f), content_type='application/x-bittorrent')
-            response['Content-Length'] = os.path.getsize(fn)
-
-            fname = inst
-            t = None
-            try:
-                t = Torrent.objects.get(hashval=inst)
-            except ObjectDoesNotExist:
-                pass
-            except Torrent.MultipleObjectsReturned:
-                pass
-            if t:
-                fname = t.name
-                response['Content-Disposition'] = 'filename=%s.torrent' % fname
-    return response
-
-import resource
 class TorrentView(Resource):
-
+     
+    @login_required
     def get(self,request,inst):
         fn = '%s/torrents/%s' % (MEDIA_ROOT, inst)
 	f = None
@@ -250,6 +203,33 @@ class TorrentView(Resource):
             if t:
                 fname = t.name
                 response['Content-Disposition'] = 'filename=%s.torrent' % fname
+
+class TorrentForm(Resource):
+
+    @login_required
+    def get(self,req):
+        return render_to_response('share/upload-torrent.html',
+                                   {'announce_url': ANNOUNCE_URL,
+                                    'user': req.user,
+                                    'form': UploadForm()})
+
+    @login_required
+    def post(self,req):
+        form = UploadForm(req.POST, req.FILES)
+        if form.is_valid():
+           tid = _store_torrent(req,form)
+           return HttpResponseRedirect('../%s' % tid)
+        else:
+           logger.info("upload_form: received invalid form")
+
+    @login_required
+    def put(self,req):
+        form = UploadForm(req.POST, req.FILES)
+        if form.is_valid():
+           tid = _store_torrent(req,form)
+           return HttpResponseRedirect('../%s' % tid)
+        else:
+           logger.info("upload_form: received invalid form")
 
 ####################
 # Keys.

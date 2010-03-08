@@ -7,7 +7,7 @@ urlpatterns = patterns(
     # RESTful API.
     #(r'^torrent/$', 'api_torrents'),
     #(r'^torrent/(?P<inst>.+)$', 'api_torrent'),
-    (r'^torrent/$', 'TorrentView'),
+    (r'^torrent/$', 'TorrentsView'),
     (r'^torrent/(?P<inst>.+)$', 'TorrentView'),
     (r'^key/$', 'api_keys'),
     (r'^key/(?P<inst>.+)$', 'api_key'),
@@ -15,7 +15,7 @@ urlpatterns = patterns(
     # Old stuff, pre API era.  FIXME: Clean up.
     (r'^user/$', 'user_self'),          # Short for self.
     (r'^upload/$', 'upload'),
-    (r'^ulform/$', 'upload_form'),
+    (r'^ulform/$', 'TorrentForm'),
     (r'^gufrt/(?P<tid>.+)$', 'gimme_url_for_reading_torrent'),
     (r'^(?P<tid>\d+)$', 'torrent_view'),
     )
