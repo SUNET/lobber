@@ -147,7 +147,27 @@ def gimme_url_for_reading_torrent(req, tid):
 ####################
 # Torrents.
 
-class TorrentsView(Resource):
+class TorrentViewBase(Resource):
+
+    @login_required
+    def post(self,req):
+        form = UploadForm(req.POST, req.FILES)
+        if form.is_valid():
+           tid = _store_torrent(req,form)
+           return HttpResponseRedirect('../%s' % tid)
+        else:
+           logger.info("upload_form: received invalid form")
+
+    @login_required
+    def put(self,req):
+        form = UploadForm(req.POST, req.FILES)
+        if form.is_valid():
+           tid = _store_torrent(req,form)
+           return HttpResponseRedirect('../%s' % tid)
+        else:
+           logger.info("upload_form: received invalid form")
+
+class TorrentsView(TorrentViewBase):
     """
     GET ==> list torrents
     PUT ==> create torrent
@@ -166,16 +186,16 @@ class TorrentsView(Resource):
                                   {'torrents': self._list(req.user),
                                    'user': req.user})
 
-    @login_required
-    def put(self,req):
-        form = UploadForm(req.POST, req.FILES)
-        if form.is_valid():
-            tid = _store_torrent(req,form)
-            return HttpResponseRedirect('../%s' % tid)
-        else:
-            logger.info("upload_form: received invalid form")
+class TorrentForm(TorrentViewBase):
 
-class TorrentView(Resource):
+    @login_required
+    def get(self,req):
+        return render_to_response('share/upload-torrent.html',
+                                   {'announce_url': ANNOUNCE_URL,
+                                    'user': req.user,
+                                    'form': UploadForm()})
+
+class TorrentView(TorrentViewBase):
      
     @login_required
     def get(self,request,inst):
@@ -205,33 +225,6 @@ class TorrentView(Resource):
                 fname = t.name
                 response['Content-Disposition'] = 'filename=%s.torrent' % fname
         return response
-
-class TorrentForm(Resource):
-
-    @login_required
-    def get(self,req):
-        return render_to_response('share/upload-torrent.html',
-                                   {'announce_url': ANNOUNCE_URL,
-                                    'user': req.user,
-                                    'form': UploadForm()})
-
-    @login_required
-    def post(self,req):
-        form = UploadForm(req.POST, req.FILES)
-        if form.is_valid():
-           tid = _store_torrent(req,form)
-           return HttpResponseRedirect('../%s' % tid)
-        else:
-           logger.info("upload_form: received invalid form")
-
-    @login_required
-    def put(self,req):
-        form = UploadForm(req.POST, req.FILES)
-        if form.is_valid():
-           tid = _store_torrent(req,form)
-           return HttpResponseRedirect('../%s' % tid)
-        else:
-           logger.info("upload_form: received invalid form")
 
 ####################
 # Keys.

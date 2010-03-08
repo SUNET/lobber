@@ -5,8 +5,6 @@ urlpatterns = patterns(
     # (regexp as a string, function without prefix as a string)
     (r'^$', 'TorrentsView'),
     # RESTful API.
-    #(r'^torrent/$', 'api_torrents'),
-    #(r'^torrent/(?P<inst>.+)$', 'api_torrent'),
     (r'^torrent/$', 'TorrentsView'),
     (r'^torrent/(?P<inst>.+)$', 'TorrentView'),
     (r'^key/$', 'api_keys'),
