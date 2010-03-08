@@ -179,6 +179,7 @@ class TorrentView(Resource):
      
     @login_required
     def get(self,request,inst):
+        response = HttpResponse('NYI: not yet implemented')
         fn = '%s/torrents/%s' % (MEDIA_ROOT, inst)
 	f = None
         try:
@@ -203,6 +204,7 @@ class TorrentView(Resource):
             if t:
                 fname = t.name
                 response['Content-Disposition'] = 'filename=%s.torrent' % fname
+        return response
 
 class TorrentForm(Resource):
 
