@@ -3,7 +3,7 @@ urlpatterns = patterns(
     # Prefix function.
     'lobber.share.views',
     # (regexp as a string, function without prefix as a string)
-    (r'^$', 'api_torrents'),
+    (r'^$', 'TorrentsView'),
     # RESTful API.
     #(r'^torrent/$', 'api_torrents'),
     #(r'^torrent/(?P<inst>.+)$', 'api_torrent'),
