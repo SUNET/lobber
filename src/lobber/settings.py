@@ -3,7 +3,7 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-BASE_DIR = '/home/nordushare'
+BASE_DIR = '/home/leifj/work/sunet.se/lobber'
 BASE_UI_URL = 'https://nordushare-dev.nordu.net'
 BASE_URL = 'http://nordushare-dev.nordu.net'
 APPLICATION_URL = 'nordushare'          # FIXME: Make this empty.
@@ -17,7 +17,7 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'sqlite3'
-DATABASE_NAME = '/tmp/nordushare.db'
+DATABASE_NAME = '%s/db/nordushare.db' % BASE_DIR
 DATABASE_USER = 'www-data'
 DATABASE_PASSWORD = ''
 DATABASE_HOST = ''
@@ -42,7 +42,7 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = BASE_DIR
+MEDIA_ROOT = "%s/src/media" % BASE_DIR
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -52,7 +52,7 @@ MEDIA_URL = ''
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/'
+ADMIN_MEDIA_PREFIX = '/admin/media/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '79881b760f983c625fee66993d40d9ec997454fb9ce0e6cb4db99624265d1ffb'
@@ -80,7 +80,7 @@ AUTHENTICATION_BACKENDS = (
 ROOT_URLCONF = 'lobber.urls'
 
 TEMPLATE_DIRS = (
-    '/home/nordushare/lobber/src/templ',
+    '%s/src/templ' % BASE_DIR,
 )
 
 LOGIN_URL = '/nordushare/login/'
@@ -94,5 +94,5 @@ INSTALLED_APPS = (
     'lobber.share',
 )
 
-LOBBER_LOG_FILE = "/tmp/web.log"
+LOBBER_LOG_FILE = "%s/logs/web.log" % BASE_DIR
 import logging; LOBBER_LOG_LEVEL = logging.DEBUG

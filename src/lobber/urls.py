@@ -3,6 +3,7 @@ from django.conf.urls.defaults import *
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 from lobber.share import auth
+from lobber.settings import MEDIA_ROOT
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -11,8 +12,8 @@ urlpatterns = patterns('',
     (r'^nordushare/logout/$', 'lobber.share.auth.logout'),
     (r'^nordushare/', include('lobber.share.urls')),
     (r'^admin/', include(admin.site.urls)),
-    (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
-        {'document_root': '/home/nordushare/web/static'}),
+    (r'^media/(?P<path>.*)$', 'django.views.static.serve',
+    	{'document_root': MEDIA_ROOT}),
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
