@@ -7,8 +7,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^auth/',include('lobber.auth.urls')),
-    (r'^admin/', include('admin.site.urls')),
+    (r'^admin/', include(admin.site.urls)),
     (r'^media/(?P<path>.*)$', 'django.views.static.serve',
     	{'document_root': MEDIA_ROOT}),
-    (r'', include('lobber.share.urls')),
+    (r'',include('lobber.share.urls')),
 )

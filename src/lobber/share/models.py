@@ -1,6 +1,7 @@
 from django.db import models
 # http://docs.djangoproject.com/en/dev/topics/auth/#module-django.contrib.auth
 from django.contrib.auth.models import User
+from lobber.settings import MEDIA_ROOT
 
 class Torrent(models.Model):
     name = models.CharField(max_length=256, blank=True)
@@ -27,6 +28,18 @@ class Torrent(models.Model):
 
     def add_ace(self, ace):
         self.acl += ace
+
+    def file(self):
+        fn = '%s/torrents/%s.torrent' % (MEDIA_ROOT, self.hashval)
+        f = None
+        try:
+            f = file(fn)
+        except IOError, e:
+            if e[0] == 2:               # ENOENT
+                raise
+            else:
+                raise
+        return f
 
 class Tag(models.Model):
     value = models.CharField(max_length=128, blank=True, primary_key=True)

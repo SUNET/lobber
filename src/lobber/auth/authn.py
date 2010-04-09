@@ -48,7 +48,7 @@ def login_federated(request):
     # Authenticated?
     if not request.user.is_authenticated():
         logfailure()
-        return HttpResponseRedirect('/')
+        return render_to_response('share/login.html',{'error': "Authentication failed",'next': request.REQUEST.get("next")});
     username = request.user.username
     
     # Key users ('key:<secret>') must already have a profile -- for
