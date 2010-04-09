@@ -4,7 +4,7 @@
 {% block main %}
 <h1>Please upload a torrent file (.torrent)</h1>
 
-<form enctype="multipart/form-data" method="post" action="/nordushare/ulform/">
+<form enctype="multipart/form-data" method="post" action="/ulform/">
   <div class="ui-widget infopanel">
     <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;"> 
       <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
@@ -31,7 +31,7 @@
   <br/>
   <div class="button">
     <input type="submit" value="Share it!" />
-    <input type="button" onClick="document.location='/nordushare'" value="Cancel"/>
+    <input type="button" onClick="document.location='/torrent'" value="Cancel"/>
   </div>
 </form>
 {% endblock %}

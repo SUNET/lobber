@@ -4,7 +4,7 @@
 {% block main %}
 <h1>Create key</h1>
 
-<form enctype="multipart/form-data" method="post" action="/nordushare/key/">
+<form enctype="multipart/form-data" method="post" action="/key/">
   <div class="ui-widget-content ui-corner-all infopanel" style="margin-top: 20px;">
     <table>
       {% for field in form %}
@@ -24,7 +24,7 @@
   <br/>
   <div class="button">
     <input type="submit" value="Create key" />
-    <input type="button" onClick="document.location='/nordushare'" value="Cancel"/>
+    <input type="button" onClick="document.location='/'" value="Cancel"/>
   </div>
 </form>
 {% endblock %}

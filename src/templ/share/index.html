@@ -4,8 +4,8 @@
 
 {% block main %}
 <div class="button">
-  <a href="upload/">Upload using Java Web Start</a>
-  <a href="ulform/">Upload a torrent file</a>
+  <a href="/upload/">Upload using Java Web Start</a>
+  <a href="/ulform/">Upload a torrent file</a>
 </div>
 
 {% if torrents %}
@@ -16,7 +16,7 @@
 	<h3><a href="#">{{ t.name }}</a></h3>
 	<div>
 	  <table>
-	    <tr><td><a href="torrent/{{t.data.url}}">{{ t.name }}</a></td></tr>
+	    <tr><td><a href="{{t.data.url}}">{{ t.name }}</a></td></tr>
 	    <tr><td>Shared at {{t.creation_date}}</td></tr>
 	    <tr><td><div id="id{{t.id}}" class="hidden"></div>
                     <button onClick="gufrt('{{t.id}}')" class="button">give me a link</button></td></tr>
