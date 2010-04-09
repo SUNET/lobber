@@ -6,8 +6,8 @@ TEMPLATE_DEBUG = DEBUG
 BASE_DIR = '/home/leifj/work/sunet.se/lobber'
 BASE_UI_URL = 'https://nordushare-dev.nordu.net'
 BASE_URL = 'http://nordushare-dev.nordu.net'
-APPLICATION_URL = 'nordushare'          # FIXME: Make this empty.
-NORDUSHARE_URL = '%s/%s' % (BASE_UI_URL, APPLICATION_URL)
+APPLICATION_CTX = ''
+NORDUSHARE_URL = BASE_UI_URL 
 ANNOUNCE_URL = '%s:4711/announce' % BASE_URL
 
 ADMINS = (
@@ -83,7 +83,7 @@ TEMPLATE_DIRS = (
     '%s/src/templ' % BASE_DIR,
 )
 
-LOGIN_URL = '/nordushare/login/'
+LOGIN_URL = '/auth/login/'
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -92,6 +92,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'lobber.share',
+    'lobber.auth'
 )
 
 LOBBER_LOG_FILE = "%s/logs/web.log" % BASE_DIR

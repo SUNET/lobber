@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 
 from lobber.share.models import UserProfile
-from lobber.settings import LOBBER_LOG_FILE, APPLICATION_URL
+from lobber.settings import LOBBER_LOG_FILE, APPLICATION_CTX
 import lobber.log
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
@@ -48,7 +48,7 @@ class KeyMiddleware(object):
             return
 
         filtermatch_flag = False
-        cmd = request.path[len('/%s/'%APPLICATION_URL):]
+        cmd = request.path[1]
         for e in profile.urlfilter:
             if re.match(e, cmd):
                 filtermatch_flag = True
