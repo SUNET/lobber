@@ -41,13 +41,14 @@ def login(request):
 
 def login_federated(request):
     def logfailure():
+        username = request.user.username
         logger.warning("Failed federated login for user %s from %s" %
                        (username, req_meta(request, "REMOTE_ADDR")))
     
     # Authenticated?
     if not request.user.is_authenticated():
         logfailure()
-        return
+        return HttpResponseRedirect('/')
     username = request.user.username
     
     # Key users ('key:<secret>') must already have a profile -- for
