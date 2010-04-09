@@ -7,6 +7,10 @@ $(function() {
    $("#id_expires").datepicker({'dateFormat': 'yy-mm-dd'});
    $("input:submit, input:button, a",".button").button();
    $("#gravatar").append($.gravatar($('#email').contents().text()));
+   {% if error %}
+   $.jGrowl('{{error}}',{
+       header: '<span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>Error', theme: 'ui-lightness'});
+   {% endif %}
 });
 function gufrt(id) {
       $("#id"+id).load("gufrt/"+id);
@@ -41,11 +45,11 @@ function gufrt(id) {
    <div id="linklist">
    {% if user %}
       <ul>
-         <li><a href="/nordushare/user">{{ user.get_full_name }}</a></li>
+         <li><a href="/user">{{ user.get_full_name }}</a></li>
       </ul>
    {% endif %}
    </div>
-   <div id="branding"><a style="text-decoration: none" href="/nordushare/">{% block title %}{% endblock %}</a></div>
+   <div id="branding"><a style="text-decoration: none" href="/">{% block title %}{% endblock %}</a></div>
 </div>
 <div id="main">
    {% block main %}{% endblock %}
