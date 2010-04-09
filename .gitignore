@@ -3,3 +3,4 @@
 *.pyc
 logs
 db
+src/media/torrents
