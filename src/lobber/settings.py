@@ -16,10 +16,10 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'postgresql_psycopg2'
-DATABASE_NAME = 'nordushare4'
+DATABASE_ENGINE = 'sqlite3'
+DATABASE_NAME = '/tmp/nordushare.db'
 DATABASE_USER = 'www-data'
-DATABASE_PASSWORD = 'skalleper'
+DATABASE_PASSWORD = ''
 DATABASE_HOST = ''
 DATABASE_PORT = ''
 
@@ -94,5 +94,5 @@ INSTALLED_APPS = (
     'lobber.share',
 )
 
-LOBBER_LOG_FILE = "/var/log/lobber/web.log"
+LOBBER_LOG_FILE = "/tmp/web.log"
 import logging; LOBBER_LOG_LEVEL = logging.DEBUG
