@@ -3,7 +3,11 @@
 {% block title %}Lobber{% endblock %}
 {% block js %}
 <script type="text/javascript">
-var link = $('#link'),email = $('#email'),allFields = $([]).add(name).add(email);
+var link = $('#link'),
+    to = $('#to'),
+    message = $('#message'),
+    allFields = $([]).add(to).add(message);
+
 $(function() {
    $('#share-mail-dialog').dialog({
        position: ['center','center'],
@@ -13,6 +17,7 @@ $(function() {
        modal: true,
        buttons: {
           'Send email': function() {
+             $('#share-mail-dialog form').submit();
              $(this).dialog('close');
           },
           'Cancel': function() {
@@ -24,10 +29,9 @@ $(function() {
        }
    });
    $('#share-link-dialog').dialog({
-       position: ['center','center'],
        autoOpen: false,
-       height: 100,
-       width: 350,
+       height: 200,
+       width: 500,
        modal: true,
        buttons: {
           'Ok': function() {
@@ -38,12 +42,24 @@ $(function() {
           allFields.val('').removeClass('ui-state-error');
        }
    });
+   $('#share-mail-dialog form').submit(function() {
+      $.get($(this).attr('action'),$(this).serialize(),function(data) {
+         if (data) {
+            $.jGrowl(data);
+         }
+      });
+      return false;
+   });
 });
-function gufrt2(id) {
-   $('#link').load("gufrt/"+id);
+
+function gufrt(id) {
+   $('#link').load("/torrent/gufrt/"+id);
    $('#share-link-dialog').dialog('open');
 }
+
 function mailit(id) {
+   allFields.val('');
+   $('#share-mail-dialog form').attr('action','/torrent/sendlink/'+id);
    $('#share-mail-dialog').dialog('open');
 }
 
@@ -56,20 +72,18 @@ function mailit(id) {
   <a href="/ulform/">Upload a torrent file</a>
 </div>
 
-<div id="share-link-dialog" class="modal-dialog" title="Share data">
-     <p>
-        <div id="link" class="text"></div>
-     </p>
+<div id="share-link-dialog" class="modal-dialog" title="A link to this data">
+   <div id="link" class="text"></div>
 </div>
 
-<div id="share-mail-dialog" class="modal-dialog" title="Share data">
-   <form>
-        <fieldset>
-                <label for="to">Email</label>
-                <input type="text" name="to" id="to" value="" size="40" class="text ui-widget-content ui-corner-all" />
-                <label for="message">Message</label>
-                <textarea name="message" id="message" value="" rows="4" cols="40" class="text ui-widget-content ui-corner-all"></textarea>
-        </fieldset>
+<div id="share-mail-dialog" class="modal-dialog" title="Send a link to this data">
+   <form action="">
+      <fieldset>
+         <label for="to">Email</label>
+         <input type="text" name="to" id="to" value="" size="40" class="text ui-widget-content ui-corner-all" />
+         <label for="message">Message</label>
+         <textarea name="message" id="message" value="" rows="4" cols="40" class="text ui-widget-content ui-corner-all"></textarea>
+      </fieldset>
    </form>
 </div>
 
@@ -78,7 +92,7 @@ function mailit(id) {
 <div id="accordion">
     {% for t in torrents %}
       <div>
-	<h3><a href="#">{{ t.name }} - created at {{t.creation_date}}</a></h3>
+	<h3><a href="#{{t.id}}">{{ t.name }} - created at {{t.creation_date}}</a></h3>
         <div>
 	   <div class="navlist">
              <ul>
@@ -93,7 +107,7 @@ function mailit(id) {
                    </a>
                 </li>
                 <li>
-                   <a class="tip" title="Share a link to this data" href="javascript:void(0);" onClick="gufrt2('{{t.id}}')">
+                   <a class="tip" title="Share a link to this data" href="javascript:void(0);" onClick="gufrt('{{t.id}}')">
                       <span class="ui-icon ui-icon-extlink"></span>
                    </a>
                 </li>
