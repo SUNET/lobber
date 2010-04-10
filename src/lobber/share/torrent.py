@@ -79,6 +79,10 @@ def welcome(req):
    return HttpResponseRedirect("/torrent/")
 
 @login_required
+def delete_torrent(req,tid):
+   raise
+
+@login_required
 def upload(req):
     d = {'sessionid': req.session.session_key,
          'announce_url': ANNOUNCE_URL,
