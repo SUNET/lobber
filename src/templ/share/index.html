@@ -5,9 +5,10 @@
 <script type="text/javascript">
 var link = $('#link'),email = $('#email'),allFields = $([]).add(name).add(email);
 $(function() {
-   $('#share-dialog').dialog({
+   $('#share-mail-dialog').dialog({
+       position: ['center','center'],
        autoOpen: false,
-       height: 200,
+       height: 240,
        width: 350,
        modal: true,
        buttons: {
@@ -22,10 +23,28 @@ $(function() {
           allFields.val('').removeClass('ui-state-error');
        }
    });
+   $('#share-link-dialog').dialog({
+       position: ['center','center'],
+       autoOpen: false,
+       height: 100,
+       width: 350,
+       modal: true,
+       buttons: {
+          'Ok': function() {
+             $(this).dialog('close');
+          }
+       },
+       close: function() {
+          allFields.val('').removeClass('ui-state-error');
+       }
+   });
 });
 function gufrt2(id) {
    $('#link').load("gufrt/"+id);
-   $('#share-dialog').dialog('open');
+   $('#share-link-dialog').dialog('open');
+}
+function mailit(id) {
+   $('#share-mail-dialog').dialog('open');
 }
 
 </script>
@@ -37,14 +56,20 @@ function gufrt2(id) {
   <a href="/ulform/">Upload a torrent file</a>
 </div>
 
-<div id="share-dialog" title="Share torrent">
+<div id="share-link-dialog" class="modal-dialog" title="Share data">
+     <p>
+        <div id="link" class="text"></div>
+     </p>
+</div>
+
+<div id="share-mail-dialog" class="modal-dialog" title="Share data">
    <form>
-	<fieldset>
-		<label for="link">Link</label>
-                <div id="link" class="text ui-widget-content ui-corner-all"></div>
-		<label for="email">Email</label>
-		<input type="text" name="email" id="email" value="" class="text ui-widget-content ui-corner-all" />
-	</fieldset>
+        <fieldset>
+                <label for="to">Email</label>
+                <input type="text" name="to" id="to" value="" size="40" class="text ui-widget-content ui-corner-all" />
+                <label for="message">Message</label>
+                <textarea name="message" id="message" value="" rows="4" cols="40" class="text ui-widget-content ui-corner-all"></textarea>
+        </fieldset>
    </form>
 </div>
 
@@ -69,6 +94,11 @@ function gufrt2(id) {
                 </li>
                 <li>
                    <a class="tip" title="Share a link to this data" href="javascript:void(0);" onClick="gufrt2('{{t.id}}')">
+                      <span class="ui-icon ui-icon-extlink"></span>
+                   </a>
+                </li>
+                <li>
+                   <a class="tip" title="Send a link to this data" href="javascript:void(0);" onClick="mailit('{{t.id}}')">
                       <span class="ui-icon ui-icon-mail-closed"></span>
                    </a>
                 </li>

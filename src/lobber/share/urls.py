@@ -16,4 +16,5 @@ urlpatterns = patterns('',
     (r'^upload/$', upload),
     (r'^ulform/$', TorrentForm),
     (r'^gufrt/(?P<tid>.+)$', gimme_url_for_reading_torrent),
+    (r'^sendlink/(?P<tid>.+)$',send_link_mail),
     )

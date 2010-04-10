@@ -3,6 +3,7 @@ from datetime import datetime as dt
 from hashlib import sha256
 from random import getrandbits
 
+from django.core.mail import send_mail
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.servers.basehttp import FileWrapper
@@ -53,8 +54,7 @@ def user_self(req):
                                                   'profile': req.user.profile.get(),
                                                   'torrents': lst})
 
-@login_required
-def gimme_url_for_reading_torrent(req, tid):
+def _make_share_link(req,tid):
     try:
         t = Torrent.objects.get(id=int(tid))
     except ObjectDoesNotExist:
@@ -64,9 +64,23 @@ def gimme_url_for_reading_torrent(req, tid):
                            entitlements='user:%s:$self' % req.user.username)
     t.add_ace('user:%s:%s#r' % (req.user.username, key))
     #link = '%s/%s?lkey=%s' % (NORDUSHARE_URL, tid, key)
-    link = '%s/torrent/%s.torrent?lkey=%s' % (NORDUSHARE_URL, t.hashval, key)
-    return HttpResponse('Here\'s your link to share: <a href=%s>%s</a>' %
-                        (link, link))
+    return '%s/torrent/%s.torrent?lkey=%s' % (NORDUSHARE_URL, t.hashval, key)
+
+@login_required
+def gimme_url_for_reading_torrent(req, tid):
+    link = _make_share_link(req,tid)
+    return HttpResponse('Here\'s your link to share: <a href=%s>%s</a>' % (link, link))
+
+@login_required
+def send_link_mail(req,tid):
+    to = req.REQUEST.get('to')
+    message = req.REQUEST.get('message')
+    link = _make_share_link(req,tid)
+    send_mail(req.user.display_name+" has shared some data with you",
+              "Follow this link to download the data using a torrent client: "+link,
+              req.user.email,
+              to);
+  
 
 ################################################################################
 # RESTful API.
