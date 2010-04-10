@@ -20,28 +20,6 @@ from lobber.resource import Resource
 import lobber.log
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
-def _create_key_user(creator, urlfilter, entitlements, expires=None):
-    # FIXME: Do random.seed() somewhere.
-    # FIXME: Is 256 bits of random data proper?
-    # FIXME: Don't chop the digest!!!  Necessary for now, since
-    # Djangos User class allows for max 30 characters user names.
-    secret = sha256(str(getrandbits(256))).hexdigest()[:26]
-    username = 'key:%s' % secret
-    user = User.objects.create_user(username, 'nomail@dev.null', username)
-
-    lst = map(lambda s: s.replace('$self', username), entitlements.split())
-    entls = ' '.join(map(lambda e: 'user:%s:%s' % (creator.username, e), lst))
-    profile = UserProfile(user=user,
-                          creator=creator,
-                          urlfilter=' '.join(urlfilter.split()),
-                          entitlements=entls,
-                          expiration_date=expires)
-    profile.save()
-    return secret
-    
-####################
-# External functions, called from urls.py.
-
 @login_required
 def user_self(req):
     # FIXME: Move to api_user() -- this is GET user/U with
@@ -53,34 +31,6 @@ def user_self(req):
     return render_to_response('share/user.html', {'user': req.user,
                                                   'profile': req.user.profile.get(),
                                                   'torrents': lst})
-
-def _make_share_link(req,tid):
-    try:
-        t = Torrent.objects.get(id=int(tid))
-    except ObjectDoesNotExist:
-        return HttpResponse('Sorry, torrent %s not found'  % tid)
-    key = _create_key_user(creator=req.user,
-                           urlfilter='torrent/%s' % tid, # FIXME: Append '$'?
-                           entitlements='user:%s:$self' % req.user.username)
-    t.add_ace('user:%s:%s#r' % (req.user.username, key))
-    #link = '%s/%s?lkey=%s' % (NORDUSHARE_URL, tid, key)
-    return '%s/torrent/%s.torrent?lkey=%s' % (NORDUSHARE_URL, t.hashval, key)
-
-@login_required
-def gimme_url_for_reading_torrent(req, tid):
-    link = _make_share_link(req,tid)
-    return HttpResponse('Here\'s your link to share: <a href=%s>%s</a>' % (link, link))
-
-@login_required
-def send_link_mail(req,tid):
-    to = req.REQUEST.get('to')
-    message = req.REQUEST.get('message')
-    link = _make_share_link(req,tid)
-    send_mail(req.user.display_name+" has shared some data with you",
-              "Follow this link to download the data using a torrent client: "+link,
-              req.user.email,
-              to);
-  
 
 ################################################################################
 # RESTful API.
