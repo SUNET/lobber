@@ -11,6 +11,7 @@ $(function() {
    $.jGrowl('{{error}}',{
        header: '<span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>Error', theme: 'ui-lightness'});
    {% endif %}
+   $('.tip').tooltip({showURL: false});
 });
 function gufrt(id) {
       $("#id"+id).load("gufrt/"+id);
@@ -18,21 +19,28 @@ function gufrt(id) {
       $(this).button("disable");
    }
 </script>
+{% block js %}{% endblock %}
 {% endblock %}
 
 {%block style %}
 <style type="text/css">
-   body{ font: 100% "Trebuchet MS", sans-serif; margin: 50px; width: 61.8%}
-   #footer{ clear: both; font: 61.8% "Trebuchet MS", sans-serif; border-top: 1px solid black; margin-top: 50px; padding-top: 10px;}
-   #footer ul { float: center; margin-right: 50px; }
-   #footer ul{ list-style: none; padding: 0; margin: 0; }
-   #footer li{ float: left; margin: 0 0.15em}
-   #branding{ font: 300% "Trebuchet MS", sans-serif; margin-left: 50px; margin-bottom: 20px; float: left}
+   body{ font: 61.8% "Trebuchet MS", sans-serif; margin: 50px; width: 61.8% }
+   label, input { display:block; }
+   #share-dialog { font-size: 110%; }
+   #share-dialog input.text { margin-bottom:12px; width:95%; padding: .4em; }
+   #share-dialog fieldset { padding:0; border:0; margin-top:25px; }
+   #footer{ clear: both; font: 100% "Trebuchet MS", sans-serif; border-top: 1px solid black; margin-top: 50px; padding-top: 10px;}
+   #footer ul { margin-right: 50px; list-style: none; padding: 0; margin: 0; }
+   #footer li { float: left; margin: 0 0.15em}
+   .navlist ul { list-style: none; padding: 0; margin: 0; }
+   .navlist li { float: left; display: inline; margin: 0 0.15em; }
+   .description { clear: both; margin-top: 25px; padding-top: 5px; border-top: 1px solid black; }
+   #branding{ font: 500% "Trebuchet MS", sans-serif; margin-left: 50px; margin-bottom: 20px; float: left}
    #linklist { float: right; margin-right: 50px; }
    #linklist ul{ list-style: none; padding: 0; margin: 0; }
    #linklist li{ float: left; margin: 0 0.15em}
-   #linklist a{ font: 100% "Trebuchet MS", sans-serif; }
-   #main{ clear: both; font: 61.8% "Trebuchet MS", sans-serif; margin: 50px;}
+   #linklist a{ font: 120% "Trebuchet MS", sans-serif; }
+   #main{ clear: both; font: 100% "Trebuchet MS", sans-serif; margin: 50px;}
    code{font: 110% "Courier", fixed}
    .infopanel{width: 62%; padding: 5px; margin-bottom: 10px; }
    div .hidden{visibility:hidden;}

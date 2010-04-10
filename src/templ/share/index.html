@@ -1,6 +1,35 @@
 {% extends "share/base_ui.html" %}
 
 {% block title %}Lobber{% endblock %}
+{% block js %}
+<script type="text/javascript">
+var link = $('#link'),email = $('#email'),allFields = $([]).add(name).add(email);
+$(function() {
+   $('#share-dialog').dialog({
+       autoOpen: false,
+       height: 200,
+       width: 350,
+       modal: true,
+       buttons: {
+          'Send email': function() {
+             $(this).dialog('close');
+          },
+          'Cancel': function() {
+             $(this).dialog('close');
+          }
+       },
+       close: function() {
+          allFields.val('').removeClass('ui-state-error');
+       }
+   });
+});
+function gufrt2(id) {
+   $('#link').load("gufrt/"+id);
+   $('#share-dialog').dialog('open');
+}
+
+</script>
+{% endblock %}
 
 {% block main %}
 <div class="button">
@@ -8,20 +37,60 @@
   <a href="/ulform/">Upload a torrent file</a>
 </div>
 
+<div id="share-dialog" title="Share torrent">
+   <form>
+	<fieldset>
+		<label for="link">Link</label>
+                <div id="link" class="text ui-widget-content ui-corner-all"></div>
+		<label for="email">Email</label>
+		<input type="text" name="email" id="email" value="" class="text ui-widget-content ui-corner-all" />
+	</fieldset>
+   </form>
+</div>
+
 {% if torrents %}
 <h1>Published Torrents</h1>
 <div id="accordion">
     {% for t in torrents %}
       <div>
-	<h3><a href="#">{{ t.name }}</a></h3>
-	<div>
-	  <table>
-	    <tr><td><a href="{{t.data.url}}">{{ t.name }}</a></td></tr>
-	    <tr><td>Shared at {{t.creation_date}}</td></tr>
-	    <tr><td><div id="id{{t.id}}" class="hidden"></div>
-                    <button onClick="gufrt('{{t.id}}')" class="button">give me a link</button></td></tr>
-	  </table>
-	</div>
+	<h3><a href="#">{{ t.name }} - created at {{t.creation_date}}</a></h3>
+        <div>
+	   <div class="navlist">
+             <ul>
+                <li>
+                   <a class="tip" title="Download this data using a torrent client" href="{{t.data.url}}">
+                      <span class="ui-icon ui-icon-arrowthickstop-1-s"></span>
+                   </a>
+                </li>
+                <li>
+                   <a class="tip" title="Download this data using the download manager" href="/torrent/{{t.hashval}}.jnlp">
+                      <span class="ui-icon ui-icon-folder-open"></span>
+                   </a>
+                </li>
+                <li>
+                   <a class="tip" title="Share a link to this data" href="javascript:void(0);" onClick="gufrt2('{{t.id}}')">
+                      <span class="ui-icon ui-icon-mail-closed"></span>
+                   </a>
+                </li>
+                <li style="float: right;">
+                   <a class="tip" title="Remove this torrent" href="/torrent/delete/{{t.hashval}}">
+                      <span class="ui-icon ui-icon-trash"></span>
+                   </a>
+                </li>
+                <li style="float: right;">
+                   <a class="tip" title="Modify settings for this torrent" href="/torrent/{{t.hashval}}.html">
+                      <span class="ui-icon ui-icon-wrench"></span>
+                   </a>
+                </li>
+             <ul> 
+           </div>
+           {% if t.description %}
+           <div class="description">
+              <h4>Description:</h4>
+              <p>{{t.description}}</p>
+           </div>
+           {% endif %} 
+        </div>
       </div>
     {% endfor %}
 </div>
