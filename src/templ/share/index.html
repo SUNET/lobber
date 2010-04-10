@@ -68,8 +68,8 @@ function mailit(id) {
 
 {% block main %}
 <div class="button">
-  <a href="/upload/">Upload using Java Web Start</a>
-  <a href="/ulform/">Upload a torrent file</a>
+  <a href="/torrent/jnlp/">Upload using Java Web Start</a>
+  <a href="/torrent/new/">Upload a torrent file</a>
 </div>
 
 <div id="share-link-dialog" class="modal-dialog" title="A link to this data">
@@ -117,7 +117,7 @@ function mailit(id) {
                    </a>
                 </li>
                 <li style="float: right;">
-                   <a class="tip" title="Remove this torrent" href="/torrent/delete/{{t.hashval}}">
+                   <a class="tip" title="Remove this torrent" href="/torrent/delete/{{t.id}}">
                       <span class="ui-icon ui-icon-trash"></span>
                    </a>
                 </li>

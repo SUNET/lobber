@@ -83,7 +83,7 @@ def delete_torrent(req,tid):
    raise
 
 @login_required
-def upload(req):
+def upload_jnlp(req):
     d = {'sessionid': req.session.session_key,
          'announce_url': ANNOUNCE_URL,
          'baseurl': BASE_UI_URL,
@@ -101,7 +101,7 @@ class TorrentViewBase(Resource):
         form = UploadForm(req.POST, req.FILES)
         if form.is_valid():
            tid = _store_torrent(req,form)
-           return HttpResponseRedirect('/torrent/%s.html' % tid)
+           return HttpResponseRedirect('/torrent/#%d' % tid)
         else:
            logger.info("upload_form: received invalid form")
 
@@ -110,7 +110,7 @@ class TorrentViewBase(Resource):
         form = UploadForm(req.POST, req.FILES)
         if form.is_valid():
            tid = _store_torrent(req,form)
-           return HttpResponseRedirect('/torrent/%s.html' % tid)
+           return HttpResponseRedirect('/torrent/#%d' % tid)
         else:
            logger.info("upload_form: received invalid form")
 
@@ -153,6 +153,6 @@ class TorrentView(TorrentViewBase):
 
         f = t.file
         return respond_to(request,
-                          {'text/html': 'share/index.html',
+                          {'text/html': 'share/torrent.html',
                            'application/x-bittorrent': lambda dict: _torrent_file_response(dict)},
                           {'torrent': t})
