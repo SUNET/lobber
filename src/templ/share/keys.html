@@ -9,7 +9,7 @@
 <div id="accordion">
   {% for profile in keys %}
     <div>
-      <h3><a href="#">{{ profile.get_username }}</a></h3>
+      <h3><a href="#{{ profile.get_username }}">{{ profile.get_username }}</a></h3>
       <div>
 	<table>
           <tr><td>Entitlements: {{ profile.entitlements }}</td></tr>
