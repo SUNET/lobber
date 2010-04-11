@@ -7,28 +7,32 @@
    <h1>{{user.get_full_name}}</h1>
 </div>
 <div class="ui-widget-content ui-corner-all infopanel">
-   <table>
+   <ul class="navlist">
+   <li><table>
       <tr><td>Username</td><td>{{user.username}}</td></tr>
+{% if profile.display_name %}
       <tr><td>Displayname</td><td>{{profile.display_name}}</td></tr>
-      <tr><td>Email</td><td><div id="email">{{user.email}}</div></td><tr>
-      <tr><td>Entitlements</td><td>{{profile.entitlements}}</td></tr>
-   </table>
-   <p class="ui-widget">
-      <div id="gravatar"></div>
-   </p>
-   <p>
-      This is your <a href="http://www.gravatar.com">Gravatar</a>!
-   </p>
-</div>
-
-{% if torrents %}
-  <ul>
-    {% for t in torrents %}
-      <li><a href="../torrent/{{ t.data.url }}">{{ t.name }}</a> ({{t.creation}})</li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>You haven't uploaded any files yet.
-    Please <a href="/upload">share something</a>.</p>
 {% endif %}
+{% if user.email %}
+      <tr><td>Email</td><td><div id="email">{{user.email}}</div></td><tr>
+{% endif %}
+{% if profile.entitlements %}
+      <tr><td>Entitlements</td><td>{{profile.entitlements}}</td></tr>
+{% endif %}
+     <tr>
+        <td colspan="2">
+           <ul class="" style="bullet-style: none">
+              <li><a href="/key/">Manage application keys</a></li>
+              <li><a href="/torrent/">Manage torrents</a></li>
+           </ul>
+        </td>
+     </tr>
+   </table></li>
+   <li style="float: right; padding: 2px; margin: 10px;">
+      <div id="gravatar"></div>
+      <div style="font-size: 80%">This is your <a href="http://www.gravatar.com">Gravatar</a></div>
+   </li>
+ </ul>
+<div style="clear:both;"></div>
+</div>
 {% endblock %}

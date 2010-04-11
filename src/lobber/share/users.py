@@ -28,7 +28,14 @@ def user_self(req):
     for t in Torrent.objects.all().order_by('-creation_date')[:40]:
         if t.auth(req.user.username, 'r') and t.expiration_date > dt.now():
             lst.append(t)
+
+    profile = None
+    try: 
+       profile = req.user.profile.get();
+    except ObjectDoesNotExist:
+       profile = UserProfile()
+       
     return render_to_response('share/user.html', {'user': req.user,
-                                                  'profile': req.user.profile.get(),
+                                                  'profile': profile,
                                                   'torrents': lst})
 
