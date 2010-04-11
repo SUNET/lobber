@@ -7,10 +7,18 @@ $(function() {
    $("#id_expires").datepicker({'dateFormat': 'yy-mm-dd'});
    $("input:submit, input:button, a",".button").button();
    $("#gravatar").append($.gravatar($('#email').contents().text()));
-   {% if error %}
-   $.jGrowl('{{error}}',{
-       header: '<span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>Error', theme: 'ui-lightness'});
-   {% endif %}
+   $('#notification').jnotifyInizialize({
+      oneAtTime: false,
+      appendType: 'append'
+   }).css({
+      'font-size': "120%",
+      'position': 'absolute',
+      'marginTop': '20px',
+      'padding': '15px',
+      'right': '20px',
+      'width': '250px',
+      'z-index': '9999'
+   });
    $('.tip').tooltip({showURL: false});
 });
 </script>
@@ -43,12 +51,24 @@ $(function() {
 {% endblock %}
 
 {% block body %}
+<div id="notification"></div>
+{% if error %}
+<script type="text/javascript">
+$(function() {
+   $('#notification').jnotifyAddMessage({
+      text: {{error}},
+      permanent: false,
+      type: 'error'
+   });
+});
+</script>
+{% endif %}
 <div id="header">
    <div style="float: right; margin-right: 50px;" class="button"><a id="logout" href="/auth/logout">Logout</a></div>
    <div id="linklist">
    {% if user %}
       <ul>
-         <li><a href="/user">{{ user.get_full_name }}</a></li>
+         <li><a href="/user"><span class="ui-icon ui-icon-locked"></span>{{ user.get_full_name }}</a></li>
       </ul>
    {% endif %}
    </div>

@@ -45,7 +45,10 @@ $(function() {
    $('#share-mail-dialog form').submit(function() {
       $.get($(this).attr('action'),$(this).serialize(),function(data) {
          if (data) {
-            $.jGrowl(data);
+            $('#notification').jnotifyAddMessage({
+               text: data,
+               permanent: false
+            });
          }
       });
       return false;
