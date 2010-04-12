@@ -7,18 +7,18 @@ from lobber.share.users import *
 
 urlpatterns = patterns('',
     # (regexp as a string, function without prefix as a string)
-    (r'^/$', welcome),
+    (r'^$', welcome),
     # RESTful API.
-    (r'^/?torrent/$',TorrentView),
-    (r'^/?torrent/delete/(?P<tid>.+)$',delete_torrent),
-    (r'^/?torrent/sendlink/(?P<tid>.+)$',send_link_mail),
-    (r'^/?torrent/gufrt/(?P<tid>.+)$', gimme_url_for_reading_torrent),
-    (r'^/?torrent/new/$',TorrentForm),
-    (r'^/?torrent/jnlp/$',upload_jnlp),
-    (r'^/?torrent/(?P<inst>.*)\.(.+)$', TorrentView),
-    (r'^/?key/$', api_keys),
-    (r'^/?key/(?P<inst>.+)$', api_key),
-    (r'^/?key.html', key_form),
+    (r'^torrent/$',TorrentView),
+    (r'^torrent/delete/(?P<tid>.+)$',delete_torrent),
+    (r'^torrent/sendlink/(?P<tid>.+)$',send_link_mail),
+    (r'^torrent/gufrt/(?P<tid>.+)$', gimme_url_for_reading_torrent),
+    (r'^torrent/new/$',TorrentForm),
+    (r'^torrent/jnlp/$',upload_jnlp),
+    (r'^torrent/(?P<inst>.*)\.(.+)$', TorrentView),
+    (r'^key/$', api_keys),
+    (r'^key/(?P<inst>.+)$', api_key),
+    (r'^key.html', key_form),
     # Old stuff, pre API era.  FIXME: Clean up.
-    (r'^/?user/$', user_self),          # Short for self.
+    (r'^user/$', user_self),          # Short for self.
     )

@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from lobber.multiresponse import respond_to
-from lobber.settings import BASE_DIR, MEDIA_ROOT, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE
+from lobber.settings import BASE_DIR, TORRENTS, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE
 from lobber.share.models import Torrent, Tag, UserProfile
 from forms import UploadForm, CreateKeyForm
 
@@ -57,7 +57,7 @@ def _store_torrent(req, form):
     torrent_file_content = torrent_file.read()
     torrent_file.close()
     torrent_name, torrent_hash = _torrent_info(torrent_file_content)
-    name_on_disk = '%s/torrents/%s' % (MEDIA_ROOT, '%s.torrent' % torrent_hash)
+    name_on_disk = '%s/%s' % (TORRENTS, '%s.torrent' % torrent_hash)
     f = file(name_on_disk, 'w')
     f.write(torrent_file_content)
     f.close()

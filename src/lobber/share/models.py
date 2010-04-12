@@ -1,7 +1,7 @@
 from django.db import models
 # http://docs.djangoproject.com/en/dev/topics/auth/#module-django.contrib.auth
 from django.contrib.auth.models import User
-from lobber.settings import MEDIA_ROOT
+from lobber.settings import TORRENTS
 
 class Torrent(models.Model):
     name = models.CharField(max_length=256, blank=True)
@@ -9,13 +9,16 @@ class Torrent(models.Model):
     creator = models.ForeignKey(User)
     creation_date = models.DateTimeField(auto_now_add=True)
     expiration_date = models.DateTimeField() # FIXME: Default to something reasonable.
-    data = models.FileField(upload_to='torrents') # upload_to: directory in MEDIA_ROOT.
+    data = models.FileField(upload_to='.') # upload_to: directory in TORRENTS.
     hashval = models.CharField(max_length=40)
     acl = models.TextField()
     tags = models.ManyToManyField('Tag')
 
     def __unicode__(self):
         return '%s "%s" (acl=%s)' % (self.hashval, self.name, self.acl)
+
+    def url(self):
+        return "/torrents/%s.torrent" % self.hashval
 
     def auth(self, username, perm):
         for ace in self.acl.split(' '):
@@ -30,7 +33,7 @@ class Torrent(models.Model):
         self.acl += ace
 
     def file(self):
-        fn = '%s/torrents/%s.torrent' % (MEDIA_ROOT, self.hashval)
+        fn = '%s/%s.torrent' % (TORRENTS, self.hashval)
         f = None
         try:
             f = file(fn)
