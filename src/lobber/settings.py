@@ -43,6 +43,7 @@ USE_I18N = True
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = "%s/src/site-media" % BASE_DIR
+ADMIN_MEDIA_ROOT = "/usr/lib/pymodules/python2.5/django/contrib/admin/media"
 TORRENTS = "%s/torrents" % BASE_DIR
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
@@ -53,7 +54,8 @@ MEDIA_URL = '/site-media/'
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/admin/media/'
+ADMIN_MEDIA_PREFIX = '/admin-media/'
+
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '79881b760f983c625fee66993d40d9ec997454fb9ce0e6cb4db99624265d1ffb'
@@ -65,8 +67,10 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.load_template_source',
 )
 
+APPEND_SLASH = False
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
+    'lobber.urlmiddleware.UrlMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'lobber.middleware.KeyMiddleware',

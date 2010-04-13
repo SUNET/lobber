@@ -31,22 +31,6 @@ def _torrent_info(data):
     info = bdecode(data)['info']
     return info['name'], sha1(bencode(info)).hexdigest()
 
-def add_hash_to_whitelist(thash):
-    """
-    Add THASH to tracker whitelist file and send signal HUP to the
-    tracker.
-    """
-    # Append hash to whitelist file.
-    wlf = file('%s/%s' % (BASE_DIR, 'tracker/whitelist'), 'a')
-    wlf.write(thash + '\n')
-    wlf.close()
-    # Read PID file.
-    pidf = file('%s/%s' % (BASE_DIR, 'tracker/pid'), 'r')
-    pid = int(pidf.read())
-    pidf.close()
-    # HUP tracker.
-    os.kill(pid, 1)
-
 def _store_torrent(req, form):
     """
     Store torrent file in the file system and add its hash to the
@@ -69,7 +53,6 @@ def _store_torrent(req, form):
                 data = '%s.torrent' % torrent_hash,
                 hashval = torrent_hash)
     t.save()
-    add_hash_to_whitelist(torrent_hash)
     return t.id
     
 ####################
@@ -90,6 +73,16 @@ def upload_jnlp(req):
          'apiurl': '%s/ulform/' % NORDUSHARE_URL} # ==> upload_form() via urls.py.
     return render_to_response('share/launch.jnlp', d,
                               mimetype='application/x-java-jnlp-file')
+
+def exists(req,inst):
+   r = HttpResponse(status=200);
+   r['Pragma'] = 'no-cache'
+   try:
+      t = Torrent.objects.get(hashval=inst)
+      r.content = t.hashval
+   except ObjectDoesNotExist:
+      r.status_code = 404
+   return r;
 
 class TorrentViewBase(Resource):
     """
