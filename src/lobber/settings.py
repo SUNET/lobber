@@ -56,6 +56,12 @@ MEDIA_URL = '/site-media/'
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = '/admin-media/'
 
+# Used by the URLmiddleware
+APPEND_SLASH = False
+
+# Used by mail sender
+SMTP_HOST = 'smtp.nordu.net'
+SMTP_PORT = 25
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '79881b760f983c625fee66993d40d9ec997454fb9ce0e6cb4db99624265d1ffb'
@@ -67,7 +73,6 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.load_template_source',
 )
 
-APPEND_SLASH = False
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'lobber.urlmiddleware.UrlMiddleware',
