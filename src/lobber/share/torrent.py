@@ -1,23 +1,18 @@
 import os
-import sys
 from datetime import datetime as dt
-from hashlib import sha256
-from random import getrandbits
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.servers.basehttp import FileWrapper
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from lobber.multiresponse import respond_to
-from lobber.settings import BASE_DIR, TORRENTS, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE
-from lobber.share.models import Torrent, Tag, UserProfile
-from forms import UploadForm, CreateKeyForm
+from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE
 
 from lobber.resource import Resource
 import lobber.log
+from lobber.share.forms import UploadForm
+from lobber.share.models import Torrent
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 ####################
@@ -45,13 +40,13 @@ def _store_torrent(req, form):
     f = file(name_on_disk, 'w')
     f.write(torrent_file_content)
     f.close()
-    t = Torrent(acl = 'user:%s#w' % req.user.username,
-                creator = req.user,
-                name = torrent_name,
-                description = form.cleaned_data['description'],
-                expiration_date = form.cleaned_data['expires'],
-                data = '%s.torrent' % torrent_hash,
-                hashval = torrent_hash)
+    t = Torrent(acl='user:%s#w' % req.user.username,
+                creator=req.user,
+                name=torrent_name,
+                description=form.cleaned_data['description'],
+                expiration_date=form.cleaned_data['expires'],
+                data='%s.torrent' % torrent_hash,
+                hashval=torrent_hash)
     t.save()
     return t.id
     
@@ -59,11 +54,11 @@ def _store_torrent(req, form):
 # External functions, called from urls.py.
 
 def welcome(req):
-   return HttpResponseRedirect("/torrent/")
+    return HttpResponseRedirect("/torrent/")
 
 @login_required
-def delete_torrent(req,tid):
-   raise
+def delete_torrent(req, tid):
+    raise
 
 @login_required
 def upload_jnlp(req):
@@ -74,15 +69,17 @@ def upload_jnlp(req):
     return render_to_response('share/launch.jnlp', d,
                               mimetype='application/x-java-jnlp-file')
 
-def exists(req,inst):
-   r = HttpResponse(status=200);
-   r['Cache-Control'] = 'max-age=5'
-   try:
-      t = Torrent.objects.get(hashval=inst)
-      r.content = t.hashval
-   except ObjectDoesNotExist:
-      r.status_code = 404
-   return r;
+def exists(req, inst):
+    r = HttpResponse(status=200);
+    r['Cache-Control'] = 'max-age=5'
+    try:
+        t = Torrent.objects.get(hashval=inst)
+        r.content = t.hashval
+    except ObjectDoesNotExist:
+        r.status_code = 404
+    return r;
+
+
 
 class TorrentViewBase(Resource):
     """
@@ -90,27 +87,27 @@ class TorrentViewBase(Resource):
     """
 
     @login_required
-    def post(self,req):
+    def post(self, req):
         form = UploadForm(req.POST, req.FILES)
         if form.is_valid():
-           tid = _store_torrent(req,form)
-           return HttpResponseRedirect('/torrent/#%d' % tid)
+            tid = _store_torrent(req, form)
+            return HttpResponseRedirect('/torrent/#%d' % tid)
         else:
-           logger.info("upload_form: received invalid form")
+            logger.info("upload_form: received invalid form")
 
     @login_required
-    def put(self,req):
+    def put(self, req):
         form = UploadForm(req.POST, req.FILES)
         if form.is_valid():
-           tid = _store_torrent(req,form)
-           return HttpResponseRedirect('/torrent/#%d' % tid)
+            tid = _store_torrent(req, form)
+            return HttpResponseRedirect('/torrent/#%d' % tid)
         else:
-           logger.info("upload_form: received invalid form")
+            logger.info("upload_form: received invalid form")
 
 class TorrentForm(TorrentViewBase):
 
     @login_required
-    def get(self,req):
+    def get(self, req):
         return render_to_response('share/upload-torrent.html',
                                    {'announce_url': ANNOUNCE_URL,
                                     'user': req.user,
@@ -126,7 +123,7 @@ def _torrent_file_response(dict):
 
 class TorrentView(TorrentViewBase):
 
-    def _list(self,user,max=40):
+    def _list(self, user, max=40):
         lst = []
         for t in Torrent.objects.all().order_by('-creation_date')[:max]:
             if t.auth(user.username, 'r') and t.expiration_date > dt.now():
@@ -134,15 +131,15 @@ class TorrentView(TorrentViewBase):
         return lst
 
     @login_required
-    def get(self,request,inst=None):
+    def get(self, request, inst=None):
         if not inst:
-	   return render_to_response('share/index.html',
-                                     {'torrents': self._list(request.user),'user': request.user})
+            return render_to_response('share/index.html',
+                                      {'torrents': self._list(request.user), 'user': request.user})
 
         try:
-           t = Torrent.objects.get(hashval=inst)
+            t = Torrent.objects.get(hashval=inst)
         except ObjectDoesNotExist:
-           return render_to_response('share/index.html',{'user': request.user, 'error': "No such torrent: %s" % inst})
+            return render_to_response('share/index.html', {'user': request.user, 'error': "No such torrent: %s" % inst})
 
         f = t.file
         return respond_to(request,

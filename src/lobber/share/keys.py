@@ -1,23 +1,13 @@
-import os
 from datetime import datetime as dt
-from hashlib import sha256
-from random import getrandbits
-
-from django.core.mail import send_mail
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response
-from django.core.servers.basehttp import FileWrapper
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist
-
-from lobber.settings import BASE_DIR, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE
-from lobber.share.models import Torrent, Tag, UserProfile
-from forms import UploadForm, CreateKeyForm
-
-from lobber.resource import Resource
+from django.http import HttpResponse
+from django.shortcuts import render_to_response
+from forms import CreateKeyForm
+from lobber.settings import LOBBER_LOG_FILE
+from lobber.share.links import _create_key_user
+from lobber.share.models import UserProfile
 import lobber.log
+
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 @login_required

@@ -1,27 +1,17 @@
-import os
-import StringIO
-import exceptions
-from datetime import datetime as dt
 from hashlib import sha256
 from random import getrandbits
 from pprint import pprint
 
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotModified
-from django.shortcuts import render_to_response
-from django.core.servers.basehttp import FileWrapper
-from django.contrib.auth import authenticate, login
+from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from time import gmtime, strftime, sleep
+from time import gmtime, strftime
 from orbited import json
 
-from lobber.settings import BASE_DIR, LOGIN_URL, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE
-from lobber.share.models import Torrent, Tag, UserProfile
+from lobber.settings import NORDUSHARE_URL, LOBBER_LOG_FILE
+from lobber.share.models import Torrent, UserProfile
 from lobber.notify import notify
-from forms import UploadForm, CreateKeyForm
-
-from lobber.resource import Resource
 import lobber.log
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
