@@ -57,6 +57,10 @@ server (20 bytes) for each new torrent and SIGHUP the tracker.
 - Redis
 - MongoDB
 - Hypertable
+*** Take two
+- Let's use http.  It's slow, yes, but it can be made ok.
+- Cache responses in (each) tracker, positive and negative.
+- 
 ** Data model
 *** Take 1
 - The central object is an upload object (Upload) which has data and
@@ -104,12 +108,11 @@ See [[file:src/lobber/share/models.py][file:~/p/lobber/src/lobber/share/models.p
 
   https://HOST.DOMAIN.TLD/APPLICATION/OBJECT-TYPE/[INSTANCE][.REPRESENTATION]][?lkey=SECRET]
 
-
-  | instance / request method | GET  | POST/PUT | DELETE |
-  |---------------------------+------+----------+--------|
-  | no instance given         | list | create   | -      |
-  | instance given            | get  | update   | delete |
-  |---------------------------+------+----------+--------|
+  | instance / request method | GET  | POST/PUT | HEAD   | DELETE |
+  |---------------------------+------+----------+--------+--------|
+  | no instance given         | list | create   | -      | -      |
+  | instance given            | get  | update   | existp | delete |
+  |---------------------------+------+----------+--------+--------|
 
 - There are four representations: raw, json, html and rss.
 
@@ -283,6 +286,8 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 #+END_EXAMPLE
 ** Check out
 - that bit in torrents the DHT article was talking about
+** URL for torrent access control
+/torrent/exists/<hashval>
 * Progress [4/8]
 ** For Uutrecht
 - [ ] web api
@@ -333,6 +338,40 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 #+END_EXAMPLE
      
 * Operations
+** Installing opentracker
+cd /u/src
+cvs -d :pserver:cvs@cvs.fefe.de:/cvs -z9 co libowfat
+cd libowfat && make
+cd /u/src
+cvs -d :pserver:anoncvs@cvs.erdgeist.org:/home/cvsroot co opentracker
+cd opentracker && patch << EOF
+Index: Makefile
+===================================================================
+RCS file: /home/cvsroot/opentracker/Makefile,v
+retrieving revision 1.66
+diff -u -r1.66 Makefile
+--- Makefile    12 Nov 2009 10:18:27 -0000      1.66
++++ Makefile    9 Mar 2010 13:44:10 -0000
+@@ -22,7 +22,7 @@
+ #FEATURES+=-DWANT_V6
+ 
+ #FEATURES+=-DWANT_ACCESSLIST_BLACK
+-#FEATURES+=-DWANT_ACCESSLIST_WHITE
++FEATURES+=-DWANT_ACCESSLIST_WHITE
+ 
+ #FEATURES+=-DWANT_SYNC_LIVE
+ #FEATURES+=-DWANT_SYNC_SCRAPE
+@@ -41,7 +41,7 @@
+ #FEATURES+=-D_DEBUG_HTTPERROR
+ 
+ OPTS_debug=-D_DEBUG -g -ggdb # -pg -fprofile-arcs -ftest-coverage
+-OPTS_production=-Os
++#OPTS_production=-Os
+ 
+ CFLAGS+=-I$(LIBOWFAT_HEADERS) -Wall -pipe -Wextra #-ansi -pedantic
+ LDFLAGS+=-L$(LIBOWFAT_LIBRARY) -lowfat -pthread -lpthread -lz
+EOF
+make
 ** Apache configuration
         <Location "/">
            SetHandler python-program
