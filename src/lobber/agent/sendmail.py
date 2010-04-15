@@ -19,7 +19,7 @@ class MailSender(StompClientFactory):
          return
 
       notify_to = None
-      if hasattr(packet,'notify_to'):
+      if packet.has_key('notify_to'):
          notify_to = packet.get('notify_to')
 
       pprint(notify_to)
