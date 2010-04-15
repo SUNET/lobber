@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import *
-from lobber.share.torrent import *
-from lobber.share.links import *
 from lobber.share.keys import *
+from lobber.share.links import *
+from lobber.share.torrent import *
 from lobber.share.users import *
 
 urlpatterns = patterns('',

@@ -1,18 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import sys
-import datetime
-import re
 
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template.loader import render_to_string
-from django.http import HttpResponse, HttpResponseRedirect,  Http404
+from django.shortcuts import render_to_response
+from django.http import HttpResponseRedirect
 from django.views.decorators.cache import never_cache
-from django import forms
 from django.contrib import auth
-from django.db.models import Q
-from django.contrib.auth.models import User
-from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 
 from lobber.settings import LOBBER_LOG_FILE
