@@ -60,7 +60,7 @@ ADMIN_MEDIA_PREFIX = '/admin-media/'
 APPEND_SLASH = False
 
 # Used by mail sender
-SMTP_HOST = 'smtp.nordu.net'
+SMTP_HOST = 'localhost'
 SMTP_PORT = 25
 
 # Make this unique, and don't share it with anybody.

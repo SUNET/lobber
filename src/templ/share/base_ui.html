@@ -20,44 +20,46 @@ $(function() {
       'z-index': '9999'
    });
    $('.tip').tooltip({showURL: false});
-   $.PeriodicalUpdater('/notices/info',{
-      method: 'get',
-      cache: true,
-      data: '',
-      minTimeout: 1000,
-      maxTimeout: 8000,
-      multiplier: 2,
-      type: 'text',
-      maxCalls: 0,
-      autoStop: 0},function(data) {
-         lines = data.split("\n");
-         for (line in lines) {
-             $('#notification').jnotifyAddMessage({
-                text: line,
-                permanent: false,
-                type: 'info'
-              });
-         }
-   });
-   $.PeriodicalUpdater('/notices/error',{
-      method: 'get',
-      cache: true,
-      data: '',
-      minTimeout: 1000,
-      maxTimeout: 8000,
-      multiplier: 2,
-      type: 'text',
-      maxCalls: 0,
-      autoStop: 0},function(data) {
-         lines = data.split("\n");
-         for (line in lines) {
-             $('#notification').jnotifyAddMessage({
-                text: line,
-                permanent: true,
-                type: 'error'
-              });
-         }
-   });
+   stomp = new STOMPClient();
+   stomp.onopen = function() {
+       $('#notification').jnotifyAddMessage({
+          text: "STOMP connection opened",
+          permanent: false,
+          type: 'info'
+       });
+   };
+   stomp.onclose = function(c) { 
+       $('#notification').jnotifyAddMessage({
+          text: "STOMP connection lost: "+c,
+          permanent: true,
+          type: 'error'
+       });
+   };
+   stomp.onerror = function(error) {
+       $('#notification').jnotifyAddMessage({
+          text: error,
+          permanent: true,
+          type: 'error'
+       });
+   };
+   stomp.onerrorframe = function(frame) {
+       $('#notification').jnotifyAddMessage({
+          text: frame.body,
+          permanent: true,
+          type: 'error'
+       });
+   };
+   stomp.onconnectedframe = function() {
+       stomp.subscribe("/session/"+$.cookie("sessionid"));
+   };
+   stomp.onmessageframe = function(frame) {
+       $('#notification').jnotifyAddMessage({
+          text: frame.body,
+          permanent: false,
+          type: 'info'
+       });
+   };
+   stomp.connect('localhost', 61613);
 });
 </script>
 {% block js %}{% endblock %}

@@ -20,7 +20,6 @@ urlpatterns = patterns('',
     (r'^key/$', api_keys),
     (r'^key/(?P<inst>.+)$', api_key),
     (r'^key.html', key_form),
-    (r'^notices/(?P<tag>.*)',get_notices),
     # Old stuff, pre API era.  FIXME: Clean up.
     (r'^user/$', user_self),          # Short for self.
     )
