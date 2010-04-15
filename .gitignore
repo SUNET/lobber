@@ -5,3 +5,6 @@
 logs
 db
 torrents
+/logs
+/torrents
+/db
