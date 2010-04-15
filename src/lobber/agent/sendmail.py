@@ -1,5 +1,4 @@
 from stompservice import StompClientFactory
-from twisted.internet import reactor
 from orbited import json
 import smtplib
 import types
@@ -35,6 +34,3 @@ class MailSender(StompClientFactory):
             pprint(e)
             if notify_to != None:
                 self.send(notify_to,"Error: "+e)
-   
-reactor.connectTCP('localhost',61613, MailSender())
-reactor.run()
