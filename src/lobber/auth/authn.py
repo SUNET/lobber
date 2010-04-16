@@ -90,10 +90,11 @@ def login_federated(request):
         profile.entitlements = entitlement_in.replace(';', ' ')
         update_profile = True
 
-    if not profile.display_name:
-        # FIXME: What was the idea with display_name again?
-        profile.display_name = '%s %s' % (request.user.first_name,
-                                          request.user.last_name)
+    display_name_in = request.META.get('HTTP_DISPLAYNAME')
+    if display_name_in == None or display_name_in == "(null)":
+        display_name_in = request.META.get('HTTP_CN')
+    if display_name_in != None and display_name_in != "(null)":
+        profile.display_name = display_name_in
         update_profile = True
 
     if update_profile:
