@@ -13,6 +13,7 @@ from lobber.resource import Resource
 import lobber.log
 from lobber.share.forms import UploadForm
 from lobber.share.models import Torrent
+from lobber.notify import notify
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 ####################
@@ -48,6 +49,7 @@ def _store_torrent(req, form):
                 data='%s.torrent' % torrent_hash,
                 hashval=torrent_hash)
     t.save()
+    notify("/torrent/new", torrent_hash);
     return t.id
     
 ####################
@@ -78,8 +80,6 @@ def exists(req, inst):
     except ObjectDoesNotExist:
         r.status_code = 404
     return r;
-
-
 
 class TorrentViewBase(Resource):
     """
@@ -139,7 +139,6 @@ class TorrentView(TorrentViewBase):
         except ObjectDoesNotExist:
             return render_to_response('share/index.html', make_response_dict(request,{'error': "No such torrent: %s" % inst}))
 
-        f = t.file
         return respond_to(request,
                           {'text/html': 'share/torrent.html',
                            'application/x-bittorrent': lambda dict: _torrent_file_response(dict)},
