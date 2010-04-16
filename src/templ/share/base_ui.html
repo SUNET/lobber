@@ -108,7 +108,7 @@ $(function() {
    <div id="linklist">
    {% if user.is_authenticated %}
       <ul>
-         <li><a href="/user"><span class="ui-icon ui-icon-locked"></span>{{ user.get_full_name }}</a></li>
+         <li><a href="/user"><span class="ui-icon ui-icon-locked" style="float: left;"></span>{{ user.get_full_name }}</a></li>
       </ul>
    {% endif %}
    </div>
