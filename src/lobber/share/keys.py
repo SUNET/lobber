@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from forms import CreateKeyForm
 from lobber.settings import LOBBER_LOG_FILE
-from lobber.share.links import _create_key_user
+from lobber.share.users import create_key_user
 from lobber.share.models import UserProfile
 import lobber.log
 
@@ -26,24 +26,18 @@ def api_keys(req):
             lst.append(p)
         return lst
 
-    d = {'user': req.user}
-        
     if req.method == 'GET':
-        d.update({'keys': _list(req.user)})
-        response = render_to_response('share/keys.html', d)
+        response = render_to_response('share/keys.html', make_response_dict(req,{'keys': _list(req.user)}))
     elif req.method == 'POST':
         form = CreateKeyForm(req.POST)
         if form.is_valid():
-            _create_key_user(req.user,
-                             form.cleaned_data['urlfilter'],
-                             form.cleaned_data['entitlements'],
-                             form.cleaned_data['expires'])
-            d.update({'keys': _list(req.user)})
-            response = render_to_response('share/keys.html', d)
+            create_key_user(req.user,
+                            form.cleaned_data['urlfilter'],
+                            form.cleaned_data['entitlements'],
+                            form.cleaned_data['expires'])
+            response = render_to_response('share/keys.html', make_response_dict(req,{'keys': _list(req.user)}))
         else:
-            response = render_to_response('share/create_key.html',
-                                          {'form': CreateKeyForm(),
-                                           'user': req.user})
+            response = render_to_response('share/create_key.html', make_response_dict(req,{'form': CreateKeyForm()}))
     return response
 
 @login_required
@@ -57,5 +51,4 @@ def api_key(req, inst):
 
 def key_form(req):
     return render_to_response('share/create_key.html',
-                              {'form': CreateKeyForm(),
-                               'user': req.user})
+                              make_response_dict(req,{'form': CreateKeyForm()}))

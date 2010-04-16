@@ -6,7 +6,7 @@ from django.shortcuts import render_to_response
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from lobber.multiresponse import respond_to
+from lobber.multiresponse import respond_to, make_response_dict
 from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE
 
 from lobber.resource import Resource
@@ -109,9 +109,7 @@ class TorrentForm(TorrentViewBase):
     @login_required
     def get(self, req):
         return render_to_response('share/upload-torrent.html',
-                                   {'announce_url': ANNOUNCE_URL,
-                                    'user': req.user,
-                                    'form': UploadForm()})
+                                   make_response_dict(req,{'form': UploadForm()}))
 
 def _torrent_file_response(dict):
     t = dict.get('torrent')
@@ -134,12 +132,12 @@ class TorrentView(TorrentViewBase):
     def get(self, request, inst=None):
         if not inst:
             return render_to_response('share/index.html',
-                                      {'torrents': self._list(request.user), 'user': request.user})
+                                      make_response_dict(request,{'torrents': self._list(request.user)}))
 
         try:
             t = Torrent.objects.get(hashval=inst)
         except ObjectDoesNotExist:
-            return render_to_response('share/index.html', {'user': request.user, 'error': "No such torrent: %s" % inst})
+            return render_to_response('share/index.html', make_response_dict(request,{'error': "No such torrent: %s" % inst}))
 
         f = t.file
         return respond_to(request,

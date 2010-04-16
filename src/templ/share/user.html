@@ -1,6 +1,11 @@
 {% extends "share/base_ui.html" %}
 
 {% block title %}Lobber{% endblock %}
+{% block js %}
+<script type="text/javascript">
+   $("#gravatar").append($.gravatar($('#email').contents().text()));
+</script>
+{% endblock %}
 
 {% block main %}
 <div class="ui-widget-header ui-corner-all infopanel">
