@@ -65,7 +65,7 @@ def upload_jnlp(req):
     d = {'sessionid': req.session.session_key,
          'announce_url': ANNOUNCE_URL,
          'baseurl': BASE_UI_URL,
-         'apiurl': '%s/ulform/' % NORDUSHARE_URL} # ==> upload_form() via urls.py.
+         'apiurl': '%s/torrent/new/' % NORDUSHARE_URL} # ==> upload_form() via urls.py.
     return render_to_response('share/launch.jnlp', d,
                               mimetype='application/x-java-jnlp-file')
 
