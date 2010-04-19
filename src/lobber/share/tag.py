@@ -1,29 +1,51 @@
 from django.http import HttpResponse
-from django.core import serializers
 from tagging.models import Tag
 from lobber.share.models import Torrent
+from django.utils.datastructures import MultiValueDictKeyError
+from orbited import json
+from pprint import pprint
 
 def list_tags(request):
         try:
-                tags = Tag.objects.filter(name__istartswith=request.GET['term']).values_list('name', flat=True)
+                tags = map(lambda x: x.name,Tag.objects.filter(name__istartswith=request.GET['term']))
         except MultiValueDictKeyError:
                 pass
 
-        return HttpResponse('\n'.join(tags), mimetype='text/plain')
+        r = HttpResponse(json.encode(tags), mimetype='text/x-json')
+        
+        r['Cache-Control'] = 'no-cache, must-revalidate' 
+        r['Pragma'] = 'no-cache'
+
+        return r
 
 def add_tag(request):
-        t = Torrent.objects.get(tid=request.POST['tid'])
-	Tag.objects.add_tag(t,request.POST['name'])
+        t = Torrent.objects.get(id=request.REQUEST['tid'])
+        Tag.objects.add_tag(t,request.REQUEST['name'])
         return HttpResponse()
 
 def get_tags(request):
-        t = Torrent.objects.get(tid=request.POST['tid'])
-        qs = Tag.objects.get_for_object(t)
-        return HttpResponse("\n".join(qs.values_list('name', flat=True).order_by('count')))
+        t = Torrent.objects.get(id=request.REQUEST['tid'])
+        lst = map(lambda t: t.name, t.tags)
+        return HttpResponse("\n".join(lst))
 
 def remove_tag(request):
-        t = Torrent.objects.get(tid=request.POST['tid'])
-        qs = Tag.objects.get_for_object(t)
-        tags = qs.values_list('name', flat=True)
-        tags.remove(request.POST['name'])
-        Tag.objects.update_tags(t,tags)
+        pprint(request.REQUEST['tid'])
+        t = Torrent.objects.get(id=request.REQUEST['tid'])
+        if t is None:
+            return
+        pprint(t)
+        lst = map(lambda t: t.name, t.tags)
+        name = request.REQUEST['name']
+        pprint(name)
+        pprint(lst)
+        pprint("hej")
+        if name in lst:
+            lst = lst.remove(name)
+            pprint(lst)
+            tags = ""
+            if lst is not None:
+                tags = " ".join(lst)
+            pprint("hoho:" + tags)
+            Tag.objects.update_tags(t,tags)
+        
+        return HttpResponse()

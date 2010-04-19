@@ -1,8 +1,9 @@
 from django.conf.urls.defaults import *
-from lobber.share.keys import *
-from lobber.share.links import *
-from lobber.share.torrent import *
-from lobber.share.users import *
+from lobber.share.keys import api_keys, api_key, key_form
+from lobber.share.links import send_link_mail, gimme_url_for_reading_torrent
+from lobber.share.torrent import TorrentView, delete_torrent, upload_jnlp, TorrentForm, exists, welcome
+from lobber.share.users import user_self
+from lobber.share.tag import list_tags, add_tag, remove_tag, get_tags
 
 urlpatterns = patterns('',
     # (regexp as a string, function without prefix as a string)
@@ -19,6 +20,11 @@ urlpatterns = patterns('',
     (r'^key/$', api_keys),
     (r'^key/(?P<inst>.+)$', api_key),
     (r'^key.html', key_form),
+    # Tagging
+    (r'^torrent/tag/list$', list_tags),
+    (r'^torrent/tag/add$', add_tag),
+    (r'^torrent/tag/remove$', remove_tag),
+    (r'^torrent/tag/get$', get_tags),
     # Old stuff, pre API era.  FIXME: Clean up.
-    (r'^user/$', user_self),          # Short for self.
+    (r'^user/$', user_self), # Short for self.
     )

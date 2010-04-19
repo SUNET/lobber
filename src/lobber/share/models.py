@@ -2,6 +2,9 @@ from django.db import models
 # http://docs.djangoproject.com/en/dev/topics/auth/#module-django.contrib.auth
 from django.contrib.auth.models import User
 from lobber.settings import TORRENTS
+import tagging
+from tagging.models import Tag
+from pprint import pprint
 
 class Torrent(models.Model):
     name = models.CharField(max_length=256, blank=True)
@@ -12,7 +15,6 @@ class Torrent(models.Model):
     data = models.FileField(upload_to='.') # upload_to: directory in TORRENTS.
     hashval = models.CharField(max_length=40)
     acl = models.TextField()
-    tags = models.ManyToManyField('Tag')
 
     def __unicode__(self):
         return '%s "%s" (acl=%s)' % (self.hashval, self.name, self.acl)
@@ -44,9 +46,6 @@ class Torrent(models.Model):
                 raise
         return f
 
-class Tag(models.Model):
-    value = models.CharField(max_length=128, blank=True, primary_key=True)
-
 class UserProfile(models.Model):
     user = models.ForeignKey(User, unique=True, related_name='profile')
     creator = models.ForeignKey(User)
@@ -67,3 +66,4 @@ class UserProfile(models.Model):
         return username
     
             
+tagging.register(Torrent)

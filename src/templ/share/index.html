@@ -53,6 +53,25 @@ $(function() {
       });
       return false;
    });
+   $('.tagfield').autocomplete({
+      source: "/torrent/tag/list",
+      minLength: 2,
+      select: function(event, ui) {
+         $.post("/torrent/tag/add",{tid: $(this).closest('.torrent').attr('id'), name: ui.item.value});
+         $('.tags:last-child').append("<li class=\"tag\"><a class=\"tip\" title=\"Search for torrets with tag "+ui.item.value+"\" href=\"#\">"+ui.item.value+"</a><a class=\"remove\"><span class=\"ui-icon ui-icon-close\"></span></a></li>");
+      }
+   });
+   $('.tagform').submit(function() {
+      $.post("/torrent/tag/add",{tid: $(this).closest('.torrent').attr('id'), name: $(this).find(".tagfield").first().attr('value')});
+      $('.tags:last-child').append("<li class=\"tag\"><a class=\"tip\" title=\"Search for torrets with tag "+ui.item.value+"\" href=\"#\">"+$(this).attr('value')+"</a><a class=\"remove\"><span class=\"ui-icon ui-icon-close\"></span></a></li>");
+      return false;
+   });
+   $('.tag .remove').click(function() {
+      $.post("/torrent/tag/remove",{
+         tid: $(this).closest('.torrent').attr('id'),
+         name: $(this).prev().text()});
+      $(this).closest('.tag').remove();
+   });
 });
 
 function gufrt(id) {
@@ -94,7 +113,7 @@ function mailit(id) {
 <h1>Published Torrents</h1>
 <div id="accordion">
     {% for t in torrents %}
-      <div>
+      <div id="{{t.id}}" class="torrent">
 	<h3><a href="#{{t.id}}">{{ t.name }} - created at {{t.creation_date}}</a></h3>
         <div>
 	   <div class="navlist">
@@ -129,6 +148,14 @@ function mailit(id) {
                       <span class="ui-icon ui-icon-wrench"></span>
                    </a>
                 </li>
+                <li style="float: right;">
+                   <form class="tagform"><input type="text" name="name" class="tagfield"/><form>
+                </li>
+                <ul class="tags">
+                {% for tag in t.tags %}
+                   <li class="tag"><a class="tip" title="Search for torrets with tag {{tag.name}}" href="#">{{tag.name}}</a><a class="remove"><span title="Remove tag" class="tip ui-icon ui-icon-close"></span></a></li>
+                {% endfor %}
+                </ul>
              <ul> 
            </div>
            {% if t.description %}

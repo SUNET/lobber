@@ -105,6 +105,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'tagging',
     'lobber.share',
     'lobber.auth'
 )
