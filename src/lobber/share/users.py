@@ -1,13 +1,15 @@
 from datetime import datetime as dt
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist
-from lobber.multiresponse import respond_to, make_response_dict
+from lobber.multiresponse import make_response_dict
 
 from lobber.settings import LOBBER_LOG_FILE
 from lobber.share.models import Torrent, UserProfile
 
 import lobber.log
+from random import getrandbits
+from hashlib import sha256
+from django.contrib.auth.models import User
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 def create_key_user(creator, urlfilter, entitlements, expires=None):
