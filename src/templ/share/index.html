@@ -56,14 +56,14 @@ $(function() {
    $('.tagfield').autocomplete({
       source: "/torrent/tag/list",
       minLength: 2,
-      select: function(event, ui) {
+      change: function(event, ui) {
          $.post("/torrent/tag/add",{tid: $(this).closest('.torrent').attr('id'), name: ui.item.value});
-         $('.tags:last-child').append("<li class=\"tag\"><a class=\"tip\" title=\"Search for torrets with tag "+ui.item.value+"\" href=\"#\">"+ui.item.value+"</a><a class=\"remove\"><span class=\"ui-icon ui-icon-close\"></span></a></li>");
+         $(this).closest('.tags').append("<li class=\"tag\"><a class=\"tip\" title=\"Search for torrets with tag "+ui.item.value+"\" href=\"#\">"+ui.item.value+"</a><a class=\"remove\"><span class=\"ui-icon ui-icon-close\"></span></a></li>");
       }
    });
    $('.tagform').submit(function() {
       $.post("/torrent/tag/add",{tid: $(this).closest('.torrent').attr('id'), name: $(this).find(".tagfield").first().attr('value')});
-      $('.tags:last-child').append("<li class=\"tag\"><a class=\"tip\" title=\"Search for torrets with tag "+ui.item.value+"\" href=\"#\">"+$(this).attr('value')+"</a><a class=\"remove\"><span class=\"ui-icon ui-icon-close\"></span></a></li>");
+      $(this).closest('.tags').append("<li class=\"tag\"><a class=\"tip\" title=\"Search for torrets with tag "+ui.item.value+"\" href=\"#\">"+$(this).attr('value')+"</a><a class=\"remove\"><span class=\"ui-icon ui-icon-close\"></span></a></li>");
       return false;
    });
    $('.tag .remove').click(function() {
