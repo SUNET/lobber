@@ -30,6 +30,9 @@ class Torrent(models.Model):
                 if ace.endswith('#%c' % perm):
                     return True
         return False
+    
+    def authz_tag(self,user,perm,tagname):
+        return True
 
     def add_ace(self, ace):
         self.acl += ace
