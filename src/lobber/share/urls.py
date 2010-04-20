@@ -21,10 +21,10 @@ urlpatterns = patterns('',
     (r'^key/(?P<inst>.+)$', api_key),
     (r'^key.html', key_form),
     # Tagging
-    (r'^torrent/tag/list$', list_tags),
-    (r'^torrent/tag/add$', add_tag),
-    (r'^torrent/tag/remove$', remove_tag),
-    (r'^torrent/tag/get$', get_tags),
+    (r'^torrent/tags$', list_tags),
+    (r'^torrent/(?P<tid>.+)/tag/add/(?P<name>.+)$', add_tag),
+    (r'^torrent/(?P<tid>.+)/tag/remove/(?P<name>.+)$', remove_tag),
+    (r'^torrent/(?P<tid>.+)/tags$', get_tags),
     # Old stuff, pre API era.  FIXME: Clean up.
     (r'^user/$', user_self), # Short for self.
     )
