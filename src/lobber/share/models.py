@@ -32,9 +32,6 @@ class Torrent(models.Model):
                     return True
         return False
     
-    def authz_tag(self,user,perm,tagname):
-        return True
-
     def authz_tag(self, user, perm, tag):
         """Does USER have PERM on torrent w.r.t. tagging operations on
         the torrent with TAG?
