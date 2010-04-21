@@ -22,12 +22,28 @@ class Torrent(models.Model):
     def url(self):
         return "/torrents/%s.torrent" % self.hashval
 
-    def auth(self, username, perm):
+    def authz(self, user, perm):
+        """Does USER have PERM on torrent?"""
         for ace in self.acl.split(' '):
-            if ace.startswith('user:%s' % username):
+            if ace.startswith('user:%s' % user.username):
                 if ace.endswith('#w'):  # Write permission == all.
                     return True
                 if ace.endswith('#%c' % perm):
+                    return True
+        return False
+
+    def authz_tag(self, user, perm, tag):
+        """Does USER have PERM on torrent w.r.t. tagging operations on
+        the torrent with TAG?
+        """
+        if tag == 'r':
+            return self.authz(user, tag)
+        elif tag == 'w' or tag == 'd':
+            if self.authz(user, 'w'):
+                if ':' in tag:
+                    if tag in user.profile.get().entitlements:
+                        return True
+                else:
                     return True
         return False
 

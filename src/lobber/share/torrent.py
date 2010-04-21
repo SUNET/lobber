@@ -124,7 +124,7 @@ class TorrentView(TorrentViewBase):
     def _list(self, user, max=40):
         lst = []
         for t in Torrent.objects.all().order_by('-creation_date')[:max]:
-            if t.auth(user.username, 'r') and t.expiration_date > dt.now():
+            if t.authz(user, 'r') and t.expiration_date > dt.now():
                 lst.append(t)
         return lst
 
