@@ -135,7 +135,7 @@ class TorrentView(TorrentViewBase):
                                       make_response_dict(request,{'torrents': self._list(request.user)}))
 
         try:
-            t = Torrent.objects.get(hashval=inst)
+            t = Torrent.objects.get(id=inst)
         except ObjectDoesNotExist:
             return render_to_response('share/index.html', make_response_dict(request,{'error': "No such torrent: %s" % inst}))
 

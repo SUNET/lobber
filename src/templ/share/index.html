@@ -53,26 +53,58 @@ $(function() {
       });
       return false;
    });
+   function _add_tag_li(elt,name) {
+	   elt.append($("<li class=\"tag\"><a class=\"tip\" title=\"Search for torrets with tag "+name+"\" href=\"#\">"+name+"</a><a class=\"remove\" href=\"javascript:void(0);\" onClick=\"remove_tag_li(this);\"><span class=\"ui-icon ui-icon-close\"></span></a></li>"));
+   }
+   function _add_tag(tid,name) {
+	   var elt = $(this).closest('.tags');
+	   $.get("/torrent/"+tid+"/tag/add/"+name,function(data) {
+        	_add_tag_li(elt,data);
+       });
+   }
+   $('.tags').each(function(index) {
+	   var elt = $(this);
+	   var tid = $(this).closest('.torrent').attr('id');
+	   $.getJSON("/torrent/"+tid+"/tags",{},function(data,status) {
+		   var length = data.length;
+		   for (var i = 0; i < length; i++) {
+	          _add_tag_li(elt,data[i]);
+		   }
+	   });
+   });
    $('.tagfield').autocomplete({
-      source: "/torrent/tag/list",
+      source: "/torrent/tags",
       minLength: 2,
       change: function(event, ui) {
-         $.post("/torrent/tag/add",{tid: $(this).closest('.torrent').attr('id'), name: ui.item.value});
-         $(this).closest('.tags').append("<li class=\"tag\"><a class=\"tip\" title=\"Search for torrets with tag "+ui.item.value+"\" href=\"#\">"+ui.item.value+"</a><a class=\"remove\"><span class=\"ui-icon ui-icon-close\"></span></a></li>");
+	      var tag;
+	      if (ui.item) {
+		    tag = ui.item.value;
+	      } else {
+			tag = $(this).closest('.tagfield').first().attr('value');
+	      }
+	     _add_tag($(this).closest('.torrent').attr('id'),tag);
       }
    });
    $('.tagform').submit(function() {
-      $.post("/torrent/tag/add",{tid: $(this).closest('.torrent').attr('id'), name: $(this).find(".tagfield").first().attr('value')});
-      $(this).closest('.tags').append("<li class=\"tag\"><a class=\"tip\" title=\"Search for torrets with tag "+ui.item.value+"\" href=\"#\">"+$(this).attr('value')+"</a><a class=\"remove\"><span class=\"ui-icon ui-icon-close\"></span></a></li>");
+	  _add_tag($(this).closest('.torrent').attr('id'),$(this).find(".tagfield").first().attr('value'));
       return false;
    });
    $('.tag .remove').click(function() {
-      $.post("/torrent/tag/remove",{
-         tid: $(this).closest('.torrent').attr('id'),
-         name: $(this).prev().text()});
-      $(this).closest('.tag').remove();
+	  var tid = $(this).closest('.torrent').attr('id');
+	  var elt = $(this).closest('.tag');
+      $.get("/torrent/"+tid+"/tag/remove/"+$(this).prev().text(),function(data) {
+      	  elt.remove();
+      });
    });
 });
+
+function remove_tag_li(a) {
+	   var tid = $(a).closest('.torrent').attr('id');
+	   var li = $(a).closest('.tag');
+	   $.get("/torrent/"+tid+"/tag/remove/"+$(a).prev().text(),function(data) {
+	      li.remove();
+	   });
+}
 
 function gufrt(id) {
    $('#link').load("/torrent/gufrt/"+id);
@@ -124,7 +156,7 @@ function mailit(id) {
                    </a>
                 </li>
                 <li>
-                   <a class="tip" title="Download this data using the download manager" href="/torrent/{{t.hashval}}.jnlp">
+                   <a class="tip" title="Download this data using the download manager" href="/torrent/{{t.id}}.jnlp">
                       <span class="ui-icon ui-icon-folder-open"></span>
                    </a>
                 </li>
@@ -144,18 +176,14 @@ function mailit(id) {
                    </a>
                 </li>
                 <li style="float: right;">
-                   <a class="tip" title="Modify settings for this torrent" href="/torrent/{{t.hashval}}.html">
+                   <a class="tip" title="Modify settings for this torrent" href="/torrent/{{t.id}}.html">
                       <span class="ui-icon ui-icon-wrench"></span>
                    </a>
                 </li>
                 <li style="float: right;">
                    <form class="tagform"><input type="text" name="name" class="tagfield"/><form>
                 </li>
-                <ul class="tags">
-                {% for tag in t.tags %}
-                   <li class="tag"><a class="tip" title="Search for torrets with tag {{tag.name}}" href="#">{{tag.name}}</a><a class="remove"><span title="Remove tag" class="tip ui-icon ui-icon-close"></span></a></li>
-                {% endfor %}
-                </ul>
+                <ul class="tags"></ul>
              <ul> 
            </div>
            {% if t.description %}

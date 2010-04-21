@@ -31,6 +31,9 @@ class Torrent(models.Model):
                 if ace.endswith('#%c' % perm):
                     return True
         return False
+    
+    def authz_tag(self,user,perm,tagname):
+        return True
 
     def authz_tag(self, user, perm, tag):
         """Does USER have PERM on torrent w.r.t. tagging operations on
@@ -49,6 +52,14 @@ class Torrent(models.Model):
 
     def add_ace(self, ace):
         self.acl += ace
+
+    def readable_tags(self, user):
+        tags = Tag.objects.get_for_object(self)
+        otags = []
+        for tag in tags:
+            if self.authz_tag(user,"r",tag.name):
+                otags.append(tag)
+        return otags
 
     def file(self):
         fn = '%s/%s.torrent' % (TORRENTS, self.hashval)
