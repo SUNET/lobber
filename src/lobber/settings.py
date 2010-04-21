@@ -3,9 +3,9 @@
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-BASE_DIR = '/home/leifj/work/sunet.se/lobber'
-BASE_UI_URL = 'https://nordushare-dev.nordu.net'
-BASE_URL = 'http://nordushare-dev.nordu.net'
+BASE_DIR = '..'
+BASE_UI_URL = 'https://localhost'
+BASE_URL = 'http://localhost'
 APPLICATION_CTX = ''
 NORDUSHARE_URL = BASE_UI_URL 
 ANNOUNCE_URL = '%s:4711/announce' % BASE_URL
