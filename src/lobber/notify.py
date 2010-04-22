@@ -1,5 +1,6 @@
 import sys
 import stomp
+import json
 
 def notify(topic,data):
     c = stomp.Connection()
@@ -8,6 +9,9 @@ def notify(topic,data):
     c.send(data,destination=topic)
     c.disconnect()
 
+def notifyJSON(topic,data):
+    notify(topic,json.dumps(data))
+
 if __name__ == "__main__":
-    notify(sys.argv[1],sys.argv[2])
+    notifyJSON(sys.argv[1],sys.argv[2])
     sys.exit(0)
