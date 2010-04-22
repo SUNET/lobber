@@ -165,17 +165,21 @@ See [[file:src/lobber/share/models.py][file:~/p/lobber/src/lobber/share/models.p
   user with an ACL containing an entry with the value of ".*".
 *** Take 4 <2010-02-27 Sat>
 #+BEGIN_EXAMPLE
+                 +---------+
+		 | creator |
+                 +---------+
+                     |
 +------+       1 +---------+       1 +-----+
 | tag  | ------- | torrent | ------- | acl |
 +------+ 0..*    +---------+ 1       +-----+
 
-+--------+       1 +-----+       1 +--------------+
-| url-   | ------- | key | ------- | entitlements |
-| filter | 1       +-----+ 1       +--------------+
-+--------+     
++-------------+       1 +-----+       1 +--------------+
+| constraints | ------- | key | ------- | entitlements |
++-------------+ 1       +-----+ 1       +--------------+
+
 
 entitlement := [a-z0-9_-]+   # note: not '$'
-permission := 'r' | 'w'
+permission := 'r' | 'w' | 'd'
 ace := <entitlement> '#' <permission>
 acl := <ace>+
 
@@ -183,11 +187,13 @@ entitlements := <entitlement>+
 
 filter-re := [a-z0-9.*]+   # simplified regular expression
 url-filter := <filter-re>+
+tag := [a-z0-9_-:]+
+constraints := <url-filter>* <tag>*
 
 key := sha256(random value)
 
-**** Default ACL's and default entitlements
-- When creating a torrent, its ACL is set to 'user:<login>#w'.
+**** Creating stuff -- default ACL's and entitlements
+- When creating a torrent, its creator and ACL is set to 'user:<login>#w'.
 
 The question is: What's the 'login' when not logged in but coming in
 via a key?  And the answer to that is that the user name is
@@ -199,15 +205,25 @@ should own the torrent created using the key.
 - When creating a key, the entitlement is set and never changed after
   that.  This is important for tracking ownership of torrents, audit
   aside.
+
 **** Permissions
 Permission #r:
-  - list torrent
-  - read torrent
+  - list/read torrent
   - read acl on torrent
 Permission #w:
-  - delete torrent
   - write acl on torrent (ace := entitlement carried (or "below"?))
-  - tag torrent (tag := entitlement carried or below)
+  - tag torrent (tag := global-tag (tag:) or equal to an entitlement carried)
+Permission #d:
+  - delete torrent
+
+**** Constraints
+Constraints consist of zero or more url-filters and zero or more tags.
+
+Permission to act on behalf of any of the entitlements associated to
+the key is dependant on
+  (i) incoming url matching ANY of the constraining url-filters
+  AND
+  (ii) tags on torrent match ANY of the constraining tags
 
 **** Use cases
 Use case #1: User U sharing torrent T with non-authenticated user
@@ -269,7 +285,7 @@ http://search.cpan.org/dist/WWW-Opentracker-Stats/
 ** Playing with torrent files
 On nordushare-dev, the 'bittorrent' package was installed.
 *** make a torrent file
-  btmakemetafile FILE http://nordushare-dev.nordu.net:4711/announce
+btmakemetafile FILE http://nordushare-dev.nordu.net:4711/announce
 *** view a torrent file
 #+BEGIN_EXAMPLE
 linus@nordushare-dev:~/tmp$ btshowmetainfo FILE.torrent
@@ -283,6 +299,8 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 #+END_EXAMPLE
 ** Check out
 - that bit in torrents the DHT article was talking about
+** Keys
+https://beta.lobber.se/torrent/0b62f69a143df7708c9a0fe74a9f83b1ec4a01af.torrent?lkey=3ee568053f160f7eed0f327f92
 * Progress [4/8]
 ** For Uutrecht
 - [ ] web api
@@ -373,3 +391,36 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
            allow from all
            SetHandler None
         </LocationMatch>
+* Tracker
+** Correspondance
+- talked to nrkbeta <knut-olav.hoven@nrk.no> 2009-09-22 about opentracker
+- author: erdgeist@erdgeist.org
+  <2010-04-16 Fri>
+  Subject: opentracker usage and development
+  --
+  Hi,
+
+  Thank's for making opentracker!  We use it in a (still internal)
+  project at NORDUnet for a file sharing and storage system currently
+  under development.  If we still use opentracker when we go public
+  with this, we should try to arrange for you having your beer. ;-)
+
+
+  We've recently added some more access control since the mmap:ed
+  black/whitelist solution didn't really cut it for our needs.  In
+  short, the hash of the requested torrent is looked up in an access
+  list (in-memory, linked list) containting hash, permission (yes/no)
+  and expiration date.  If not found (or expired), the hash is added
+  to a queue (in-memory, linked list) which is handled by a separate
+  thread doing an http request to resolve the permission for the
+  torrent and adding an entry to the access list.
+
+  Would you be interested in a patch?  We're currently depending on
+  libcurl[0] (for http requests) and GLib-2.0[1] (for linked lists and
+  queues) but I'm sure that you could remove these dependencies quite
+  easily if they're problematic.
+
+  [0] http://curl.haxx.se/libcurl/
+  [1] http://library.gnome.org/devel/glib/
+** debugging
+printf '%s\r\n\r\n' 'GET /announce?info_hash=%2EZc%15b%BA%7F%EE%24E%E0%CB5^C2%0Bv%F22X7 HTTP/1.1' | nc localhost 4711

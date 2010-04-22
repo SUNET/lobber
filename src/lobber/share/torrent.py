@@ -73,7 +73,7 @@ def upload_jnlp(req):
 
 def exists(req, inst):
     r = HttpResponse(status=200);
-    r['Cache-Control'] = 'max-age=5'
+    r['Cache-Control'] = 'max-age=1800' # seconds
     try:
         t = Torrent.objects.get(hashval=inst)
         r.content = t.hashval
