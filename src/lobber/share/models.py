@@ -72,11 +72,12 @@ class Torrent(models.Model):
         return f
 
 class UserProfile(models.Model):
+    """This is how we represent a key, as well as an ordinary user."""
     user = models.ForeignKey(User, unique=True, related_name='profile')
-    creator = models.ForeignKey(User)
+    creator = models.ForeignKey(User)   # Important for key users.
     display_name = models.CharField(max_length=256, blank=True)
     entitlements = models.TextField(blank=True) # Space separated entls.
-    urlfilter = models.TextField() # Space separated simplified regexps.
+    urlfilter = models.TextField(blank=True) # Space separated simplified regexps.
     expiration_date = models.DateTimeField(null=True)
 
     def __unicode__(self):
