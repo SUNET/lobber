@@ -36,9 +36,9 @@ class Torrent(models.Model):
         """Does USER have PERM on torrent w.r.t. tagging operations on
         the torrent with TAG?
         """
-        if tag == 'r':
+        if perm == 'r':
             return self.authz(user, tag)
-        elif tag == 'w' or tag == 'd':
+        elif perm == 'w' or perm == 'd':
             if self.authz(user, 'w'):
                 if ':' in tag:
                     p = user.profile.get()
