@@ -47,7 +47,7 @@ def remove_tag(request,tid,name):
         if t is None:
             return HttpResponse(status=404)
         
-        if not t.authz_tag(request.user,'w',name):
+        if not t.authz_tag(request.user,'d',name):
             return HttpResponse("Not authorized to remove tag",status=401)
             
         tags = map(lambda x: x.name, t.tags)
