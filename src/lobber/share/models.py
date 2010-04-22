@@ -41,7 +41,8 @@ class Torrent(models.Model):
         elif tag == 'w' or tag == 'd':
             if self.authz(user, 'w'):
                 if ':' in tag:
-                    if tag in user.profile.get().entitlements:
+                    p = user.profile.get()
+                    if p and tag in p.entitlements:
                         return True
                 else:
                     return True
