@@ -9,3 +9,4 @@ Other components needed:
 - Python (tested with python2.6 2.6.4-0ubuntu3)
 - rtorrent (tested with rtorrent 0.8.2-0ubuntu2, libtorrent11 0.12.2-0ubuntu2)
 - opentracker (tested with CVS as of February 2010)
+- libowfat (tested with 0.29 / CVS :pserver:cvs@cvs.fefe.de:/cvs)
