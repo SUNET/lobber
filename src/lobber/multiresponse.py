@@ -9,7 +9,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from lobber.settings import STOMP_HOST, STOMP_PORT, ORBITED_PREFIX, ANNOUNCE_URL
 from lobber.share.models import UserProfile
 
-default_suffix_mapping = { "\.htm(l?)$": "text/html", "\.json$": "application/json", "\.torrent$": "application/x-bittorrent"}
+default_suffix_mapping = {"\.htm(l?)$": "text/html",
+                          "\.json$": "application/json",
+                          "\.torrent$": "application/x-bittorrent"}
 
 def _accept_types(request, suffix):
    for r in suffix.keys():
@@ -42,7 +44,7 @@ def respond_to(request, template_mapping, dict, suffix_mapping=default_suffix_ma
    accept = _accept_types(request, suffix_mapping)
    if accept is None:
       accept = (request.META['HTTP_ACCEPT'].split(','))[0]
-   content_type = mimeparse.best_match(template_mapping.keys(),accept)
+   content_type = mimeparse.best_match(template_mapping.keys(), accept)
    template = template_mapping[content_type]
    if callable(template):
       response = template(dict)
