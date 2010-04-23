@@ -88,8 +88,8 @@ server (20 bytes) for each new torrent and SIGHUP the tracker.
   (id :user)
   (permisssions :int))  ; two bits -- read and write
 #+END_EXAMPLE
-*** Take 3 <2009-12-11 Fri>
-See [[file:src/lobber/share/models.py][file:~/p/lobber/src/lobber/share/models.py]] for data model.
+*** Take 3 <2009-12-11 Fri> and 4 <2010-02-27 Sat>
+See [[file:src/lobber/share/models.py][file:~/p/nordushare/lobber/src/lobber/share/models.py]] for data model.
 
 - There are four object types: torrrent, tag, user and key.
 
@@ -136,34 +136,22 @@ See [[file:src/lobber/share/models.py][file:~/p/lobber/src/lobber/share/models.p
   - wget https://.../torrent/foo.torrent?lobberkey=secret0 ==>
     - select from torrent where owner=<secret0->owner> and name="foo"
 
-- An access control list (ACL) is associated with a user via a key.
+- An access control list (ACL) is associated with a torrent.
 
-  Anyone who knows the secret in the key will be able to act on behalf
-  of that user.  The ACL consists of regular expressions denoting if
-  an action is allowed by matching it against the URL.  First match
-  wins.
+  The ACL consists of pairs of regular expressions and permissions (r,
+  w, d).
 
-#+BEGIN_EXAMPLE
-  ACL -- key -- user
-                 /\
-                /  \
-              tag  torrent
-#+END_EXAMPLE	      
+- A key has constraints and entitlements.
 
-  - A key has zero or one ACL.
-  - An ACL has one or more keys.
-  - A key has one owner (user).
-  - A user has zero or more keys.
-  - A user has zero or more torrents and tags.
-  - A torrent has one owner (user).
-  - A torrent has zero or more tags.
-  - A tag has one owner (user).
-  - A tag has zero or more torrents.
+  Anyone who knows the secret in a key will be able to act as if s/he
+  was logged in as a user carrying the entitlements associated with
+  the key.
 
-- Requests from a user with an HTTP session (cookie) is treated as if
-  the request had contained a secret for a key tied to the logged in
-  user with an ACL containing an entry with the value of ".*".
-*** Take 4 <2010-02-27 Sat>
+  Any operations will be checked against the constraints, see
+  [[*Constraints]].
+
+
+**** Overview
 #+BEGIN_EXAMPLE
                  +---------+
 		 | creator |
@@ -224,6 +212,8 @@ the key is dependant on
   (i) incoming url matching ANY of the constraining url-filters
   AND
   (ii) tags on torrent match ANY of the constraining tags
+
+**** URL space
 
 **** Use cases
 Use case #1: User U sharing torrent T with non-authenticated user
@@ -301,7 +291,14 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 - that bit in torrents the DHT article was talking about
 ** Keys
 https://beta.lobber.se/torrent/0b62f69a143df7708c9a0fe74a9f83b1ec4a01af.torrent?lkey=3ee568053f160f7eed0f327f92
-* Progress [4/8]
+* Progress
+** For TREFpunkt [0/5]
+- [ ] api: search (list)
+      see share/torrent.py, multiresponse.py
+- [ ] api: create torrents
+- [ ] api: delete torrents
+- [ ] api: tag handling (add, remove)	 
+- [ ] audit
 ** For Uutrecht
 - [ ] web api
       - GET torrent/<inst>
@@ -316,7 +313,7 @@ https://beta.lobber.se/torrent/0b62f69a143df7708c9a0fe74a9f83b1ec4a01af.torrent?
         file here.  The user can edit this field later.  The torrent
         file is stored as <hash>.torrent.
       Torrent spec: http://www.bittorrent.org/beps/bep_0003.html
-** Needed for demo 2009-12-18 [6/8]
+** Needed for demo 2009-12-18 [8/8]
 - [X] Working tracker running
 - [X] Dummy page in Django
 - [X] List of public, non expired torrents on start page
@@ -326,11 +323,14 @@ https://beta.lobber.se/torrent/0b62f69a143df7708c9a0fe74a9f83b1ec4a01af.torrent?
   - [X] Whitelist is updated and HUP is sent to tracker
 - [X] Client is running, seeding everything in database (that hasn't expired)
 - [X] _Some_ authentication
-- [ ] Tracker sends 4xx rather than 5xx on "not allowed"
+- [X] Tracker sends 4xx rather than 5xx on "not allowed"
+      resulution: wontfix since that's not how it's done -- for
+      tracker responses, there's "failure reason" and a new, optional
+      response "warning message" which means that "the response still
+      gets processed normally".
 - [X] Save torrent files named as the hash of the torrent, present them in
       web as what was typed in as "name" (content-disposition?)
-- [ ] Send mail with links on torrent creation
-*** Use cases
+- [X] Send mail with links on torrent creation
 ** For 0.1, after 2009-12-16
 - [ ] Proper DNS names
 - [ ] Old torrent files are removed, from index (i.e. web page) and from whitelist

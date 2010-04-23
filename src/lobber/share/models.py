@@ -52,12 +52,8 @@ class Torrent(models.Model):
         self.acl += ace
 
     def readable_tags(self, user):
-        tags = Tag.objects.get_for_object(self)
-        otags = []
-        for tag in tags:
-            if self.authz_tag(user,"r",tag.name):
-                otags.append(tag)
-        return otags
+        return filter(lambda tag: self.authz_tag(user, "r", tag.name),
+                      Tag.objects.get_for_object(self))
 
     def file(self):
         fn = '%s/%s.torrent' % (TORRENTS, self.hashval)

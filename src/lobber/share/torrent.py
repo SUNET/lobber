@@ -6,9 +6,11 @@ from django.shortcuts import render_to_response
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
+
+from tagging.models import Tag, TaggedItem
+
 from lobber.multiresponse import respond_to, make_response_dict
 from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE
-
 from lobber.resource import Resource
 import lobber.log
 from lobber.share.forms import UploadForm
@@ -121,25 +123,44 @@ def _torrent_file_response(dict):
 
 class TorrentView(TorrentViewBase):
 
-    def _list(self, user, max=40):
-        lst = []
-        for t in Torrent.objects.all().order_by('-creation_date')[:max]:
-            if t.authz(user, 'r') and t.expiration_date > dt.now():
-                lst.append(t)
-        return lst
+    def _list(self, user, args, max=40):
+        """Search for torrents for which USER has read access.
+        Filter on certain properties found in ARGS.
+
+        https://.../torrent/?txt=STRING&tag=STRING
+        """
+        q = Torrent.objects.filter(expiration_date__gt=dt.now()).order_by('-creation_date')
+        
+        for e, vals in args:            # e=(field, [search strings])
+            if e == 'user':
+                for val in vals:
+                    # q = q.filter(creator=
+                    pass                # NYI
+            elif e == 'txt':
+                for re in vals:
+                    q = q.filter(description__iregex=re) | q.filter(name__iregex=re)
+            elif e == 'tag':
+                for val in vals:
+                    tag = Tag.objects.get(name=val)
+                    q = TaggedItem.objects.get_by_model(q, tag)
+            
+        return filter(lambda t: t.authz(user, 'r'), q)[:max]
 
     @login_required
     def get(self, request, inst=None):
         if not inst:
-            return render_to_response('share/index.html',
-                                      make_response_dict(request,{'torrents': self._list(request.user)}))
+            return render_to_response(
+                'share/index.html',
+                make_response_dict(request,
+                                   {'torrents': self._list(request.user, request.GET.lists())}))
 
         try:
             t = Torrent.objects.get(id=inst)
         except ObjectDoesNotExist:
-            return render_to_response('share/index.html', make_response_dict(request,{'error': "No such torrent: %s" % inst}))
+            return render_to_response('share/index.html',
+                                      make_response_dict(request, {'error': "No such torrent: %s" % inst}))
 
         return respond_to(request,
                           {'text/html': 'share/torrent.html',
-                           'application/x-bittorrent': lambda dict: _torrent_file_response(dict)},
+                           'application/x-bittorrent': _torrent_file_response},
                           {'torrent': t})
