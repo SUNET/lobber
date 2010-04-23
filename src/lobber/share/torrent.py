@@ -6,6 +6,7 @@ from django.shortcuts import render_to_response
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import User
 
 from tagging.models import Tag, TaggedItem
 
@@ -127,15 +128,19 @@ class TorrentView(TorrentViewBase):
         """Search for torrents for which USER has read access.
         Filter on certain properties found in ARGS.
 
-        https://.../torrent/?txt=STRING&tag=STRING
+        https://.../torrent/?txt=STRING&tag=STRING&user=STRING
         """
         q = Torrent.objects.filter(expiration_date__gt=dt.now()).order_by('-creation_date')
+        empty_set = Torrent.objects.in_bulk([])
         
         for e, vals in args:            # e=(field, [search strings])
             if e == 'user':
-                for val in vals:
-                    # q = q.filter(creator=
-                    pass                # NYI
+                try:
+                    user = User.objects.get(username=vals[0])
+                except ObjectDoesNotExist:
+                    q = empty_set
+                    break
+                q = q.filter(creator=user)
             elif e == 'txt':
                 for re in vals:
                     q = q.filter(description__iregex=re) | q.filter(name__iregex=re)
