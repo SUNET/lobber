@@ -11,6 +11,7 @@ from lobber.share.models import UserProfile
 
 default_suffix_mapping = {"\.htm(l?)$": "text/html",
                           "\.json$": "application/json",
+                          "\.rss$": "application/rss+xml",
                           "\.torrent$": "application/x-bittorrent"}
 
 def _accept_types(request, suffix):
@@ -47,8 +48,8 @@ def respond_to(request, template_mapping, dict, suffix_mapping=default_suffix_ma
    content_type = mimeparse.best_match(template_mapping.keys(), accept)
    template = template_mapping[content_type]
    if callable(template):
-      response = template(dict)
+      response = template(make_response_dict(request,dict))
    else:
-      response = render_to_response(template,dict)
+      response = render_to_response(template,make_response_dict(request,dict))
       response['Content-Type'] = "%s; charset=%s" % (content_type, settings.DEFAULT_CHARSET)
    return response
