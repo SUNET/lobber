@@ -3,7 +3,7 @@ from lobber.share.keys import api_keys, api_key, key_form
 from lobber.share.links import send_link_mail, gimme_url_for_reading_torrent
 from lobber.share.torrent import TorrentView, delete_torrent, upload_jnlp, TorrentForm, exists, welcome
 from lobber.share.users import user_self
-from lobber.share.tag import list_tags, add_tag, remove_tag, get_tags
+from lobber.share.tag import list_tags, add_tag, remove_tag, get_tags, list_torrents_for_tag
 
 urlpatterns = patterns('',
     # (regexp as a string, function without prefix as a string)
@@ -22,6 +22,7 @@ urlpatterns = patterns('',
     (r'^key.html', key_form),
     # Tagging
     (r'^torrent/tags$', list_tags),
+    (r'^torrent/tag/(?P<name>.+)\.([^\.]+)$', list_torrents_for_tag),
     (r'^torrent/(?P<tid>.+)/tag/add/(?P<name>.+)$', add_tag),
     (r'^torrent/(?P<tid>.+)/tag/remove/(?P<name>.+)$', remove_tag),
     (r'^torrent/(?P<tid>.+)/tags$', get_tags),

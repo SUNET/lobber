@@ -4,6 +4,8 @@ from lobber.share.models import Torrent
 from django.utils.datastructures import MultiValueDictKeyError
 from orbited import json
 from pprint import pprint
+from torrent import find_torrents
+from lobber.multiresponse import respond_to
 
 def list_tags(request):
         try:
@@ -66,4 +68,12 @@ def remove_tag(request,tid,name):
         r['Pragma'] = 'no-cache'
 
         return r
-        
+
+def list_torrents_for_tag(request,name):
+        return respond_to(request,
+                          {'text/html': 'share/index.html',
+                           'application/rss+xml': 'share/rss2.xml',
+                           'text/rss': 'share/rss2.xml'},
+                          {'torrents': find_torrents(request.user, [('tag',[name])]),
+                           'title': 'Lobber torrents for tag '+name,
+                           'description': 'Lobber torrents for tag '+name})
