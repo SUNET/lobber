@@ -55,6 +55,33 @@ def _store_torrent(req, form):
     notify("/torrent/new", torrent_hash);
     return t.id
     
+def find_torrents(user, args, max=40):
+    """Search for torrents for which USER has read access.
+    Filter on certain properties found in ARGS.
+
+    https://.../torrent/?txt=STRING&tag=STRING&user=STRING
+    """
+    q = Torrent.objects.filter(expiration_date__gt=dt.now()).order_by('-creation_date')
+    empty_set = Torrent.objects.in_bulk([])
+    
+    for e, vals in args:            # e=(field, [search strings])
+        if e == 'user':
+            try:
+                user = User.objects.get(username=vals[0])
+            except ObjectDoesNotExist:
+                q = empty_set
+                break
+            q = q.filter(creator=user)
+        elif e == 'txt':
+            for re in vals:
+                q = q.filter(description__iregex=re) | q.filter(name__iregex=re)
+        elif e == 'tag':
+            for val in vals:
+                tag = Tag.objects.get(name=val)
+                q = TaggedItem.objects.get_by_model(q, tag)
+        
+    return filter(lambda t: t.authz(user, 'r'), q)[:max]
+    
 ####################
 # External functions, called from urls.py.
 
@@ -124,40 +151,16 @@ def _torrent_file_response(dict):
 
 class TorrentView(TorrentViewBase):
 
-    def _list(self, user, args, max=40):
-        """Search for torrents for which USER has read access.
-        Filter on certain properties found in ARGS.
-
-        https://.../torrent/?txt=STRING&tag=STRING&user=STRING
-        """
-        q = Torrent.objects.filter(expiration_date__gt=dt.now()).order_by('-creation_date')
-        empty_set = Torrent.objects.in_bulk([])
-        
-        for e, vals in args:            # e=(field, [search strings])
-            if e == 'user':
-                try:
-                    user = User.objects.get(username=vals[0])
-                except ObjectDoesNotExist:
-                    q = empty_set
-                    break
-                q = q.filter(creator=user)
-            elif e == 'txt':
-                for re in vals:
-                    q = q.filter(description__iregex=re) | q.filter(name__iregex=re)
-            elif e == 'tag':
-                for val in vals:
-                    tag = Tag.objects.get(name=val)
-                    q = TaggedItem.objects.get_by_model(q, tag)
-            
-        return filter(lambda t: t.authz(user, 'r'), q)[:max]
-
     @login_required
     def get(self, request, inst=None):
         if not inst:
-            return render_to_response(
-                'share/index.html',
-                make_response_dict(request,
-                                   {'torrents': self._list(request.user, request.GET.lists())}))
+            return respond_to(request,
+                              {'text/html': 'share/index.html',
+                               'application/rss+xml': 'share/rss2.xml',
+                               'text/rss': 'share/rss2.xml'},
+                              {'torrents': find_torrents(request.user, request.GET.lists()),
+			                   'title': 'lobber search result',
+                               'description': 'lobber search result'})
 
         try:
             t = Torrent.objects.get(id=inst)
