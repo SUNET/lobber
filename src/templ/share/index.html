@@ -54,7 +54,7 @@ $(function() {
       return false;
    });
    function _add_tag_li(elt,name) {
-	   elt.append($("<li class=\"tag\"><a class=\"tip\" title=\"Search for torrets with tag "+name+"\" href=\"#\">"+name+"</a><a class=\"remove\" href=\"javascript:void(0);\" onClick=\"remove_tag_li(this);\"><span class=\"ui-icon ui-icon-close\"></span></a></li>"));
+	   elt.append($("<li class=\"tag\"><a class=\"tip\" title=\"Search for torrets with tag "+name+"\" href=\"/torrent/tag/"+name+".html\">"+name+"</a><a class=\"remove\" href=\"javascript:void(0);\" onClick=\"remove_tag_li(this);\"><span class=\"ui-icon ui-icon-close\"></span></a></li>"));
    }
    function _add_tag(tid,name) {
 	   var elt = $(this).closest('.tags');
@@ -142,7 +142,7 @@ function mailit(id) {
 </div>
 
 {% if torrents %}
-<h1>Published Torrents</h1>
+<h1>Search result</h1>
 <div id="accordion">
     {% for t in torrents %}
       <div id="{{t.id}}" class="torrent">
