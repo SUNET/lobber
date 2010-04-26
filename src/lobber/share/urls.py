@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     (r'^$', welcome),
     # RESTful API.
     (r'^torrent/$',TorrentView),
+    (r'^torrent/all.rss$',TorrentView),
     (r'^torrent/delete/(?P<tid>[0-9]+)$',delete_torrent),
     (r'^torrent/sendlink/(?P<tid>[0-9]+)$',send_link_mail),
     (r'^torrent/gufrt/(?P<tid>[0-9]+)$', gimme_url_for_reading_torrent),
