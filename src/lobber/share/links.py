@@ -20,7 +20,7 @@ def _make_share_link(req,tid):
     try:
         t = Torrent.objects.get(id=int(tid))
     except ObjectDoesNotExist:
-        return HttpResponse('Sorry, torrent %s not found'  % tid)
+        return None
     key = create_key_user(creator=req.user,
                            urlfilter='torrent/%s' % tid, # FIXME: Append '$'?
                            entitlements='user:%s:$self' % req.user.username)
@@ -31,6 +31,8 @@ def _make_share_link(req,tid):
 @login_required
 def gimme_url_for_reading_torrent(req, tid):
     link = _make_share_link(req,tid)
+    if link is None:
+        return HttpResponse('Sorry, torrent %s not found'  % tid)
     return HttpResponse('<a href=\"%s\">%s</a>' % (link, link))
 
 @login_required
