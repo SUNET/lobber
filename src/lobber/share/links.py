@@ -40,6 +40,8 @@ def send_link_mail(req,tid):
     to = req.REQUEST.get('to')
     message = req.REQUEST.get('message')
     link = _make_share_link(req,tid)
+    if link is None:
+        return HttpResponse('Sorry, torrent %s not found'  % tid)
     msg = "Data: "+strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())+"\n"
     msg += "From: "+req.user.email+"\n"
     msg += "To: "+to+"\n"
