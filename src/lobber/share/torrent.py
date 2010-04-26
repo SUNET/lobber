@@ -159,8 +159,8 @@ class TorrentView(TorrentViewBase):
                                'application/rss+xml': 'share/rss2.xml',
                                'text/rss': 'share/rss2.xml'},
                               {'torrents': find_torrents(request.user, request.GET.lists()),
-			                   'title': 'lobber search result',
-                               'description': 'lobber search result'})
+			                   'title': 'Search result',
+                               'description': 'Search result'})
 
         try:
             t = Torrent.objects.get(id=inst)
