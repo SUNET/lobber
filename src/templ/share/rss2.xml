@@ -10,8 +10,8 @@
       	  <item>
       	  	<title>{{t.name}}</title>
       	  	<description>{{t.description}}</description>
-      	  	<link>{{t.url}}</link>
-      	  	<guid isPermaLink="true">{{t.url}}</guid>
+      	  	<link>{{t.abs_url}}</link>
+      	  	<guid isPermaLink="true">{{t.abs_url}}</guid>
       	  </item>
       	  {% endfor %}
       </channel>  
