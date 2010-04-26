@@ -54,12 +54,12 @@ $(function() {
       return false;
    });
    function _add_tag_li(elt,name) {
-	   elt.append($("<li class=\"tag\"><a class=\"tip\" title=\"Search for torrets with tag "+name+"\" href=\"/torrent/tag/"+name+".html\">"+name+"</a><a class=\"remove\" href=\"javascript:void(0);\" onClick=\"remove_tag_li(this);\"><span class=\"ui-icon ui-icon-close\"></span></a></li>"));
+	   elt.append($("<li class=\"tag text ui-state-highlight ui-widget-content ui-corner-all\"><a class=\"tip\" title=\"Search for torrets with tag "+name+"\" href=\"/torrent/tag/"+name+".html\">"+name+"</a><a class=\"remove\" href=\"javascript:void(0);\" onClick=\"remove_tag_li(this);\"><span class=\"ui-icon ui-icon-close\"></span></a></li>"));
    }
-   function _add_tag(tid,name) {
-	   var elt = $(this).closest('.tags');
+   function _add_tag(tags,tid,name,tf) {
 	   $.get("/torrent/"+tid+"/tag/add/"+name,function(data) {
-        	_add_tag_li(elt,data);
+        	_add_tag_li(tags,name);
+        	tf.attr('value','')
        });
    }
    $('.tags').each(function(index) {
@@ -75,18 +75,27 @@ $(function() {
    $('.tagfield').autocomplete({
       source: "/torrent/tags",
       minLength: 2,
-      change: function(event, ui) {
+      select: function(event, ui) {
 	      var tag;
+	      var tf = $(this).closest('.tagfield').first();
 	      if (ui.item) {
 		    tag = ui.item.value;
 	      } else {
-			tag = $(this).closest('.tagfield').first().attr('value');
+			tag = tf.attr('value');
 	      }
-	     _add_tag($(this).closest('.torrent').attr('id'),tag);
+	      torrent_elt = $(this).closest('.torrent');
+	      tags = torrent_elt.find('.tags').first();
+	      tid = torrent_elt.attr('id');
+	     _add_tag(tags,tid,tag,tf);
       }
    });
+   
    $('.tagform').submit(function() {
-	  _add_tag($(this).closest('.torrent').attr('id'),$(this).find(".tagfield").first().attr('value'));
+   	  var tf = $(this).children('.tagfield');
+   	  torrent_elt = $(this).closest('.torrent');
+	  tags = torrent_elt.find('.tags').first();
+	  tid = torrent_elt.attr('id');
+	  _add_tag(tags,tid,tf.attr('value'),tf);
       return false;
    });
    $('.tag .remove').click(function() {

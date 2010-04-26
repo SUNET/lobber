@@ -58,13 +58,11 @@ def remove_tag(request,tid,name):
             return HttpResponse("Not authorized to remove tag",status=401)
             
         tags = map(lambda x: x.name, t.tags)
-        pprint(tags)
         if name in tags:
             tags.remove(name)
             tags_str = ""
             if tags is not None:
                 tags_str = " ".join(tags)
-            pprint(tags_str)
             Tag.objects.update_tags(t,tags_str)
             
         r = HttpResponse(json.encode(tags), mimetype='text/x-json')
