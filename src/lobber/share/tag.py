@@ -6,7 +6,9 @@ from orbited import json
 from pprint import pprint
 from torrent import find_torrents
 from lobber.multiresponse import respond_to
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def list_tags(request):
         try:
                 tags = map(lambda x: x.name,Tag.objects.filter(name__istartswith=request.GET['term']))
@@ -20,6 +22,7 @@ def list_tags(request):
 
         return r
 
+@login_required
 def add_tag(request,tid,name):
         t = Torrent.objects.get(id=tid)
         if t is None:
@@ -31,6 +34,7 @@ def add_tag(request,tid,name):
         Tag.objects.add_tag(t,name)
         return HttpResponse(name)
 
+@login_required
 def get_tags(request,tid):
         t = Torrent.objects.get(id=tid)
         if t is None:
@@ -44,6 +48,7 @@ def get_tags(request,tid):
 
         return r
 
+@login_required
 def remove_tag(request,tid,name):
         t = Torrent.objects.get(id=tid)
         if t is None:
@@ -69,11 +74,12 @@ def remove_tag(request,tid,name):
 
         return r
 
+@login_required
 def list_torrents_for_tag(request,name):
         return respond_to(request,
                           {'text/html': 'share/index.html',
                            'application/rss+xml': 'share/rss2.xml',
                            'text/rss': 'share/rss2.xml'},
                           {'torrents': find_torrents(request.user, [('tag',[name])]),
-                           'title': 'Lobber torrents for tag '+name,
-                           'description': 'Lobber torrents for tag '+name})
+                           'title': 'Torrents tagged with '+name,
+                           'description': 'Torrents tagged with '+name})
