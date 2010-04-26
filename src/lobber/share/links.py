@@ -16,16 +16,15 @@ from lobber.notify import notify
 import lobber.log
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
-def _make_share_link(req,tid):
+def _make_share_link(req, tid):
     try:
         t = Torrent.objects.get(id=int(tid))
     except ObjectDoesNotExist:
         return None
     key = create_key_user(creator=req.user,
-                           urlfilter='torrent/%s' % tid, # FIXME: Append '$'?
-                           entitlements='user:%s:$self' % req.user.username)
+                          urlfilter='torrent/%s' % tid, # FIXME: Append '$', limiting more?
+                          entitlements='user:%s:$self' % req.user.username)
     t.add_ace('user:%s:%s#r' % (req.user.username, key))
-    #link = '%s/%s?lkey=%s' % (NORDUSHARE_URL, tid, key)
     return '%s/torrent/%s.torrent?lkey=%s' % (NORDUSHARE_URL, t.hashval, key)
 
 @login_required
