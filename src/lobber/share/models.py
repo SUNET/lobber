@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from lobber.settings import TORRENTS,BASE_URL
 import tagging
 from tagging.models import Tag
-from pprint import pprint
 
 class Torrent(models.Model):
     name = models.CharField(max_length=256, blank=True)
@@ -36,14 +35,34 @@ class Torrent(models.Model):
             pass
         if profile:
             usernames += profile.entitlements.split()
-        
+            tagconstraintsok_flag = True
+            if profile.tagconstraints:
+                tagconstraintsok_flag = False
+                c = profile.tagconstraints.split()
+                for tag in Tag.objects.get_for_object(self):
+                    if tag.name in c:
+                        tagconstraintsok_flag = True
+                        break
+            if not tagconstraintsok_flag:
+                #print 'DEBUG: tag constraints not ok for %s with tag constraints %s, seeking #%c for torrrent %s' % (user, profile.tagconstraints, perm, self)
+                return False
+
         for ace in self.acl.split():
             for username in usernames:
+                # FIXME: ace must start with username, not the other way around!
+                #
+                # The result is that if USER creates a key with
+                # entitlement user:USER:key:blurb, the key user will
+                # be able to act as USER wrt to ACL checks.
+                #
+                # I changed this 2010-04-26 because I was confused.
+                # Now I don't want to change it back until we have an API for adding ace:s.
                 if username.startswith(ace.split('#')[0]):
                     if ace.endswith('#w'):  # Write permission == all.
                         return True
                     if ace.endswith('#%c' % perm):
                         return True
+        #print 'DEBUG: perm %s denied for %s on %s' % (perm, user, self)
         return False
     
     def authz_tag(self, user, perm, tag):
@@ -54,7 +73,7 @@ class Torrent(models.Model):
             return self.authz(user, tag)
         elif perm == 'w' or perm == 'd':
             if self.authz(user, 'w'):
-                if ':' in tag:
+                if ':' in tag:       # Non-global tags are restricted.
                     p = None
                     try:
                         p = user.profile.get()
@@ -64,6 +83,7 @@ class Torrent(models.Model):
                         return True
                 else:
                     return True
+        #print 'DEBUG: perm %s denied for %s on %s for %s' % (perm, user, self, tag)
         return False
 
     def add_ace(self, ace):

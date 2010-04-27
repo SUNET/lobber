@@ -34,6 +34,7 @@ def api_keys(req):
         if form.is_valid():
             create_key_user(req.user,
                             form.cleaned_data['urlfilter'],
+                            '',         # FIXME: Add tagconstraints to form.
                             form.cleaned_data['entitlements'],
                             form.cleaned_data['expires'])
             response = render_to_response('share/keys.html', make_response_dict(req,{'keys': _list(req.user)}))

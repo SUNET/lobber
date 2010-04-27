@@ -24,7 +24,7 @@ class KeyMiddleware(object):
                 " MIDDLEWARE_CLASSES setting to insert"
                 " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
                 " before the KeyMiddleware class.")
-        # Look for 'lkey' in query part of URL or in the X_LOBBER_KEY header
+        # Look for 'lkey' in query part of URL and in the X_LOBBER_KEY header.
         secret = request.REQUEST.get('lkey', None)
         if secret is None:
             secret = request.META.get('HTTP_X_LOBBER_KEY', None)
@@ -54,7 +54,7 @@ class KeyMiddleware(object):
         cmd = request.path
         urlfilter = profile.urlfilter.split()
         for e in urlfilter:
-            if re.match(e, cmd):
+            if re.match(e, cmd): # Note: Implicit `^' starting the RE.
                 filtermatch_flag = True
                 break
         if not filtermatch_flag:
