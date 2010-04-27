@@ -44,7 +44,7 @@ def login_federated(request):
     username = request.user.username
     
     # Key users ('key:<secret>') must already have a profile -- for
-    # url filtering.
+    # constraints (url and tag).
     profile = None
     try:
         profile = request.user.profile.get()
