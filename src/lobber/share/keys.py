@@ -19,7 +19,7 @@ def api_keys(req):
     """
     def _list(user):
         lst = []
-        for p in UserProfile.objects.filter(creator=user):
+        for p in UserProfile.objects.filter(creator=user).order_by('-id'):
             if p.expiration_date and p.expiration_date <= dt.now():
                 continue
             if not p.user.username.startswith('key:'):
