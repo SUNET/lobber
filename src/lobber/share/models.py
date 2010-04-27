@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 # http://docs.djangoproject.com/en/dev/topics/auth/#module-django.contrib.auth
 from django.contrib.auth.models import User
 from lobber.settings import TORRENTS,BASE_URL
@@ -20,19 +21,29 @@ class Torrent(models.Model):
         return '%s "%s" (acl=%s)' % (self.hashval, self.name, self.acl)
 
     def url(self):
-        return "/torrents/%s.torrent" % self.hashval
+        return "/torrent/%s.torrent" % self.hashval
 
     def abs_url(self):
         return "%s%s" % (BASE_URL,self.url())
 
     def authz(self, user, perm):
         """Does USER have PERM on torrent?"""
-        for ace in self.acl.split(' '):
-            if ace.startswith('user:%s' % user.username):
-                if ace.endswith('#w'):  # Write permission == all.
-                    return True
-                if ace.endswith('#%c' % perm):
-                    return True
+        usernames = ['user:%s' % user.username]
+        profile = None
+        try:
+            profile = user.profile.get()
+        except ObjectDoesNotExist:
+            pass
+        if profile:
+            usernames += profile.entitlements.split()
+        
+        for ace in self.acl.split():
+            for username in usernames:
+                if username.startswith(ace.split('#')[0]):
+                    if ace.endswith('#w'):  # Write permission == all.
+                        return True
+                    if ace.endswith('#%c' % perm):
+                        return True
         return False
     
     def authz_tag(self, user, perm, tag):
@@ -44,7 +55,11 @@ class Torrent(models.Model):
         elif perm == 'w' or perm == 'd':
             if self.authz(user, 'w'):
                 if ':' in tag:
-                    p = user.profile.get()
+                    p = None
+                    try:
+                        p = user.profile.get()
+                    except ObjectDoesNotExist:
+                        pass
                     if p and tag in p.entitlements:
                         return True
                 else:
@@ -76,7 +91,8 @@ class UserProfile(models.Model):
     creator = models.ForeignKey(User)   # Important for key users.
     display_name = models.CharField(max_length=256, blank=True)
     entitlements = models.TextField(blank=True) # Space separated entls.
-    urlfilter = models.TextField(blank=True) # Space separated simplified regexps.
+    urlfilter = models.TextField(blank=True) # Space separated list of regexps.
+    tagconstraints = models.TextField(blank=True) # Space separated list of tags.
     expiration_date = models.DateTimeField(null=True)
 
     def __unicode__(self):
@@ -89,6 +105,8 @@ class UserProfile(models.Model):
         if username.startswith('key:'):
             username = username[4:]
         return username
-    
+
+    def get_entitlements(self):
+        return list(self.entitlements.split(' '))
             
 tagging.register(Torrent)
