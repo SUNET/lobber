@@ -177,6 +177,7 @@ class TorrentView(TorrentViewBase):
                            'application/x-bittorrent': _torrent_file_response},
                           {'torrent': t})
 
+@login_required
 def torrent_by_hashval(request, inst):
     try:
         t = Torrent.objects.get(hashval=inst)
