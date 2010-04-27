@@ -51,14 +51,15 @@ class KeyMiddleware(object):
             return
 
         filtermatch_flag = False
-        cmd = request.path[1]
-        for e in profile.urlfilter:
+        cmd = request.path
+        urlfilter = profile.urlfilter.split()
+        for e in urlfilter:
             if re.match(e, cmd):
                 filtermatch_flag = True
                 break
         if not filtermatch_flag:
             logger.info("%s: no match for url in filter (url=%s, filter=%s)"
-                        % (username, cmd, profile.urlfilter))
+                        % (username, cmd, urlfilter))
             return
 
         if request.user.is_authenticated():
