@@ -292,11 +292,13 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 ** Keys
 https://beta.lobber.se/torrent/0b62f69a143df7708c9a0fe74a9f83b1ec4a01af.torrent?lkey=3ee568053f160f7eed0f327f92
 * Progress
-** For TREFpunkt [0/5]
-- [ ] api: search (list)
-      see share/torrent.py, multiresponse.py
+** For TREFpunkt [1/8]
+- [ ] genral constraints, with url-filter and tag-constraints
+- [X] api: search (list)
 - [ ] api: create torrents
 - [ ] api: delete torrents
+- [ ] verify https://portal.nordu.net/display/nordushare/Running+a+storage+node
+- [ ] acl and tag templates for newly created torrents
 - [ ] api: tag handling (add, remove)	 
 - [ ] audit
 ** For Uutrecht
