@@ -20,9 +20,7 @@ def create_key_user(creator, urlfilter, entitlements, expires=None):
     secret = sha256(str(getrandbits(256))).hexdigest()[:26]
     username = 'key:%s' % secret
     user = User.objects.create_user(username, 'nomail@dev.null', username)
-
-    lst = map(lambda s: s.replace('$self', username), entitlements.split())
-    entls = ' '.join(map(lambda e: 'user:%s:%s' % (creator.username, e), lst))
+    entls = ' '.join(map(lambda s: s.replace('$self', username), entitlements.split()))
     profile = UserProfile(user=user,
                           creator=creator,
                           urlfilter=' '.join(urlfilter.split()),

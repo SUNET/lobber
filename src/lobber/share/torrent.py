@@ -67,17 +67,21 @@ def find_torrents(user, args, max=40):
     for e, vals in args:            # e=(field, [search strings])
         if e == 'user':
             try:
-                user = User.objects.get(username=vals[0])
+                u = User.objects.get(username=vals[0])
             except ObjectDoesNotExist:
                 q = empty_set
                 break
-            q = q.filter(creator=user)
+            q = q.filter(creator=u)
         elif e == 'txt':
             for re in vals:
                 q = q.filter(description__iregex=re) | q.filter(name__iregex=re)
         elif e == 'tag':
             for val in vals:
-                tag = Tag.objects.get(name=val)
+                try:
+                    tag = Tag.objects.get(name=val)
+                except ObjectDoesNotExist:
+                    q = empty_set
+                    break
                 q = TaggedItem.objects.get_by_model(q, tag)
         
     return filter(lambda t: t.authz(user, 'r'), q)[:max]
@@ -172,3 +176,14 @@ class TorrentView(TorrentViewBase):
                           {'text/html': 'share/torrent.html',
                            'application/x-bittorrent': _torrent_file_response},
                           {'torrent': t})
+
+def torrent_by_hashval(request, inst):
+    try:
+        t = Torrent.objects.get(hashval=inst)
+    except ObjectDoesNotExist:
+        return render_to_response('share/index.html',
+                                  make_response_dict(request, {'error': "No such torrent: %s" % inst}))
+    return respond_to(request,
+                      {'text/html': 'share/torrent.html',
+                       'application/x-bittorrent': _torrent_file_response},
+                      {'torrent': t})

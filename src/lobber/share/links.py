@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from time import gmtime, strftime
 from orbited import json
+from tagging.models import Tag
 
 from lobber.share.users import create_key_user
 from lobber.settings import NORDUSHARE_URL, LOBBER_LOG_FILE
@@ -54,3 +55,16 @@ def send_link_mail(req,tid):
                                            'sender': req.user.email,
                                            'message': msg}));
     return HttpResponse()
+
+@login_required
+def gimme_url_for_reading_tag(request, tagstr):
+    try:
+        tag = Tag.objects.get(name=tagstr)
+    except ObjectDoesNotExist:
+        return HttpResponse('Sorry, tag %s not found'  % tagstr)
+    # TODO: Add tag constraint when those creatures are implemented.
+    key = create_key_user(creator=request.user,
+                          urlfilter='torrent/tag/%s' % tagstr,
+                          entitlements='user:%s:$self' % request.user.username)
+    link = '%s/torrent/tag/%s.rss?lkey=%s' % (NORDUSHARE_URL, tagstr, key)
+    return HttpResponse('<a href=\"%s\">%s</a>' % (link, link))
