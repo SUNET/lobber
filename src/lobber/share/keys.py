@@ -19,7 +19,7 @@ def api_keys(req):
     """
     def _list(user):
         lst = []
-        for p in UserProfile.objects.filter(creator=user):
+        for p in UserProfile.objects.filter(creator=user).order_by('-id'):
             if p.expiration_date and p.expiration_date <= dt.now():
                 continue
             if not p.user.username.startswith('key:'):
@@ -34,12 +34,13 @@ def api_keys(req):
         if form.is_valid():
             create_key_user(req.user,
                             form.cleaned_data['urlfilter'],
-                            '',         # FIXME: Add tagconstraints to form.
+                            form.cleaned_data['tagconstraints'],
                             form.cleaned_data['entitlements'],
                             form.cleaned_data['expires'])
             response = render_to_response('share/keys.html', make_response_dict(req,{'keys': _list(req.user)}))
         else:
-            response = render_to_response('share/create_key.html', make_response_dict(req,{'form': CreateKeyForm()}))
+            response = render_to_response('share/create_key.html',
+                                          make_response_dict(req, {'form': CreateKeyForm()}))
     return response
 
 @login_required

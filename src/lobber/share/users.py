@@ -13,6 +13,11 @@ from django.contrib.auth.models import User
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 def create_key_user(creator, urlfilter, tagconstraints, entitlements, expires=None):
+    """Create a user profile named key:<random text>.  
+    Each space separated entitlement in ENTITLEMENTS is prepended with
+    'user:<username>:', where username is the name of CREATOR.  Also,
+    '$self' is substituted for the name of the newly created key-user.
+    """
     # FIXME: Do random.seed() somewhere.
     # FIXME: Is 256 bits of random data proper?
     # FIXME: Don't chop the digest!!!  Necessary for now, since
@@ -20,7 +25,9 @@ def create_key_user(creator, urlfilter, tagconstraints, entitlements, expires=No
     secret = sha256(str(getrandbits(256))).hexdigest()[:26]
     username = 'key:%s' % secret
     user = User.objects.create_user(username, 'nomail@dev.null', username)
-    entls = ' '.join(map(lambda s: s.replace('$self', username), entitlements.split()))
+    # Fix entitlements by i) s/$self/<username>/g and ii) prepend 'user:<creator.username>'
+    entls = ' '.join(map(lambda e: 'user:%s:%s' % (creator.username, e),
+                         map(lambda s: s.replace('$self', username), entitlements.split())))
     profile = UserProfile(user=user,
                           creator=creator,
                           urlfilter=' '.join(urlfilter.split()),

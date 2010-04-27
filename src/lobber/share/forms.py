@@ -7,6 +7,7 @@ class UploadForm(forms.Form):
 
 class CreateKeyForm(forms.Form):
     urlfilter = forms.CharField(label="URL filter", widget=forms.Textarea)
+    tagconstraints = forms.CharField(label="Tag constraints", widget=forms.Textarea)
     entitlements = forms.CharField(label="Entitlements", widget=forms.Textarea)
     expires = forms.DateTimeField(label="Expiration date")
 

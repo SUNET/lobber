@@ -292,9 +292,9 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 ** Keys
 https://beta.lobber.se/torrent/0b62f69a143df7708c9a0fe74a9f83b1ec4a01af.torrent?lkey=3ee568053f160f7eed0f327f92
 * Progress
-** For TREFpunkt [3/10]
-- [ ] genral constraints, with url-filter and tag-constraints
-- [ ] close down create_key.html
+** For TREFpunkt [5/11]
+- [X] genral constraints, with url-filter and tag-constraints
+- [X] close down create_key.html
 - [X] api: search (list)
 - [X] api: add torrent
 - [X] api: add, remove tag on torrent
