@@ -4,8 +4,8 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 BASE_DIR = '..'
-BASE_UI_URL = 'https://localhost'
-BASE_URL = 'http://localhost'
+BASE_UI_URL = 'http://localhost:8000'
+BASE_URL = 'http://localhost:8000'
 APPLICATION_CTX = ''
 NORDUSHARE_URL = BASE_UI_URL 
 ANNOUNCE_URL = '%s:4711/announce' % BASE_URL

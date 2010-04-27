@@ -305,6 +305,8 @@ https://beta.lobber.se/torrent/0b62f69a143df7708c9a0fe74a9f83b1ec4a01af.torrent?
 - [ ] api: remove torrent
 - [ ] verify https://portal.nordu.net/display/nordushare/Running+a+storage+node
 - [ ] audit
+- [ ] add more search criterias
+      - ace
 ** For Uutrecht
 - [ ] web api
       - GET torrent/<inst>
