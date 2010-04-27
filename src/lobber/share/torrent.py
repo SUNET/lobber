@@ -16,7 +16,7 @@ from lobber.resource import Resource
 import lobber.log
 from lobber.share.forms import UploadForm
 from lobber.share.models import Torrent
-from lobber.notify import notify
+from lobber.notify import notifyJSON
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 ####################
@@ -52,7 +52,7 @@ def _store_torrent(req, form):
                 data='%s.torrent' % torrent_hash,
                 hashval=torrent_hash)
     t.save()
-    notify("/torrent/new", torrent_hash);
+    notifyJSON("/torrent/add", torrent_hash);
     return t.id
     
 def find_torrents(user, args, max=40):
@@ -97,7 +97,7 @@ def upload_jnlp(req):
     d = {'sessionid': req.session.session_key,
          'announce_url': ANNOUNCE_URL,
          'baseurl': BASE_UI_URL,
-         'apiurl': '%s/torrent/new/' % NORDUSHARE_URL} # ==> upload_form() via urls.py.
+         'apiurl': '%s/torrent/add/' % NORDUSHARE_URL} # ==> upload_form() via urls.py.
     return render_to_response('share/launch.jnlp', d,
                               mimetype='application/x-java-jnlp-file')
 
