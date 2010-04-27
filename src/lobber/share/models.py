@@ -91,7 +91,8 @@ class UserProfile(models.Model):
     creator = models.ForeignKey(User)   # Important for key users.
     display_name = models.CharField(max_length=256, blank=True)
     entitlements = models.TextField(blank=True) # Space separated entls.
-    urlfilter = models.TextField(blank=True) # Space separated simplified regexps.
+    urlfilter = models.TextField(blank=True) # Space separated list of regexps.
+    tagconstraints = models.TextField(blank=True) # Space separated list of tags.
     expiration_date = models.DateTimeField(null=True)
 
     def __unicode__(self):
