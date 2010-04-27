@@ -20,7 +20,7 @@ def _make_share_link(req, tid):
     key = create_key_user(creator=req.user,
                           urlfilter='/torrent/%s[^/]$' % tid,
                           tagconstraints='',
-                          entitlements='user:%s:$self' % req.user.username)
+                          entitlements='$self')
     t.add_ace('user:%s:%s#r' % (req.user.username, key))
     return '%s/torrent/%s.torrent?lkey=%s' % (NORDUSHARE_URL, t.hashval, key)
 
@@ -61,6 +61,6 @@ def gimme_url_for_reading_tag(request, tagstr):
     key = create_key_user(creator=request.user,
                           urlfilter='/torrent/tag/%s /torrent/.*[^/]$' % tagstr,
                           tagconstraints=tagstr,
-                          entitlements='user:%s:$self' % request.user.username)
+                          entitlements='$self')
     link = '%s/torrent/tag/%s.rss?lkey=%s' % (NORDUSHARE_URL, tagstr, key)
     return HttpResponse('<a href=\"%s\">%s</a>' % (link, link))
