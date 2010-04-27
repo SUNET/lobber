@@ -74,12 +74,13 @@ $(function() {
    });
    $('.tagfield').autocomplete({
       source: "/torrent/tags",
-      minLength: 2,
+      minLength: 2,  
       select: function(event, ui) {
 	      var tag;
 	      var tf = $(this).closest('.tagfield').first();
 	      if (ui.item) {
 		    tag = ui.item.value;
+		    tf.attr('value',tag);
 	      } else {
 			tag = tf.attr('value');
 	      }
@@ -88,15 +89,6 @@ $(function() {
 	      tid = torrent_elt.attr('id');
 	     _add_tag(tags,tid,tag,tf);
       }
-   });
-   
-   $('.tagform').submit(function() {
-   	  var tf = $(this).children('.tagfield');
-   	  torrent_elt = $(this).closest('.torrent');
-	  tags = torrent_elt.find('.tags').first();
-	  tid = torrent_elt.attr('id');
-	  _add_tag(tags,tid,tf.attr('value'),tf);
-      return false;
    });
    $('.tag .remove').click(function() {
 	  var tid = $(this).closest('.torrent').attr('id');
@@ -189,10 +181,10 @@ function mailit(id) {
                       <span class="ui-icon ui-icon-wrench"></span>
                    </a>
                 </li>
+                <ul style="float: left;" class="tags"></ul>
                 <li style="float: right;">
-                   <form class="tagform"><input type="text" name="name" class="tagfield"/><form>
+                   <input type="text" name="name" value="" class="tagfield"/>
                 </li>
-                <ul class="tags"></ul>
              <ul> 
            </div>
            {% if t.description %}

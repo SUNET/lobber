@@ -12,7 +12,10 @@ from lobber.notify import notifyJSON
 @login_required
 def list_tags(request):
         try:
-                tags = map(lambda x: x.name,Tag.objects.filter(name__istartswith=request.GET['term']))
+                q = request.GET['term']
+                tags = map(lambda x: x.name,Tag.objects.filter(name__istartswith=q))
+                if not q in tags:
+                    tags.insert(0,q)
         except MultiValueDictKeyError:
                 pass
 
