@@ -12,7 +12,7 @@ from hashlib import sha256
 from django.contrib.auth.models import User
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
-def create_key_user(creator, urlfilter, entitlements, expires=None):
+def create_key_user(creator, urlfilter, tagconstraints, entitlements, expires=None):
     # FIXME: Do random.seed() somewhere.
     # FIXME: Is 256 bits of random data proper?
     # FIXME: Don't chop the digest!!!  Necessary for now, since
@@ -24,6 +24,7 @@ def create_key_user(creator, urlfilter, entitlements, expires=None):
     profile = UserProfile(user=user,
                           creator=creator,
                           urlfilter=' '.join(urlfilter.split()),
+                          tagconstraints=tagconstraints,
                           entitlements=entls,
                           expiration_date=expires)
     profile.save()
