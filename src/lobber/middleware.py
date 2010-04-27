@@ -10,6 +10,7 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from lobber.share.models import UserProfile
 from lobber.settings import LOBBER_LOG_FILE, APPLICATION_CTX
 import lobber.log
+from pprint import pprint
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 class KeyMiddleware(object):
@@ -23,8 +24,10 @@ class KeyMiddleware(object):
                 " MIDDLEWARE_CLASSES setting to insert"
                 " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
                 " before the KeyMiddleware class.")
-        # Look for 'lkey' in query part of URL.
+        # Look for 'lkey' in query part of URL or in the X_LOBBER_KEY header
         secret = request.REQUEST.get('lkey', None)
+        if secret is None:
+            secret = request.META.get('HTTP_X_LOBBER_KEY', None)
         if secret is None:
             return
 

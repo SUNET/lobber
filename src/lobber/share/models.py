@@ -2,7 +2,7 @@ from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 # http://docs.djangoproject.com/en/dev/topics/auth/#module-django.contrib.auth
 from django.contrib.auth.models import User
-from lobber.settings import TORRENTS
+from lobber.settings import TORRENTS,BASE_URL
 import tagging
 from tagging.models import Tag
 from pprint import pprint
@@ -22,6 +22,9 @@ class Torrent(models.Model):
 
     def url(self):
         return "/torrents/%s.torrent" % self.hashval
+
+    def abs_url(self):
+        return "%s%s" % (BASE_URL,self.url())
 
     def authz(self, user, perm):
         """Does USER have PERM on torrent?"""

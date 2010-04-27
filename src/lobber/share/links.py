@@ -1,9 +1,4 @@
-from hashlib import sha256
-from random import getrandbits
-from pprint import pprint
-
 from django.http import HttpResponse
-from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
 from time import gmtime, strftime
@@ -12,7 +7,7 @@ from tagging.models import Tag
 
 from lobber.share.users import create_key_user
 from lobber.settings import NORDUSHARE_URL, LOBBER_LOG_FILE
-from lobber.share.models import Torrent, UserProfile
+from lobber.share.models import Torrent
 from lobber.notify import notify
 import lobber.log
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
