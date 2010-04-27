@@ -21,7 +21,7 @@ class Torrent(models.Model):
         return '%s "%s" (acl=%s)' % (self.hashval, self.name, self.acl)
 
     def url(self):
-        return "/torrents/%s.torrent" % self.hashval
+        return "/torrent/%s.torrent" % self.hashval
 
     def abs_url(self):
         return "%s%s" % (BASE_URL,self.url())
