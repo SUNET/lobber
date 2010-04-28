@@ -10,11 +10,11 @@ from django.contrib.auth.decorators import login_required
 from lobber.notify import notifyJSON
 
 @login_required
-def list_tags(request):
+def list_tags(request,onlyExisting=False):
         try:
                 q = request.GET['term']
                 tags = map(lambda x: x.name,Tag.objects.filter(name__istartswith=q))
-                if not q in tags:
+                if not q in tags and not onlyExisting:
                     tags.insert(0,q)
         except MultiValueDictKeyError:
                 pass
@@ -25,6 +25,9 @@ def list_tags(request):
         r['Pragma'] = 'no-cache'
 
         return r
+    
+def list_assigned_tags(request):
+    return list_tags(request,True)
 
 @login_required
 def add_tag(request,tid,name):
