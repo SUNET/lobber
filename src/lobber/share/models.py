@@ -86,8 +86,17 @@ class Torrent(models.Model):
         #print 'DEBUG: perm %s denied for %s on %s for %s' % (perm, user, self, tag)
         return False
 
-    def add_ace(self, ace):
-        self.acl += ace
+    def add_ace(self, user, ace):
+        """Add ACE to ACL of self, prepended by 'user:<username>'
+        where username is the name of USER.
+
+        Return resulting ace on success.
+        """
+        fullace = 'user:%s:%s' % (user.username, ace)
+        if not acl.valid_ace_p(fullace):
+            return None
+        self.acl += fullace
+        return fullace
 
     def readable_tags(self, user):
         return filter(lambda tag: self.authz_tag(user, "r", tag.name),
