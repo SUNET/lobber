@@ -24,7 +24,7 @@ def _make_share_link(req, tid):
                           urlfilter='/torrent/%s.torrent[^/]*$' % t.hashval,
                           tagconstraints='',
                           entitlements='$self')
-    t.add_ace(req.user, '%s#r' % key)
+    t.add_ace(req.user, 'user:%s:%s#r' % (req.user.username, key))
     return '%s/torrent/%s.torrent?lkey=%s' % (NORDUSHARE_URL, t.hashval, key)
 
 @login_required
