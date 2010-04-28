@@ -87,7 +87,12 @@ class Torrent(models.Model):
         return False
 
     def authz_acl(self, user, perm, ace):
-        return True                     # FIXME: Implement.
+        "Does USER have PERM on torrent w.r.t. its ACL?"
+        if perm == 'r':
+            return self.authz(user, 'r')
+        elif perm == 'd':
+            return self.authz(user, 'w')
+        return False                
 
     def add_ace(self, user, ace):
         """Add ACE to ACL of self.
