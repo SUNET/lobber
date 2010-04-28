@@ -71,7 +71,7 @@ class Torrent(models.Model):
         the torrent with TAG?
         """
         if perm == 'r':
-            return self.authz(user, tag)
+            return self.authz(user, perm)
         elif perm == 'w' or perm == 'd':
             if self.authz(user, 'w'):
                 if ':' in tag:       # Non-global tags are restricted.
