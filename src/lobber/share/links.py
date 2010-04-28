@@ -21,7 +21,7 @@ def _make_share_link(req, tid):
     except ObjectDoesNotExist:
         return None
     key = create_key_user(creator=req.user,
-                          urlfilter='/torrent/%s[^/]$' % tid,
+                          urlfilter='/torrent/%s.torrent[^/]*$' % t.hashval,
                           tagconstraints='',
                           entitlements='$self')
     t.add_ace(req.user, '%s#r' % key)
@@ -62,7 +62,7 @@ def gimme_url_for_reading_tag(request, tagstr):
     except ObjectDoesNotExist:
         return HttpResponse('Sorry, tag %s not found' % escape(tagstr))
     key = create_key_user(creator=request.user,
-                          urlfilter='/torrent/tag/%s /torrent/.*[^/]$' % tagstr,
+                          urlfilter='/torrent/tag/%s /torrent/.*[^/]+$' % tagstr,
                           tagconstraints=tagstr,
                           entitlements='$self')
     link = '%s/torrent/tag/%s.rss?lkey=%s' % (NORDUSHARE_URL, tagstr, key)
