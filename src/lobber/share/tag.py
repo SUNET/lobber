@@ -8,6 +8,7 @@ from torrent import find_torrents
 from lobber.multiresponse import respond_to
 from django.contrib.auth.decorators import login_required
 from lobber.notify import notifyJSON
+from django.core.exceptions import ObjectDoesNotExist
 
 @login_required
 def list_tags(request,onlyExisting=False):
@@ -16,6 +17,11 @@ def list_tags(request,onlyExisting=False):
                 tags = map(lambda x: x.name,Tag.objects.filter(name__istartswith=q))
                 if not q in tags and not onlyExisting:
                     tags.insert(0,q)
+                try:
+                    profile = request.user.profile.get();
+                    q.append(profile.get_entitlements())
+                except ObjectDoesNotExist:
+                    pass
         except MultiValueDictKeyError:
                 pass
 
