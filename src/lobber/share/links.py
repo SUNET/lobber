@@ -1,7 +1,9 @@
+from time import gmtime, strftime
+
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
-from time import gmtime, strftime
+from django.utils.html import escape
 from orbited import json
 from tagging.models import Tag
 
@@ -10,6 +12,7 @@ from lobber.settings import NORDUSHARE_URL, LOBBER_LOG_FILE
 from lobber.share.models import Torrent
 from lobber.notify import notify
 import lobber.log
+
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 def _make_share_link(req, tid):
@@ -18,17 +21,17 @@ def _make_share_link(req, tid):
     except ObjectDoesNotExist:
         return None
     key = create_key_user(creator=req.user,
-                          urlfilter='/torrent/%s[^/]$' % tid,
+                          urlfilter='/torrent/%s.torrent[^/]*$' % t.hashval,
                           tagconstraints='',
                           entitlements='$self')
-    t.add_ace('user:%s:%s#r' % (req.user.username, key))
+    t.add_ace(req.user, '%s#r' % key)
     return '%s/torrent/%s.torrent?lkey=%s' % (NORDUSHARE_URL, t.hashval, key)
 
 @login_required
 def gimme_url_for_reading_torrent(req, tid):
     link = _make_share_link(req,tid)
     if link is None:
-        return HttpResponse('Sorry, torrent %s not found'  % tid)
+        return HttpResponse('Sorry, torrent %s not found'  % escape(tid))
     return HttpResponse('<a href=\"%s\">%s</a>' % (link, link))
 
 @login_required
@@ -37,7 +40,7 @@ def send_link_mail(req,tid):
     message = req.REQUEST.get('message')
     link = _make_share_link(req,tid)
     if link is None:
-        return HttpResponse('Sorry, torrent %s not found'  % tid)
+        return HttpResponse('Sorry, torrent %s not found'  % escape(tid))
     msg = "Data: "+strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())+"\n"
     msg += "From: "+req.user.email+"\n"
     msg += "To: "+to+"\n"
@@ -57,9 +60,9 @@ def gimme_url_for_reading_tag(request, tagstr):
     try:
         tag = Tag.objects.get(name=tagstr)
     except ObjectDoesNotExist:
-        return HttpResponse('Sorry, tag %s not found'  % tagstr)
+        return HttpResponse('Sorry, tag %s not found' % escape(tagstr))
     key = create_key_user(creator=request.user,
-                          urlfilter='/torrent/tag/%s /torrent/.*[^/]$' % tagstr,
+                          urlfilter='/torrent/tag/%s /torrent/.*[^/]+$' % tagstr,
                           tagconstraints=tagstr,
                           entitlements='$self')
     link = '%s/torrent/tag/%s.rss?lkey=%s' % (NORDUSHARE_URL, tagstr, key)

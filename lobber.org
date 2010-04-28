@@ -157,7 +157,7 @@ See [[file:src/lobber/share/models.py][file:~/p/nordushare/lobber/src/lobber/sha
 		 | creator |
                  +---------+
                      |
-+------+       1 +---------+       1 +-----+
++------+    0..* +---------+       1 +-----+
 | tag  | ------- | torrent | ------- | acl |
 +------+ 0..*    +---------+ 1       +-----+
 
@@ -166,10 +166,10 @@ See [[file:src/lobber/share/models.py][file:~/p/nordushare/lobber/src/lobber/sha
 +-------------+ 1       +-----+ 1       +--------------+
 
 
-entitlement := [a-z0-9_-]+   # note: not '$'
+entitlement := [a-zA-Z0-9_\.]+   # note: specifically not '$'
 permission := 'r' | 'w' | 'd'
 ace := <entitlement> '#' <permission>
-acl := <ace>+
+acl := <ace>*
 
 entitlements := <entitlement>+
 
@@ -292,7 +292,7 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 ** Keys
 https://beta.lobber.se/torrent/0b62f69a143df7708c9a0fe74a9f83b1ec4a01af.torrent?lkey=3ee568053f160f7eed0f327f92
 * Progress
-** For TREFpunkt [5/11]
+** For TREFpunkt [6/16]
 - [X] genral constraints, with url-filter and tag-constraints
 - [X] close down create_key.html
 - [X] api: search (list)
@@ -304,7 +304,14 @@ https://beta.lobber.se/torrent/0b62f69a143df7708c9a0fe74a9f83b1ec4a01af.torrent?
       /key/<key-id>/constraint/add/tag/<tag>
 - [ ] api: remove torrent
 - [ ] verify https://portal.nordu.net/display/nordushare/Running+a+storage+node
-- [ ] audit
+- do some basic web security analysis based on [[http://www.djangobook.com/en/2.0/chapter20/][The Django Book, chapter 20]]:
+- [ ] verify that we don't do any SQL queries "manually"
+- [X] HTML-escape all variables not sent via forms
+- [ ] verify that HTML code in variables in forms are really escaped
+- [ ] directory traversal accessing .torrent files?
+- [ ] make sure error messages are sane (DEBUG=False)
+-
+- [ ] create audit trail in log file
 - [ ] add more search criterias
       - ace
 ** For Uutrecht
