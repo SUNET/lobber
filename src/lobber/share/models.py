@@ -86,37 +86,41 @@ class Torrent(models.Model):
         #print 'DEBUG: perm %s denied for %s on %s for %s' % (perm, user, self, tag)
         return False
 
-    def authz_acl(self, user, perm, ace):
+    def authz_acl(self, user, perm):
         "Does USER have PERM on torrent w.r.t. its ACL?"
         if perm in 'rw':
             return self.authz(user, perm)
         return False                
 
-    def get_ace(self, user):
-        return list(self.ace.split(' '))
+    def get_acl(self, user):
+        if not self.authz_acl(user, 'r'):
+            return []
+        return list(self.acl.split())
 
-    def set_ace(self,user,aces):
-        self.ace = ' '.join(aces)
+    def set_acl(self, user, aces):
+        if not self.authz_acl(user, 'w'):
+            return None
+        self.acl = ' '.join(aces)
+        return self.acl
 
     def add_ace(self, user, ace):
         """
         Add ACE to ACL of self.  Return True on success, False if
         permission is denied.
         """
-        if not self.authz_acl(user, 'w', ace):
-            return False
-        self.acl += ' ' + ace
-        return True
+        r = self.set_acl(user, self.get_acl(user) + [ace])
+        return r
     
     def remove_ace(self, user, ace):
         """
         Remove ACE from ACL of self.
+        Return False if permission is denied, otherwise True.
         """
-        aces = self.get_ace(user)
+        aces = self.get_acl(user)
         if ace in aces:
             aces.remove(ace)
-            return True
-        return False
+            return self.set_acl(user, aces)
+        return True
 
     def readable_tags(self, user):
         return filter(lambda tag: self.authz_tag(user, "r", tag.name),

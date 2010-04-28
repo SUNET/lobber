@@ -33,14 +33,14 @@ def add_ace(req, tid, ace):
     except ObjectDoesNotExist:
         return HttpResponse("Torrent with id %d not found." % int(tid), status=404)
 
-    fullace = 'user:%s:%s' % (req.user.username, ace)
-    if not valid_ace_p(fullace):
+    if not valid_ace_p(ace):
         return HttpResponse("invalid ace: %s" % escape(ace), status=400)
 
     if not t.add_ace(req.user, ace):
         return HttpResponse("Permission denied.", status=403)
-    
-    return HttpResponse("Access control entry %s set on torrent %s." % (fullace, t))
+
+    t.save()
+    return HttpResponse("Access control entry %s set on torrent %s." % (ace, t))
 
 @login_required
 def remove_ace(req, tid, ace):
@@ -49,5 +49,8 @@ def remove_ace(req, tid, ace):
     except ObjectDoesNotExist:
         return HttpResponse("Torrent with id %d not found." % int(tid), status=404)
 
-    t.remove_ace(req.user,ace)
-    return HttpResponse()
+    if not t.remove_ace(req.user, ace):
+        return HttpResponse("Permission denied.", status=403)
+        
+    t.save()
+    return HttpResponse("Access control entry %s removed from torrent %s." % (escape(ace), t))
