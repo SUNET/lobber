@@ -7,11 +7,15 @@ from pprint import pprint
 from torrent import find_torrents
 from lobber.multiresponse import respond_to
 from django.contrib.auth.decorators import login_required
+from lobber.notify import notifyJSON
 
 @login_required
 def list_tags(request):
         try:
-                tags = map(lambda x: x.name,Tag.objects.filter(name__istartswith=request.GET['term']))
+                q = request.GET['term']
+                tags = map(lambda x: x.name,Tag.objects.filter(name__istartswith=q))
+                if not q in tags:
+                    tags.insert(0,q)
         except MultiValueDictKeyError:
                 pass
 
@@ -32,6 +36,10 @@ def add_tag(request,tid,name):
             return HttpResponse("Not authorized to add tag",status=401)
         
         Tag.objects.add_tag(t,name)
+        
+        notifyJSON("/torrent/tag/add", t.hashval)
+        notifyJSON("/torrent/tag/add/"+name, t.hashval)
+        
         return HttpResponse(name)
 
 @login_required
@@ -69,6 +77,9 @@ def remove_tag(request,tid,name):
         
         r['Cache-Control'] = 'no-cache, must-revalidate' 
         r['Pragma'] = 'no-cache'
+
+        notifyJSON("/torrent/tag/remove", t.hashval)
+        notifyJSON("/torrent/tag/remove/"+name, t.hashval)
 
         return r
 
