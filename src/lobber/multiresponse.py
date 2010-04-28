@@ -24,10 +24,8 @@ def timeAsrfc822 ( theTime ) :
     import rfc822
     return rfc822 . formatdate ( rfc822 . mktime_tz ( rfc822 . parsedate_tz ( theTime . strftime ( "%a, %d %b %Y %H:%M:%S" ) ) ) )
 
-def make_response_dict(request,d=None):
-    if d == None: 
-        d = {}
-
+def make_response_dict(request,d={}):
+ 
     if request.user.is_authenticated():
         d['user'] = request.user
         profile = None
@@ -50,6 +48,11 @@ def respond_to(request, template_mapping, dict, suffix_mapping=default_suffix_ma
     if accept is None:
         accept = (request.META['HTTP_ACCEPT'].split(','))[0]
     content_type = mimeparse.best_match(template_mapping.keys(), accept)
+    template = None
+    if template_mapping.has_key(content_type):
+        template = template_mapping[content_type]
+    else:
+        template = template_mapping["text/html"]
     template = template_mapping[content_type]
     if callable(template):
         response = template(make_response_dict(request,dict))

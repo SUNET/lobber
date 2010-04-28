@@ -97,6 +97,16 @@ $(function() {
       	  elt.remove();
       });
    });
+   function _add_nav_tag_li(elt,name) {
+	   elt.append($("<li class=\"ui-state-highlight ui-widget-content ui-corner-all\">"+name+"</li>"));
+   }
+   $('#tagnavfield').autocomplete({
+      source: "/torrent/tags/assigned",
+      minLength: 2,
+      select: function(event, ui) {
+         $(this).parent().submit();
+      }
+   });
 });
 
 function remove_tag_li(a) {
@@ -144,6 +154,13 @@ function mailit(id) {
 
 {% if torrents %}
 <h1>{{title}}</h1>
+<!-- div class="tagnav navlist">
+    <form>
+		<input type="text" name="tag" class="ui-widget" id="tagnavfield"></input>
+	</form>
+</div -->
+<div style="clear: both;"></div>
+
 <div id="accordion">
     {% for t in torrents %}
   <div id="{{t.id}}" class="torrent">
