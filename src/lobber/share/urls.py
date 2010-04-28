@@ -3,14 +3,9 @@ from lobber.share.keys import api_keys, api_key, key_form
 from lobber.share.links import send_link_mail, gimme_url_for_reading_torrent, gimme_url_for_reading_tag
 from lobber.share.torrent import TorrentView, delete_torrent, upload_jnlp, TorrentForm, exists, welcome, torrent_by_hashval
 from lobber.share.users import user_self
->>>>>>>>>>>>>>>>>>>> File 1
 from lobber.share.tag import list_tags, list_assigned_tags, add_tag, remove_tag, get_tags, list_torrents_for_tag
->>>>>>>>>>>>>>>>>>>> File 2
-from lobber.share.tag import list_tags, add_tag, remove_tag, get_tags, list_torrents_for_tag
->>>>>>>>>>>>>>>>>>>> File 3
 from lobber.share.tag import list_tags, add_tag, remove_tag, get_tags, list_torrents_for_tag
 from lobber.share.acl import add_ace, remove_ace
-<<<<<<<<<<<<<<<<<<<<
 
 urlpatterns = patterns('',
     # (regexp as a string, function without prefix as a string)
