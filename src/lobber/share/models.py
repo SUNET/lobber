@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from lobber.settings import TORRENTS,BASE_URL
 import tagging
 from tagging.models import Tag
+import acl_util
 
 class Torrent(models.Model):
     name = models.CharField(max_length=256, blank=True)
@@ -93,7 +94,7 @@ class Torrent(models.Model):
         Return resulting ace on success.
         """
         fullace = 'user:%s:%s' % (user.username, ace)
-        if not acl.valid_ace_p(fullace):
+        if not acl_util.valid_ace_p(fullace):
             return None
         self.acl += fullace
         return fullace
