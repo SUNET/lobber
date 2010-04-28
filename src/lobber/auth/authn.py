@@ -10,6 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from lobber.settings import LOBBER_LOG_FILE
 
 import lobber.log
+from lobber.multiresponse import make_response_dict
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 
@@ -29,7 +30,7 @@ def logout(request):
 
 @never_cache
 def login(request):
-    return render_to_response('share/login.html',{'user': request.user,'next': request.REQUEST.get("next")});
+    return render_to_response('share/login.html',make_response_dict(request,{'next': request.REQUEST.get("next")}));
 
 def login_federated(request):
     def logfailure():
@@ -40,7 +41,10 @@ def login_federated(request):
     # Authenticated?
     if not request.user.is_authenticated():
         logfailure()
-        return render_to_response('share/login.html',{'error': "Authentication failed",'next': request.REQUEST.get("next")});
+        return render_to_response('share/login.html',
+                                  make_response_dict(request,
+                                                     {'error': "Authentication failed",
+                                                      'next': request.REQUEST.get("next")}));
     username = request.user.username
     
     # Key users ('key:<secret>') must already have a profile -- for
@@ -108,6 +112,6 @@ def login_federated(request):
     # On a sucessful login, just do the redirect if one is requested
     next = request.REQUEST.get("next", None)
     if next is None:
-        return render_to_response("share/login.html",{"user": request.user});
+        return render_to_response("share/login.html",make_response_dict(request));
     else:
         return HttpResponseRedirect(next)
