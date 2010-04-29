@@ -1,4 +1,5 @@
 import os
+import httplib
 from datetime import datetime as dt
 
 from django.http import HttpResponse, HttpResponseRedirect
@@ -11,7 +12,7 @@ from django.contrib.auth.models import User
 from tagging.models import Tag, TaggedItem
 
 from lobber.multiresponse import respond_to, make_response_dict
-from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE
+from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE, TRACKER_ADDR
 from lobber.resource import Resource
 import lobber.log
 from lobber.share.forms import UploadForm
@@ -53,8 +54,11 @@ def _store_torrent(req, form):
                 hashval=torrent_hash)
     t.save()
     notifyJSON("/torrent/add", torrent_hash);
-    return t.id
+    return t
     
+def _prefetch_existlink(hash):
+    httplib.HTTPConnection(TRACKER_ADDR).request('GET', '/announce?info_hash=' + hash)
+
 def find_torrents(user, args, max=40):
     """Search for torrents for which USER has read access.
     Filter on certain properties found in ARGS.
@@ -124,8 +128,9 @@ class TorrentViewBase(Resource):
     def post(self, req):
         form = UploadForm(req.POST, req.FILES)
         if form.is_valid():
-            tid = _store_torrent(req, form)
-            return HttpResponseRedirect('/torrent/#%d' % tid)
+            t = _store_torrent(req, form)
+            _prefetch_existlink(t.hashval)
+            return HttpResponseRedirect('/torrent/#%d' % t.id)
         else:
             logger.info("upload_form: received invalid form")
 
@@ -133,7 +138,8 @@ class TorrentViewBase(Resource):
     def put(self, req):
         form = UploadForm(req.POST, req.FILES)
         if form.is_valid():
-            tid = _store_torrent(req, form)
+            t = _store_torrent(req, form)
+            _prefetch_existlink(t.hashval)
             return HttpResponseRedirect('/torrent/#%d' % tid)
         else:
             logger.info("upload_form: received invalid form")

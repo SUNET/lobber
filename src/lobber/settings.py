@@ -4,11 +4,16 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 BASE_DIR = '..'
-BASE_UI_URL = 'http://localhost:8000'
-BASE_URL = 'http://localhost:8000'
+APP_ADDR = 'localhost:8000'
+BASE_UI_URL = 'http://' + APP_ADDR
+BASE_URL = BASE_UI_URL
 APPLICATION_CTX = ''
 NORDUSHARE_URL = BASE_UI_URL 
-ANNOUNCE_URL = '%s:4711/announce' % BASE_URL
+TRACKER_EXIST_URL = '%s/torrent/exists' % BASE_URL
+
+TRACKER_ADDR = 'localhost:4711'
+ANNOUNCE_BASE_URL = 'http://' + TRACKER_ADDR
+ANNOUNCE_URL = ANNOUNCE_BASE_URL + '/announce'
 
 ADMINS = (
     ('Linus Nordberg', 'linus@nordu.net'),
