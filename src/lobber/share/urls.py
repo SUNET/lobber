@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-from lobber.share.keys import api_keys, api_key, key_form
+from lobber.share.keys import api_keys, key_form
 from lobber.share.links import send_link_mail, gimme_url_for_reading_torrent, gimme_url_for_reading_tag
 from lobber.share.torrent import TorrentView, delete_torrent, upload_jnlp, TorrentForm, exists, welcome, torrent_by_hashval
 from lobber.share.users import user_self
