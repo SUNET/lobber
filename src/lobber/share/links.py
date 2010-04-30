@@ -57,10 +57,6 @@ def send_link_mail(req,tid):
 
 @login_required
 def gimme_url_for_reading_tag(request, tagstr):
-    try:
-        tag = Tag.objects.get(name=tagstr)
-    except ObjectDoesNotExist:
-        return HttpResponse('Sorry, tag %s not found' % escape(tagstr))
     key = create_key_user(creator=request.user,
                           urlfilter='/torrent/tag/%s /torrent/.*[^/]+$' % tagstr,
                           tagconstraints=tagstr,
