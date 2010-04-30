@@ -39,6 +39,7 @@ urlpatterns = patterns('',
     (r'^key/(?P<key>.+)/constraint/remove/url/(?P<pattern>.+)$', remove_urlfilter),
     (r'^key/(?P<key>.+)/constraint/add/tag/(?P<tag>.+)$', add_tagconstraint),
     (r'^key/(?P<key>.+)/constraint/remove/tag/(?P<tag>.+)$', remove_tagconstraint),
+    (r'^key/$', api_keys),
     # Old stuff, pre API era.  FIXME: Clean up.
     (r'^user/$', user_self), # Short for self.
     )
