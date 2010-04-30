@@ -18,6 +18,7 @@ import lobber.log
 from lobber.share.forms import UploadForm
 from lobber.share.models import Torrent
 from lobber.notify import notifyJSON
+from django.utils.http import urlquote
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 ####################
@@ -56,14 +57,8 @@ def _store_torrent(req, form):
     notifyJSON("/torrent/add", torrent_hash);
     return t
     
-def _urlesc(s):
-    r = ''
-    for n in range(0, len(s), 2):
-        r += '%%%s' % s[n:n+2].upper()
-    return r
-
 def _prefetch_existlink(hash):
-    httplib.HTTPConnection(TRACKER_ADDR).request('GET', '/announce?info_hash=' + _urlesc(hash))
+    httplib.HTTPConnection(TRACKER_ADDR).request('GET', urlquote('/announce',{'info_hash': hash}))
 
 def find_torrents(user, args, max=40):
     """Search for torrents for which USER has read access.
