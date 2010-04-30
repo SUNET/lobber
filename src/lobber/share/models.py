@@ -79,7 +79,7 @@ class Torrent(models.Model):
                         p = user.profile.get()
                     except ObjectDoesNotExist:
                         pass
-                    if p and tag in p.entitlements:
+                    if p and tag in p.get_entitlements():
                         return True
                 else:
                     return True
