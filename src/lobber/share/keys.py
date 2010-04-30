@@ -43,15 +43,6 @@ def api_keys(req):
                                           make_response_dict(req, {'form': CreateKeyForm()}))
     return response
 
-@login_required
-def api_key(req, inst):
-    """
-    GET ==> get key
-    DELETE ==> delete key
-    """
-    response = HttpResponse('NYI: not yet implemented')
-    return response
-
 def key_form(req):
     return render_to_response('share/create_key.html',
                               make_response_dict(req,{'form': CreateKeyForm()}))
