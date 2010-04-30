@@ -21,9 +21,8 @@ def add_urlfilter(req, key, pattern):
     p = _get_profile(key)
     if not p:
         return HttpResponse("%s: key not found" % escape(key), status=404)
-    if not p.authz(req.user):
+    if not p.add_urlfilter(req.user, escape(pattern)):
         return HttpResponse("Permission denied.", status=403)
-    p.add_urlfilter(escape(pattern))
     p.save()
     return HttpResponse("Added %s to %s." % (escape(pattern), p))
 
@@ -32,6 +31,10 @@ def remove_urlfilter(req, key, pattern):
     p = _get_profile(key)
     if not p:
         return HttpResponse("%s: key not found" % escape(key))
+    if not p.remove_urlfilter(req.user, escape(pattern)):
+        return HttpResponse("Permission denied.", status=403)
+    p.save()
+    return HttpResponse("Removed %s from %s." % (escape(pattern), p))
 
 
 @login_required

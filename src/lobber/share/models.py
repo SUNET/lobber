@@ -99,7 +99,7 @@ class Torrent(models.Model):
 
     def set_acl(self, user, aces):
         if not self.authz_acl(user, 'w'):
-            return None
+            return False
         self.acl = ' '.join(aces)
         return self.acl
 
@@ -108,8 +108,7 @@ class Torrent(models.Model):
         Add ACE to ACL of self.  Return True on success, False if
         permission is denied.
         """
-        r = self.set_acl(user, self.get_acl(user) + [ace])
-        return r
+        return self.set_acl(user, self.get_acl(user) + [ace])
     
     def remove_ace(self, user, ace):
         """
@@ -165,9 +164,34 @@ class UserProfile(models.Model):
     def get_entitlements(self):
         return list(self.entitlements.split())
 
-    def add_urlfilter(self, filter):
-        self.urlfilter += ' ' + filter
+    def get_urlfilter(self, user):
+        if not self.authz(user):
+            return False
+        return list(self.urlfilter.split())
 
+    def set_urlfilter(self, user, flt):
+        if not self.authz(user):
+            return False
+        self.urlfilter = ' '.join(flt)
+        return self.urlfilter
+
+    def add_urlfilter(self, user, flt):
+        f = self.get_urlfilter(user)
+        if not flt in f:
+            return self.set_urlfilter(user, f + [flt])
+        return f
+
+    def remove_urlfilter(self, user, flt):
+        """
+        Remove FLT from self.urlfilter.
+        Return False if permission is denied, otherwise removed element.
+        """
+        f = self.get_urlfilter(user)
+        if flt in f:
+            f.remove(flt)
+            return self.set_urlfilter(user, f)
+        return True
+            
     def authz(self, user):
         print 'user:', repr(user)
         print 'creator:', self.creator.username
