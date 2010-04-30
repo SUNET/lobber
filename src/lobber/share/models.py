@@ -149,10 +149,13 @@ class UserProfile(models.Model):
     expiration_date = models.DateTimeField(null=True)
 
     def __unicode__(self):
-        return '%s (%s), entl="%s", filter="%s"' % (self.display_name,
-                                                    self.user,
-                                                    self.entitlements,
-                                                    self.urlfilter)
+        return '%s (%s), entl="%s", filter="%s", tagconstraints="%s"' \
+               % (self.display_name,
+                  self.user,
+                  self.entitlements,
+                  self.urlfilter,
+                  self.tagconstraints)
+
     def get_username(self):
         username = self.user.username
         if username.startswith('key:'):
