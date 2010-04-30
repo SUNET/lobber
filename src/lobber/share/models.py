@@ -164,6 +164,7 @@ class UserProfile(models.Model):
     def get_entitlements(self):
         return list(self.entitlements.split())
 
+    ### URL-filter.
     def get_urlfilter(self, user):
         if not self.authz(user):
             return False
@@ -184,24 +185,60 @@ class UserProfile(models.Model):
     def remove_urlfilter(self, user, flt):
         """
         Remove FLT from self.urlfilter.
-        Return False if permission is denied, otherwise removed element.
+
+        Return False if permission is denied, otherwise the removed
+        element or True if the element wasn't present.
         """
         f = self.get_urlfilter(user)
-        if flt in f:
-            f.remove(flt)
-            return self.set_urlfilter(user, f)
-        return True
+        if not flt in f:
+            return True
+        f.remove(flt)
+        if self.set_urlfilter(user, f) == False:
+            return False
+        return flt
+
+    ### Tag constraints.
+    # FIXME: Behold the pattern -- same as the url filter stuff!  Do
+    # something about it, please.
+    def get_tagconstraint(self, user):
+        if not self.authz(user):
+            return False
+        return list(self.tagconstraints.split())
+
+    def set_tagconstraint(self, user, tag):
+        if not self.authz(user):
+            return False
+        self.tagconstraints = ' '.join(tag)
+        return self.tagconstraints
+
+    def add_tagconstraint(self, user, tag):
+        t = self.get_tagconstraint(user)
+        if not tag in t:
+            return self.set_tagconstraint(user, t + [tag])
+        return t
             
+    def remove_tagconstraint(self, user, tag):
+        """
+        Remove TAG from self.tagconstraints.
+
+        Return False if permission is denied, otherwise True.
+        element or True if the element wasn't present.
+        """
+        t = self.get_tagconstraint(user)
+        if not tag in t:
+            return True
+        t.remove(tag)
+        if self.set_tagconstraint(user, t) == False:
+            return False
+        return tag
+
+    ### Authz.
     def authz(self, user):
-        print 'user:', repr(user)
-        print 'creator:', self.creator.username
         try:
             profile = user.profile.get()
         except ObjectDoesNotExist:
-            print 'no profile'
             return False
         for entl in profile.get_entitlements():
-            print entl
             if entl == 'user:' + self.creator.username:
                 return True
         return False

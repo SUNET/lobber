@@ -16,36 +16,38 @@ def _get_profile(key):
         return None
     return p
 
-@login_required
-def add_urlfilter(req, key, pattern):
+
+def add_constraint(req, key, constraint, fun):
     p = _get_profile(key)
     if not p:
         return HttpResponse("%s: key not found" % escape(key), status=404)
-    if not p.add_urlfilter(req.user, escape(pattern)):
+    if not fun(p, req.user, escape(constraint)):
         return HttpResponse("Permission denied.", status=403)
     p.save()
-    return HttpResponse("Added %s to %s." % (escape(pattern), p))
+    return HttpResponse("Added %s to %s." % (escape(constraint), p))
+
+def remove_constraint(req, key, constraint, fun):
+    p = _get_profile(key)
+    if not p:
+        return HttpResponse("%s: key not found" % escape(key))
+    if not fun(p, req.user, escape(constraint)):
+        return HttpResponse("Permission denied.", status=403)
+    p.save()
+    return HttpResponse("Removed %s from %s." % (escape(constraint), p))
+
+
+@login_required
+def add_urlfilter(req, key, pattern):
+    return add_constraint(req, key, pattern, UserProfile.add_urlfilter)
 
 @login_required
 def remove_urlfilter(req, key, pattern):
-    p = _get_profile(key)
-    if not p:
-        return HttpResponse("%s: key not found" % escape(key))
-    if not p.remove_urlfilter(req.user, escape(pattern)):
-        return HttpResponse("Permission denied.", status=403)
-    p.save()
-    return HttpResponse("Removed %s from %s." % (escape(pattern), p))
-
+    return remove_constraint(req, key, pattern, UserProfile.remove_urlfilter)
 
 @login_required
 def add_tagconstraint(req, key, tag):
-    p = _get_profile(key)
-    if not p:
-        return HttpResponse("%s: key not found" % escape(key))
-
+    return remove_constraint(req, key, tag, UserProfile.add_tagconstraint)
 
 @login_required
 def remove_tagconstraint(req, key, tag):
-    p = _get_profile(key)
-    if not p:
-        return HttpResponse("%s: key not found" % escape(key))
+    return remove_constraint(req, key, tag, UserProfile.remove_tagconstraint)
