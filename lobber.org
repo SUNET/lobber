@@ -150,7 +150,6 @@ See [[file:src/lobber/share/models.py][file:~/p/nordushare/lobber/src/lobber/sha
   Any operations will be checked against the constraints, see
   [[*Constraints]].
 
-
 **** Overview
 #+BEGIN_EXAMPLE
                  +---------+
@@ -199,7 +198,7 @@ Permission #r:
   - list/read torrent
   - read acl on torrent
 Permission #w:
-  - write acl on torrent (ace := entitlement carried (or "below"?))
+  - write or delete acl on torrent (ace := entitlement carried (or "below"?))
   - tag torrent (tag := global-tag (tag:) or equal to an entitlement carried)
 Permission #d:
   - delete torrent
@@ -292,13 +291,14 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 ** Keys
 https://beta.lobber.se/torrent/0b62f69a143df7708c9a0fe74a9f83b1ec4a01af.torrent?lkey=3ee568053f160f7eed0f327f92
 * Progress
-** For TREFpunkt [6/16]
+** For TREFpunkt [8/17]
 - [X] genral constraints, with url-filter and tag-constraints
 - [X] close down create_key.html
 - [X] api: search (list)
 - [X] api: add torrent
 - [X] api: add, remove tag on torrent
-- [ ] api: add, remove ace on torrent
+- [X] api: add, remove ace on torrent
+- [X] prefetching of torrents by application
 - [ ] api: add, remove constraint on key
       /key/<key-id>/constraint/add/url/<pattern>
       /key/<key-id>/constraint/add/tag/<tag>
@@ -439,3 +439,4 @@ https://beta.lobber.se/torrent/0b62f69a143df7708c9a0fe74a9f83b1ec4a01af.torrent?
   [1] http://library.gnome.org/devel/glib/
 ** debugging
 printf '%s\r\n\r\n' 'GET /announce?info_hash=%2EZc%15b%BA%7F%EE%24E%E0%CB5^C2%0Bv%F22X7 HTTP/1.1' | nc localhost 4711
+twistd -n lobberstoragenode -k 662485b707d535868d951329c7 -h beta.lobber.se -d /tmp --script="transmission-remote -n transmission:transmission -a" https://beta.lobber.se/torrent/tag/foo.rss /torrent/tag/foo
