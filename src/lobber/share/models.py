@@ -163,6 +163,23 @@ class UserProfile(models.Model):
         return username
 
     def get_entitlements(self):
-        return list(self.entitlements.split(' '))
-            
+        return list(self.entitlements.split())
+
+    def add_urlfilter(self, filter):
+        self.urlfilter += ' ' + filter
+
+    def authz(self, user):
+        print 'user:', repr(user)
+        print 'creator:', self.creator.username
+        try:
+            profile = user.profile.get()
+        except ObjectDoesNotExist:
+            print 'no profile'
+            return False
+        for entl in profile.get_entitlements():
+            print entl
+            if entl == 'user:' + self.creator.username:
+                return True
+        return False
+
 tagging.register(Torrent)
