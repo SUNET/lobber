@@ -20,7 +20,7 @@ urlpatterns = patterns('',
     (r'^torrent/add/$',TorrentForm),
     (r'^torrent/jnlp/$',upload_jnlp),
     (r'^torrent/(?P<inst>[0-9]+)\.([^\.]+)$', TorrentView),
-    (r'^torrent/(?P<inst>.*)\.torrent$', torrent_by_hashval),
+    (r'^torrent/(?P<inst>.+)\.torrent$', torrent_by_hashval),
     (r'^torrent/exists/(?P<inst>.+)$', exists),
     # Tagging.
     (r'^torrent/tags$', list_tags),
