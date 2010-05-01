@@ -53,7 +53,6 @@ def respond_to(request, template_mapping, dict, suffix_mapping=default_suffix_ma
         template = template_mapping[content_type]
     else:
         template = template_mapping["text/html"]
-    template = template_mapping[content_type]
     if callable(template):
         response = template(make_response_dict(request,dict))
     else:
