@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.contrib.auth.models import User
 
 from tagging.models import Tag, TaggedItem
@@ -160,19 +160,20 @@ def _torrent_file_response(dict):
     response['Content-Disposition'] = 'filename=%s.torrent' % t.name
     return response
 
+def _torrentlist(request, torrents):
+    return respond_to(request,
+                      {'text/html': 'share/index.html',
+                       'application/rss+xml': 'share/rss2.xml',
+                       'text/rss': 'share/rss2.xml'},
+                      {'torrents': torrents, 'title': 'Search result',
+                       'description': 'Search result'})
+
 class TorrentView(TorrentViewBase):
 
     @login_required
     def get(self, request, inst=None):
         if not inst:
-            return respond_to(request,
-                              {'text/html': 'share/index.html',
-                               'application/rss+xml': 'share/rss2.xml',
-                               'text/rss': 'share/rss2.xml'},
-                              {'torrents': find_torrents(request.user, request.GET.lists()),
-			                   'title': 'Search result',
-                               'description': 'Search result'})
-
+            return _torrentlist(request, find_torrents(request.user, request.GET.lists()))
         try:
             t = Torrent.objects.get(id=inst)
         except ObjectDoesNotExist:
@@ -191,6 +192,9 @@ def torrent_by_hashval(request, inst):
     except ObjectDoesNotExist:
         return render_to_response('share/index.html',
                                   make_response_dict(request, {'error': "No such torrent: %s" % inst}))
+    except MultipleObjectsReturned:
+        return _torrentlist(request,
+                            Torrent.objects.filter(hashval=inst).order_by('-creation_date'))
     return respond_to(request,
                       {'text/html': 'share/torrent.html',
                        'application/x-bittorrent': _torrent_file_response},
