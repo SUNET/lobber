@@ -70,7 +70,7 @@ SMTP_PORT = 25
 
 STOMP_HOST = 'localhost'
 STOMP_PORT = 61613
-ORBITED_PREFIX = 'http://localhost:9000'
+ORBITED_PREFIX = 'http://localhost:9001'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '79881b760f983c625fee66993d40d9ec997454fb9ce0e6cb4db99624265d1ffb'
