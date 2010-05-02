@@ -1,5 +1,4 @@
 {% extends "share/base.html" %}
-{% load tagging_tags %}
 {%block code %}
 <script type="text/javascript">
 $(function() {
@@ -113,9 +112,9 @@ $(function() {
 </script>
 {% endif %}
 <div id="header">
+   {% if user.is_authenticated %}
    <div style="float: right; margin-right: 50px;" class="button"><a id="logout" href="/auth/logout">Logout</a></div>
    <div id="linklist">
-   {% if user.is_authenticated %}
       <ul>
          <li><a href="/user"><span class="ui-icon ui-icon-locked" style="float: left;"></span>{{ user.get_full_name }}</a></li>
       </ul>
@@ -129,11 +128,7 @@ $(function() {
 	   	{% block main %}{% endblock %}
 	</div>
 	<div id="rhs">
-	    <h4>Tag cloud</h4>
-		{% tag_cloud_for_model share.Torrent as tags with steps=6 min_count=1 distribution=log %}
-		{% for tag in tags %}
-		<a style="font-size: {{tag.font_size}}" href="/torrent/tag/{{tag.name}}.html">{{tag.name}}</a>  
-		{% endfor %}
+	    {% block rhs %}{% endblock %}
 	</div>
 	<div class="clear"></div>
 </div>

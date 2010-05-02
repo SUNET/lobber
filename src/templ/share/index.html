@@ -215,6 +215,15 @@ function mailit(id) {
     {% endfor %}
 </div>
 {% else %}
-  <p>Seems like we're out of shared material.</p>
+  <p>Nothing matched your search or we're simply out of shared material...</p>
 {% endif %}
+{% endblock %}
+
+{% block rhs %}
+{% load tagging_tags %}
+<h4>Tag cloud</h4>
+{% tag_cloud_for_model share.Torrent as tags with steps=6 min_count=1 distribution=log %}
+{% for tag in tags %}
+<a style="font-size: {{tag.font_size}}" href="/torrent/tag/{{tag.name}}.html">{{tag.name}}</a>  
+{% endfor %}
 {% endblock %}
