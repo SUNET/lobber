@@ -14,6 +14,8 @@ from django.core.exceptions import ObjectDoesNotExist
 def list_tags(request,onlyExisting=False):
         try:
                 q = request.GET['term']
+                if q is None:
+                    q = []
                 tags = map(lambda x: x.name,Tag.objects.filter(name__istartswith=q))
                 if not q in tags and not onlyExisting:
                     tags.insert(0,q)
