@@ -46,7 +46,7 @@ def _store_torrent(req, form):
     f = file(name_on_disk, 'w')
     f.write(torrent_file_content)
     f.close()
-    t = Torrent(acl='user:%s#w' % req.user.username,
+    t = Torrent(acl='user:%s#w urn:x-lobber:storagenode#r' % req.user.username,
                 creator=req.user,
                 name=torrent_name,
                 description=form.cleaned_data['description'],
