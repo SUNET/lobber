@@ -48,19 +48,13 @@ class Torrent(models.Model):
                 return False
 
         for ace in self.acl.split():
+            ace_user, ace_perm = ace.split('#')
+            #print 'DEBUG: ace_user: %s, ace_perm: %s, usernames: %s' % (ace_user, ace_perm, usernames)
             for username in usernames:
-                # FIXME: ace must start with username, not the other way around!
-                #
-                # The result is that if USER creates a key with
-                # entitlement user:USER:key:blurb, the key user will
-                # be able to act as USER wrt to ACL checks.
-                #
-                # I changed this 2010-04-26 because I was confused.
-                # Now I don't want to change it back until we have an API for adding ace:s.
-                if username.startswith(ace.split('#')[0]):
-                    if ace.endswith('#w'):  # Write permission == all.
+                if ace_user.startswith(username):
+                    if ace_perm == 'w': # Write permission == all.
                         return True
-                    if ace.endswith('#%c' % perm):
+                    if ace_perm == 'c':
                         return True
         #print 'DEBUG: perm %s denied for %s on %s' % (perm, user, self)
         return False
