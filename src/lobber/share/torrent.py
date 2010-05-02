@@ -18,7 +18,7 @@ import lobber.log
 from lobber.share.forms import UploadForm
 from lobber.share.models import Torrent
 from lobber.notify import notifyJSON
-from django.utils.http import urlquote
+from django.utils.http import urlencode
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 ####################
@@ -65,7 +65,7 @@ def _urlesc(s):
 
 def _prefetch_existlink(hash):
     try:
-        httplib.HTTPConnection(TRACKER_ADDR).request('GET', urlquote('/announce?info_hash'+hash))
+        httplib.HTTPConnection(TRACKER_ADDR).request('GET', '/announce?info_hash'+_urlesc(hash))
     except:
         pass
 
@@ -173,7 +173,7 @@ class TorrentViewBase(Resource):
         if form.is_valid():
             t = _store_torrent(req, form)
             _prefetch_existlink(t.hashval)
-            return HttpResponseRedirect('/torrent/#%d' % tid)
+            return HttpResponseRedirect('/torrent/#%d' % t.id)
         else:
             logger.info("upload_form: received invalid form")
 
