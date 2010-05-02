@@ -5,6 +5,12 @@ class UploadForm(forms.Form):
     expires = forms.DateTimeField(label="Expiration date")
     file = forms.FileField(label="Torrent file")
 
+    def clean_file(self):
+        file = self.cleaned_data['file']
+        if not file.content_type == 'application/x-bittorrent':
+            raise forms.ValidationError('Not a BitTorrent file...')
+        return file
+        
 class CreateKeyForm(forms.Form):
     urlfilter = forms.CharField(label="URL filter", widget=forms.Textarea)
     tagconstraints = forms.CharField(label="Tag constraints", widget=forms.Textarea)
