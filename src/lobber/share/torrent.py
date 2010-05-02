@@ -64,7 +64,10 @@ def _urlesc(s):
     return r
 
 def _prefetch_existlink(hash):
-    httplib.HTTPConnection(TRACKER_ADDR).request('GET', '/announce?info_hash=' + _urlesc(hash))
+    try:
+        httplib.HTTPConnection(TRACKER_ADDR).request('GET', urlquote('/announce?info_hash'+hash))
+    except:
+        pass
 
 def find_torrents(user, args, max=40):
     """Search for torrents for which USER has read access.
