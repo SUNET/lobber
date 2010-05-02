@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.contrib.auth.models import User
 
 from tagging.models import Tag, TaggedItem
@@ -18,7 +18,7 @@ import lobber.log
 from lobber.share.forms import UploadForm
 from lobber.share.models import Torrent
 from lobber.notify import notifyJSON
-from django.utils.http import urlencode, urlquote
+from django.utils.http import urlquote
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 ####################
@@ -57,11 +57,14 @@ def _store_torrent(req, form):
     notifyJSON("/torrent/add", torrent_hash);
     return t
     
+def _urlesc(s):
+    r = ''
+    for n in range(0, len(s), 2):
+        r += '%%%s' % s[n:n+2].upper()
+    return r
+
 def _prefetch_existlink(hash):
-    try:
-        httplib.HTTPConnection(TRACKER_ADDR).request('GET', urlquote('/announce?info_hash'+hash))
-    except:
-        pass
+    httplib.HTTPConnection(TRACKER_ADDR).request('GET', '/announce?info_hash=' + _urlesc(hash))
 
 def find_torrents(user, args, max=40):
     """Search for torrents for which USER has read access.
@@ -94,6 +97,23 @@ def find_torrents(user, args, max=40):
         
     return filter(lambda t: t.authz(user, 'r'), q)[:max]
     
+
+def _torrent_file_response(dict):
+    t = dict.get('torrent')
+    f = t.file()
+    response = HttpResponse(FileWrapper(f), content_type='application/x-bittorrent')
+    response['Content-Length'] = os.path.getsize(f.name)
+    response['Content-Disposition'] = 'filename=%s.torrent' % t.name
+    return response
+
+def _torrentlist(request, torrents):
+    return respond_to(request,
+                      {'text/html': 'share/index.html',
+                       'application/rss+xml': 'share/rss2.xml',
+                       'text/rss': 'share/rss2.xml'},
+                      {'torrents': torrents, 'title': 'Search result',
+                       'description': 'Search result'})
+
 ####################
 # External functions, called from urls.py.
 
@@ -101,8 +121,14 @@ def welcome(req):
     return HttpResponseRedirect("/torrent/")
 
 @login_required
-def delete_torrent(req, tid):
-    raise
+def remove_torrent(req, tid):
+    try:
+        t = Torrent.objects.get(id=tid)
+    except ObjectDoesNotExist:
+        return render_to_response('share/index.html',
+                                  make_response_dict(req, {'error': "No such torrent: %s" % tid}))
+    t.delete()
+    return _torrentlist(req, find_torrents(req.user, req.GET.lists()))
 
 @login_required
 def upload_jnlp(req):
@@ -144,7 +170,7 @@ class TorrentViewBase(Resource):
         if form.is_valid():
             t = _store_torrent(req, form)
             _prefetch_existlink(t.hashval)
-            return HttpResponseRedirect('/torrent/#%d' % t.id)
+            return HttpResponseRedirect('/torrent/#%d' % tid)
         else:
             logger.info("upload_form: received invalid form")
 
@@ -155,27 +181,12 @@ class TorrentForm(TorrentViewBase):
         return render_to_response('share/upload-torrent.html',
                                    make_response_dict(req,{'form': UploadForm()}))
 
-def _torrent_file_response(dict):
-    t = dict.get('torrent')
-    f = t.file()
-    response = HttpResponse(FileWrapper(f), content_type='application/x-bittorrent')
-    response['Content-Length'] = os.path.getsize(f.name)
-    response['Content-Disposition'] = 'filename=%s.torrent' % t.name
-    return response
-
 class TorrentView(TorrentViewBase):
 
     @login_required
     def get(self, request, inst=None):
         if not inst:
-            return respond_to(request,
-                              {'text/html': 'share/index.html',
-                               'application/rss+xml': 'share/rss2.xml',
-                               'text/rss': 'share/rss2.xml'},
-                              {'torrents': find_torrents(request.user, request.GET.lists()),
-			                   'title': 'Search result',
-                               'description': 'Search result'})
-
+            return _torrentlist(request, find_torrents(request.user, request.GET.lists()))
         try:
             t = Torrent.objects.get(id=inst)
         except ObjectDoesNotExist:
@@ -194,6 +205,9 @@ def torrent_by_hashval(request, inst):
     except ObjectDoesNotExist:
         return render_to_response('share/index.html',
                                   make_response_dict(request, {'error': "No such torrent: %s" % inst}))
+    except MultipleObjectsReturned:
+        return _torrentlist(request,
+                            Torrent.objects.filter(hashval=inst).order_by('-creation_date'))
     return respond_to(request,
                       {'text/html': 'share/torrent.html',
                        'application/x-bittorrent': _torrent_file_response},

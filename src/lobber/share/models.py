@@ -20,7 +20,7 @@ class Torrent(models.Model):
         return '%s (%d / %s) (acl=%s)' % (self.name, self.id, self.hashval, self.acl)
 
     def url(self):
-        return "/torrent/%s.torrent" % self.hashval
+        return "/torrent/%d.torrent" % self.id
 
     def abs_url(self):
         return "%s%s" % (BASE_URL,self.url())

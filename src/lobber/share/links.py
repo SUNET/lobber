@@ -21,11 +21,11 @@ def _make_share_link(req, tid):
     except ObjectDoesNotExist:
         return None
     key = create_key_user(creator=req.user,
-                          urlfilter='/torrent/%s.torrent[^/]*$' % t.hashval,
+                          urlfilter='/torrent/%d.torrent[^/]*$' % t.id,
                           tagconstraints='',
                           entitlements='$self')
     t.add_ace(req.user, 'user:%s:%s#r' % (req.user.username, key))
-    return '%s/torrent/%s.torrent?lkey=%s' % (NORDUSHARE_URL, t.hashval, key)
+    return '%s/torrent/%d.torrent?lkey=%s' % (NORDUSHARE_URL, t.id, key)
 
 @login_required
 def gimme_url_for_reading_torrent(req, tid):
