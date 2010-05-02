@@ -91,6 +91,23 @@ def find_torrents(user, args, max=40):
         
     return filter(lambda t: t.authz(user, 'r'), q)[:max]
     
+
+def _torrent_file_response(dict):
+    t = dict.get('torrent')
+    f = t.file()
+    response = HttpResponse(FileWrapper(f), content_type='application/x-bittorrent')
+    response['Content-Length'] = os.path.getsize(f.name)
+    response['Content-Disposition'] = 'filename=%s.torrent' % t.name
+    return response
+
+def _torrentlist(request, torrents):
+    return respond_to(request,
+                      {'text/html': 'share/index.html',
+                       'application/rss+xml': 'share/rss2.xml',
+                       'text/rss': 'share/rss2.xml'},
+                      {'torrents': torrents, 'title': 'Search result',
+                       'description': 'Search result'})
+
 ####################
 # External functions, called from urls.py.
 
@@ -99,7 +116,13 @@ def welcome(req):
 
 @login_required
 def delete_torrent(req, tid):
-    raise
+    try:
+        t = Torrent.objects.get(id=tid)
+    except ObjectDoesNotExist:
+        return render_to_response('share/index.html',
+                                  make_response_dict(req, {'error': "No such torrent: %s" % tid}))
+    t.delete()
+    return _torrentlist(req, find_torrents(req.user, req.GET.lists()))
 
 @login_required
 def upload_jnlp(req):
@@ -151,22 +174,6 @@ class TorrentForm(TorrentViewBase):
     def get(self, req):
         return render_to_response('share/upload-torrent.html',
                                    make_response_dict(req,{'form': UploadForm()}))
-
-def _torrent_file_response(dict):
-    t = dict.get('torrent')
-    f = t.file()
-    response = HttpResponse(FileWrapper(f), content_type='application/x-bittorrent')
-    response['Content-Length'] = os.path.getsize(f.name)
-    response['Content-Disposition'] = 'filename=%s.torrent' % t.name
-    return response
-
-def _torrentlist(request, torrents):
-    return respond_to(request,
-                      {'text/html': 'share/index.html',
-                       'application/rss+xml': 'share/rss2.xml',
-                       'text/rss': 'share/rss2.xml'},
-                      {'torrents': torrents, 'title': 'Search result',
-                       'description': 'Search result'})
 
 class TorrentView(TorrentViewBase):
 
