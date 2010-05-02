@@ -5,7 +5,7 @@ from django.utils.html import escape
 from django.contrib.auth.models import User
 from lobber.share.models import UserProfile
 
-def _get_profile(key):
+def get_profile(key):
     try:
         u = User.objects.get(username='key:%s' % key)
     except ObjectDoesNotExist:
@@ -18,7 +18,7 @@ def _get_profile(key):
 
 
 def add_constraint(req, key, constraint, fun):
-    p = _get_profile(key)
+    p = get_profile(key)
     if not p:
         return HttpResponse("%s: key not found" % escape(key), status=404)
     if not fun(p, req.user, escape(constraint)):
@@ -27,7 +27,7 @@ def add_constraint(req, key, constraint, fun):
     return HttpResponse("Added %s to %s." % (escape(constraint), p))
 
 def remove_constraint(req, key, constraint, fun):
-    p = _get_profile(key)
+    p = get_profile(key)
     if not p:
         return HttpResponse("%s: key not found" % escape(key))
     if not fun(p, req.user, escape(constraint)):
