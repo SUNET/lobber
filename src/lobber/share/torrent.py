@@ -115,7 +115,7 @@ def welcome(req):
     return HttpResponseRedirect("/torrent/")
 
 @login_required
-def delete_torrent(req, tid):
+def remove_torrent(req, tid):
     try:
         t = Torrent.objects.get(id=tid)
     except ObjectDoesNotExist:
