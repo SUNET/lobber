@@ -20,7 +20,11 @@ def list_tags(request,onlyExisting=False):
                 try:
                     profile = request.user.profile.get();
                     if profile is not None:
-                        tags.append(profile.get_entitlements())
+                        entitlements = profile.get_entitlements()
+                        pprint(entitlements)
+                        if entitlements is not None and len(entitlements) > 0:
+                            for e in entitlements:
+                                tags.append(e)
                 except ObjectDoesNotExist:
                     pass
         except MultiValueDictKeyError:
