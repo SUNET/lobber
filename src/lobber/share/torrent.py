@@ -154,6 +154,8 @@ def exists(req, inst):
         r.content = t.hashval
     except ObjectDoesNotExist:
         r.status_code = 404
+    except MultipleObjectsReturned:
+        pass                            # Ok.
     return r;
 
 class TorrentViewBase(Resource):
