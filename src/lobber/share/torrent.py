@@ -66,8 +66,10 @@ def _urlesc(s):
     return r
 
 def _prefetch_existlink(hash):
+    url = '/announce?info_hash='+_urlesc(hash)
+    #print 'DEBUG: prefetching %s from %s' % (url, TRACKER_ADDR)
     try:
-        httplib.HTTPConnection(TRACKER_ADDR).request('GET', '/announce?info_hash='+_urlesc(hash))
+        httplib.HTTPConnection(TRACKER_ADDR).request('GET', url)
     except:
         pass
 
