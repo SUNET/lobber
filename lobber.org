@@ -290,7 +290,7 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 ** Keys
 https://beta.lobber.se/torrent/0b62f69a143df7708c9a0fe74a9f83b1ec4a01af.torrent?lkey=3ee568053f160f7eed0f327f92
 * Progress
-** For TREFpunkt [10/19]
+** For TREFpunkt [13/21]
 - [X] genral constraints, with url-filter and tag-constraints
 - [X] close down create_key.html
 - [X] api: search (list)
@@ -299,11 +299,13 @@ https://beta.lobber.se/torrent/0b62f69a143df7708c9a0fe74a9f83b1ec4a01af.torrent?
 - [X] api: add, remove ace on torrent
 - [X] prefetching of torrents by application
 - [X] api: add, remove constraint on key
-- [ ] investigate the assertion in opentracker and wrap invocation of
+- [X] investigate the assertion in opentracker and wrap invocation of
       it in a loop restarting it if it crashes
+- [X] remove collission in key user names (chopping 4 octets)
 - [ ] perform some basic load tests
+
 - [X] api: remove torrent
-- [ ] verify https://portal.nordu.net/display/nordushare/Running+a+storage+node
+- [X] verify https://portal.nordu.net/display/nordushare/Running+a+storage+node
 - do some basic web security analysis based on [[http://www.djangobook.com/en/2.0/chapter20/][The Django Book, chapter 20]]:
 - [ ] verify that we don't do any SQL queries "manually"
 - [X] HTML-escape all variables not sent via forms
