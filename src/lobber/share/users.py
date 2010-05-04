@@ -1,15 +1,15 @@
 from datetime import datetime as dt
+import binascii
+
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
-from lobber.multiresponse import make_response_dict
+from django.contrib.auth.models import User
 
+from lobber.multiresponse import make_response_dict
 from lobber.settings import LOBBER_LOG_FILE
 from lobber.share.models import Torrent, UserProfile
-
 import lobber.log
-from random import getrandbits
-from hashlib import sha256
-from django.contrib.auth.models import User
+
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 def create_key_user(creator, urlfilter, tagconstraints, entitlements, expires=None):
@@ -18,11 +18,7 @@ def create_key_user(creator, urlfilter, tagconstraints, entitlements, expires=No
     'user:<username>:', where username is the name of CREATOR.  Also,
     '$self' is substituted for the name of the newly created key-user.
     """
-    # FIXME: Do random.seed() somewhere.
-    # FIXME: Is 256 bits of random data proper?
-    # FIXME: Don't chop the digest!!!  Necessary for now, since
-    # Djangos User class allows for max 30 characters user names.
-    secret = sha256(str(getrandbits(256))).hexdigest()[:26]
+    secret = binascii.hexlify(open('/dev/urandom').read(13))
     username = 'key:%s' % secret
     user = User.objects.create_user(username, 'nomail@dev.null', username)
     # Fix entitlements by i) s/$self/<username>/g and ii) prepend 'user:<creator.username>'
