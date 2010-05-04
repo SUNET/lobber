@@ -154,6 +154,7 @@ def exists(req, inst):
         r.content = t.hashval
     except ObjectDoesNotExist:
         r.status_code = 404
+        r['Cache-Control'] = 'max-age=2'
     except MultipleObjectsReturned:
         pass                            # Ok.
     return r;
