@@ -56,7 +56,7 @@ def _store_torrent(req, form):
                 data='%s.torrent' % torrent_hash,
                 hashval=torrent_hash)
     t.save()
-    notifyJSON("/torrent/add", torrent_hash);
+    notifyJSON("/torrent/add", t.id);
     return t
     
 def _urlesc(s):
@@ -158,6 +158,8 @@ def exists(req, inst):
     except MultipleObjectsReturned:
         pass                            # Ok.
     return r;
+
+## TODO: This class stuff wasn't so neat after all - refactor to regular methods checking for the method instead
 
 class TorrentViewBase(Resource):
     """

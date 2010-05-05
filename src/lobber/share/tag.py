@@ -51,8 +51,8 @@ def add_tag(request,tid,name):
         
         Tag.objects.add_tag(t,name)
         
-        notifyJSON("/torrent/tag/add", t.hashval)
-        notifyJSON("/torrent/tag/add/"+name, t.hashval)
+        notifyJSON("/torrent/tag/add", t.id)
+        notifyJSON("/torrent/tag/add/"+name, t.id)
         
         return HttpResponse(name)
 
@@ -92,8 +92,8 @@ def remove_tag(request,tid,name):
         r['Cache-Control'] = 'no-cache, must-revalidate' 
         r['Pragma'] = 'no-cache'
 
-        notifyJSON("/torrent/tag/remove", t.hashval)
-        notifyJSON("/torrent/tag/remove/"+name, t.hashval)
+        notifyJSON("/torrent/tag/remove", t.id)
+        notifyJSON("/torrent/tag/remove/"+name, t.id)
 
         return r
 
