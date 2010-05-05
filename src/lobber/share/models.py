@@ -54,7 +54,7 @@ class Torrent(models.Model):
                 if ace_user.startswith(username):
                     if ace_perm == 'w': # Write permission == all.
                         return True
-                    if ace_perm == 'c':
+                    if ace_perm == '%c' % perm:
                         return True
         #print 'DEBUG: perm %s denied for %s on %s' % (perm, user, self)
         return False
