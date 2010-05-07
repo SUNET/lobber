@@ -19,6 +19,7 @@ $(function() {
    });
    $('.tip').tooltip({showURL: false});
    stomp = new STOMPClient();
+   {% if debug %}
    stomp.onopen = function() {
        $('#notification').jnotifyAddMessage({
           text: "STOMP connection opened",
@@ -33,6 +34,7 @@ $(function() {
           type: 'error'
        });
    };
+   {% endif %}
    stomp.onerror = function(error) {
        $('#notification').jnotifyAddMessage({
           text: error,
