@@ -3,7 +3,7 @@ import re
 from django.conf import settings
 from django.shortcuts import render_to_response
 from django.core.exceptions import ObjectDoesNotExist
-from lobber.settings import STOMP_HOST, STOMP_PORT, ORBITED_PREFIX, ANNOUNCE_URL
+from lobber.settings import STOMP_HOST, STOMP_PORT, ORBITED_PREFIX, ANNOUNCE_URL, DEBUG
 from lobber.share.models import UserProfile
 from datetime import datetime
 
@@ -40,6 +40,8 @@ def make_response_dict(request,d={}):
     d['orbited_prefix'] = ORBITED_PREFIX
     d['announce_url'] = ANNOUNCE_URL
     d['date'] = timeAsrfc822(datetime.now())
+    if DEBUG is not None:
+        d['debug'] = True
 
     return d
     
