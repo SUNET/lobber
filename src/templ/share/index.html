@@ -53,69 +53,8 @@ $(function() {
       });
       return false;
    });
-   function _add_tag_li(elt,name) {
-	   elt.append($("<li class=\"tag text ui-state-highlight ui-widget-content ui-corner-all\"><a class=\"tip\" title=\"Search for torrets with tag "+name+"\" href=\"/torrent/tag/"+name+".html\">"+name+"</a><a class=\"remove\" href=\"javascript:void(0);\" onClick=\"remove_tag_li(this);\"><span class=\"ui-icon ui-icon-close\"></span></a></li>"));
-   }
-   function _add_tag(tags,tid,name,tf) {
-	   $.get("/torrent/"+tid+"/tag/add/"+name,function(data) {
-        	_add_tag_li(tags,name);
-        	tf.attr('value','')
-       });
-   }
-   $('.tags').each(function(index) {
-	   var elt = $(this);
-	   var tid = $(this).closest('.torrent').attr('id');
-	   $.getJSON("/torrent/"+tid+"/tags",{},function(data,status) {
-		   var length = data.length;
-		   for (var i = 0; i < length; i++) {
-	          _add_tag_li(elt,data[i]);
-		   }
-	   });
-   });
-   $('.tagfield').autocomplete({
-      source: "/torrent/tags",
-      minLength: 2,  
-      select: function(event, ui) {
-	      var tag;
-	      var tf = $(this).closest('.tagfield').first();
-	      if (ui.item) {
-		    tag = ui.item.value;
-		    tf.attr('value',tag);
-	      } else {
-			tag = tf.attr('value');
-	      }
-	      torrent_elt = $(this).closest('.torrent');
-	      tags = torrent_elt.find('.tags').first();
-	      tid = torrent_elt.attr('id');
-	     _add_tag(tags,tid,tag,tf);
-      }
-   });
-   $('.tag .remove').click(function() {
-	  var tid = $(this).closest('.torrent').attr('id');
-	  var elt = $(this).closest('.tag');
-      $.get("/torrent/"+tid+"/tag/remove/"+$(this).prev().text(),function(data) {
-      	  elt.remove();
-      });
-   });
-   function _add_nav_tag_li(elt,name) {
-	   elt.append($("<li class=\"ui-state-highlight ui-widget-content ui-corner-all\">"+name+"</li>"));
-   }
-   $('#tagnavfield').autocomplete({
-      source: "/torrent/tags/assigned",
-      minLength: 2,
-      select: function(event, ui) {
-         $(this).parent().submit();
-      }
-   });
+   
 });
-
-function remove_tag_li(a) {
-	   var tid = $(a).closest('.torrent').attr('id');
-	   var li = $(a).closest('.tag');
-	   $.get("/torrent/"+tid+"/tag/remove/"+$(a).prev().text(),function(data) {
-	      li.remove();
-	   });
-}
 
 function gufrt(id) {
    $('#link').load("/torrent/gufrt/"+id);
@@ -135,6 +74,10 @@ function mailit(id) {
 <div class="button">
   <a href="/torrent/jnlp/">Upload using Java Web Start</a>
   <a href="/torrent/add/">Upload a torrent file</a>
+</div>
+
+<div id="tag-dialog" class="modal-dialog" title="Tag this data">
+	<div id="tags" class="text"></div>
 </div>
 
 <div id="share-link-dialog" class="modal-dialog" title="A link to this data">
@@ -198,10 +141,6 @@ function mailit(id) {
                       <span class="ui-icon ui-icon-wrench"></span>
                    </a>
                 </li -->
-                <ul style="float: left;" class="tags"></ul>
-                <li style="float: right;">
-                   <input type="text" name="name" value="" class="tagfield"/>
-                </li>
              <ul> 
            </div>
            {% if t.description %}
