@@ -6,7 +6,6 @@ from lobber.share.users import user_self
 from lobber.share.tag import tag_usage, tags, list_torrents_for_tag
 from lobber.share.acl import add_ace, remove_ace
 from lobber.share.constraint import add_urlfilter, add_tagconstraint, remove_urlfilter, remove_tagconstraint
-from lobber.share.keys import update_key, list_keys
 
 urlpatterns = patterns('',
     # (regexp as a string, function without prefix as a string)
