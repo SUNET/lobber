@@ -5,9 +5,8 @@ from forms import CreateKeyForm
 from lobber.settings import LOBBER_LOG_FILE
 from lobber.share.users import create_key_user
 from lobber.share.models import UserProfile
-from lobber.multiresponse import respond_to
+from lobber.multiresponse import respond_to, json_response
 import lobber.log
-from multiresponse import json_response
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
