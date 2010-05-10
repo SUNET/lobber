@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 
 from tagging.models import Tag, TaggedItem
 
-from lobber.multiresponse import respond_to, make_response_dict
+from lobber.multiresponse import respond_to, make_response_dict, json_response
 from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE, TRACKER_ADDR
 from lobber.resource import Resource
 import lobber.log
@@ -128,14 +128,19 @@ def welcome(req):
     return HttpResponseRedirect("/torrent/")
 
 @login_required
-def remove_torrent(req, tid):
+def remove_torrent(request, tid):
+    # TODO write a html version of this with a form confirmation
+    t = None
     try:
         t = Torrent.objects.get(id=tid)
     except ObjectDoesNotExist:
-        return render_to_response('share/index.html',
-                                  make_response_dict(req, {'error': "No such torrent: %s" % tid}))
+        return respond_to(request,
+                          {'application/json': json_response("No such torrent: "+tid),
+                           'text/html': 'share/index.html'},{'error': "No such torrent: %s" % tid});
     t.delete()
-    return _torrentlist(req, find_torrents(req.user, req.GET.lists()))
+    return respond_to(request,
+                      {'application/json': json_response(tid),
+                       'text/html': HttpResponseRedirect("/torrent")})
 
 @login_required
 def upload_jnlp(req):

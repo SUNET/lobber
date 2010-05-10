@@ -89,6 +89,24 @@ $(function() {
       	//suggestedTagsPlaceHolder:$("#suggested"),
       	boldify:true
    });
+   $("#remove-torrent-dialog").dialog({
+			autoOpen: false,
+			resizable: false,
+			height: 160,
+			modal: true,
+			buttons: {
+				'Remove torrent': function() {
+					$.getJSON($("#remove-torrent-dialog form").attr('action'),function(data) {
+					   $("#"+data).remove();
+					});
+					$(this).dialog('close');
+				},
+				'Cancel': function() {
+					$(this).dialog('close');
+				}
+			}
+		});
+   
 });
 
 function gufrt(id) {
@@ -108,6 +126,11 @@ function tagit(id) {
 		$('#tag-dialog form input').attr('value',data.join(" "));
 	});
 	$('#tag-dialog').dialog('open');
+}
+
+function removeit(id) {
+   $('#remove-torrent-dialog form').attr('action','/torrent/remove/'+id+'.json');
+   $('#remove-torrent-dialog').dialog('open');
 }
 
 </script>
@@ -133,6 +156,13 @@ function tagit(id) {
    <div id="link" class="text"></div>
 </div>
 
+<div id="remove-torrent-dialog" class="modal-dialog" title="Really remove this torrent?">
+    <form action="">
+		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+			This torrent will be permanently deleted and cannot be recovered. Are you sure?</p>
+	</form>
+</div>
+
 <div id="share-mail-dialog" class="modal-dialog" title="Send a link to this data">
    <form action="">
       <fieldset>
@@ -154,58 +184,58 @@ function tagit(id) {
 <div style="clear: both;"></div>
 
 <div id="accordion">
-    {% for t in torrents %}
+  {% for t in torrents %}
   <div id="{{t.id}}" class="torrent">
-	<h3><a href="#{{t.id}}">{{ t.name }} - created at {{t.creation_date}}</a></h3>
-        <div>
-	   <div class="navlist">
-             <ul>
-                <li>
-                   <a class="tip" title="Download this data using a torrent client" href="{{t.url}}">
-                      <span class="ui-icon ui-icon-arrowthickstop-1-s"></span>
-                   </a>
-                </li>
-                <!-- li>
-                   <a class="tip" title="Download this data using the download manager" href="/torrent/{{t.id}}.jnlp">
-                      <span class="ui-icon ui-icon-folder-open"></span>
-                   </a>
-                </li -->
-                <li>
-                   <a class="tip" title="Share a link to this data" href="javascript:void(0);" onClick="gufrt('{{t.id}}')">
-                      <span class="ui-icon ui-icon-extlink"></span>
-                   </a>
-                </li>
-                <li>
-                   <a class="tip" title="Send a link to this data" href="javascript:void(0);" onClick="mailit('{{t.id}}')">
-                      <span class="ui-icon ui-icon-mail-closed"></span>
-                   </a>
-                </li>
-                <li style="float: right;">
-                   <a class="tip" title="Remove this torrent" href="/torrent/remove/{{t.id}}">
-                      <span class="ui-icon ui-icon-trash"></span>
-                   </a>
-                </li>
-                <li style="float: right;">
-                   <a class="tip" title="Tag this torrent" href="javascript:void(0);" onClick="tagit('{{t.id}}')">
-                   	<span class="ui-icon ui-icon-star"></span>
-                   </a> 
-                </li>
-                <!-- li style="float: right;">
-                   <a class="tip" title="Modify settings for this torrent" href="/torrent/{{t.id}}.html">
-                      <span class="ui-icon ui-icon-wrench"></span>
-                   </a>
-                </li -->
-             <ul> 
-           </div>
-           {% if t.description %}
-           <div class="description">
-              <h4>Description:</h4>
-              <p>{{t.description}}</p>
-           </div>
-           {% endif %} 
-        </div>
-      </div>
-    {% endfor %}
+    <h3><a href="#{{t.id}}">{{ t.name }} - created at {{t.creation_date}}</a></h3>
+    <div>
+       <div class="navlist">
+         <ul>
+            <li>
+               <a class="tip" title="Download this data using a torrent client" href="{{t.url}}">
+                  <span class="ui-icon ui-icon-arrowthickstop-1-s"></span>
+               </a>
+            </li>
+            <!-- li>
+               <a class="tip" title="Download this data using the download manager" href="/torrent/{{t.id}}.jnlp">
+                  <span class="ui-icon ui-icon-folder-open"></span>
+               </a>
+            </li -->
+            <li>
+               <a class="tip" title="Share a link to this data" href="javascript:void(0);" onClick="gufrt('{{t.id}}')">
+                  <span class="ui-icon ui-icon-extlink"></span>
+               </a>
+            </li>
+            <li>
+               <a class="tip" title="Send a link to this data" href="javascript:void(0);" onClick="mailit('{{t.id}}')">
+                  <span class="ui-icon ui-icon-mail-closed"></span>
+               </a>
+            </li>
+            <li style="float: right;">
+               <a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{t.id}}')">
+                  <span class="ui-icon ui-icon-trash"></span>
+               </a>
+            </li>
+            <li style="float: right;">
+               <a class="tip" title="Tag this torrent" href="javascript:void(0);" onClick="tagit('{{t.id}}')">
+               	<span class="ui-icon ui-icon-star"></span>
+               </a> 
+            </li>
+            <!-- li style="float: right;">
+               <a class="tip" title="Modify settings for this torrent" href="/torrent/{{t.id}}.html">
+                  <span class="ui-icon ui-icon-wrench"></span>
+               </a>
+            </li -->
+         </ul> 
+       </div>
+       {% if t.description %}
+       <div class="description">
+          <h4>Description:</h4>
+          <p>{{t.description}}</p>
+       </div>
+       {% endif %} 
+    </div>
+  </div>
+  {% endfor %}
 </div>
 {% else %}
   <p>Nothing matched your search or we're simply out of shared material...</p>
