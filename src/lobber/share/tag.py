@@ -1,102 +1,70 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from tagging.models import Tag
 from lobber.share.models import Torrent
 from django.utils.datastructures import MultiValueDictKeyError
 from orbited import json
 from pprint import pprint
 from torrent import find_torrents
-from lobber.multiresponse import respond_to
+from lobber.multiresponse import respond_to, json_response
 from django.contrib.auth.decorators import login_required
 from lobber.notify import notifyJSON
 from django.core.exceptions import ObjectDoesNotExist
+from lobber.share.forms import TagForm
+from tagging.utils import parse_tag_input
 
 @login_required
-def list_tags(request,onlyExisting=False):
+def tag_usage(request):
+        q = request.GET['search']
+        r = None
         try:
-                q = request.GET['term']
-                tags = map(lambda x: x.name,Tag.objects.filter(name__istartswith=q))
-                if not q in tags and not onlyExisting:
-                    tags.insert(0,q)
-                try:
-                    profile = request.user.profile.get();
-                    if profile is not None:
-                        entitlements = profile.get_entitlements()
-                        pprint(entitlements)
-                        if entitlements is not None and len(entitlements) > 0:
-                            for e in entitlements:
-                                tags.append(e)
-                except ObjectDoesNotExist:
-                    pass
-        except MultiValueDictKeyError:
-                pass
-
-        r = HttpResponse(json.encode(tags), mimetype='text/x-json')
-        
-        r['Cache-Control'] = 'no-cache, must-revalidate' 
-        r['Pragma'] = 'no-cache'
-
+            tags = filter(lambda x: x.name.startswith(q),Tag.objects.usage_for_model(Torrent,counts=True))
+            r = json_response([{'tag': tag.name, 'freq': tag.count} for tag in tags])
+        except MultiValueDictKeyError,e:
+            pprint(e)
         return r
     
-def list_assigned_tags(request):
-    return list_tags(request,True)
-
 @login_required
-def add_tag(request,tid,name):
+def tags(request,tid):
         t = Torrent.objects.get(id=tid)
         if t is None:
             return HttpResponse(status=404)
         
-        if not t.authz_tag(request.user,'w',name):
-            return HttpResponse("Not authorized to add tag",status=401)
+        if request.method == 'GET':
+            try:
+                tags = map(lambda t: t.name,t.readable_tags(request.user))
+                return respond_to(request, {'application/json': lambda dict: json_response(dict.get('tags')),
+                                            'text/html': "share/tags.html" }, {'tags': tags, 'form': TagForm()})
+            except Exception,e:
+                pprint(e)
+                raise e
         
-        Tag.objects.add_tag(t,name)
-        
-        notifyJSON("/torrent/tag/add", t.id)
-        notifyJSON("/torrent/tag/add/"+name, t.id)
-        
-        return HttpResponse(name)
-
-@login_required
-def get_tags(request,tid):
-        t = Torrent.objects.get(id=tid)
-        if t is None:
-            return HttpResponse(status=404)
-        
-        tags = map(lambda t: t.name,t.readable_tags(request.user))
-        r = HttpResponse(json.encode(tags), mimetype='text/x-json')
-        
-        r['Cache-Control'] = 'no-cache, must-revalidate' 
-        r['Pragma'] = 'no-cache'
-
-        return r
-
-@login_required
-def remove_tag(request,tid,name):
-        t = Torrent.objects.get(id=tid)
-        if t is None:
-            return HttpResponse(status=404)
-        
-        if not t.authz_tag(request.user,'d',name):
-            return HttpResponse("Not authorized to remove tag",status=401)
+        if request.method == 'POST':
+            form = TagForm(request.POST)
+            if not form.is_valid():
+                return respond_to(request, {'application/json': json_response(dict.get('form').errors),
+                                            'text/html': "share/tags.html" }, {'tags': tags, 'form': form})
             
-        tags = map(lambda x: x.name, t.tags)
-        if name in tags:
-            tags.remove(name)
-            tags_str = ""
-            if tags is not None:
-                tags_str = " ".join(tags)
-            Tag.objects.update_tags(t,tags_str)
+            try:
+                to_tags = parse_tag_input(form.cleaned_data['tags'])
+                from_tags = Tag.objects.get_for_object(t)
+                Tag.objects.update_tags(t, form.cleaned_data['tags'])
+                
+                # figure out the diff and notify subscribers
+                for tag in from_tags:
+                    if not tag in to_tags:
+                        notifyJSON("/torrent/tag/remove",tag)
+                for tag in to_tags:
+                    if not tag in from_tags:
+                        notifyJSON("/torrent/tag/add",tag)
+            except Exception,e:
+                pprint(e)
             
-        r = HttpResponse(json.encode(tags), mimetype='text/x-json')
+            return respond_to(request, {'application/json': HttpResponse("Tagged "+t.name+" with "+to_tags.join(',')),
+                                        'text/html': HttpResponseRedirect("/torrent/#"+tid)})
+            
+
+        raise "Bad method: "+request.method
         
-        r['Cache-Control'] = 'no-cache, must-revalidate' 
-        r['Pragma'] = 'no-cache'
-
-        notifyJSON("/torrent/tag/remove", t.id)
-        notifyJSON("/torrent/tag/remove/"+name, t.id)
-
-        return r
-
 @login_required
 def list_torrents_for_tag(request,name):
         return respond_to(request,

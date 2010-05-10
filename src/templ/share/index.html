@@ -53,7 +53,42 @@ $(function() {
       });
       return false;
    });
-   
+   $('#tag-dialog').dialog({
+       autoOpen: false,
+       height: 200,
+       width: 600,
+       modal: true,
+       buttons: {
+          'Ok': function() {
+          	 $('#tag-dialog form').submit();
+             $(this).dialog('close');
+          },
+          'Cancel': function() {
+          	 $(this).dialog('close');
+          }
+       },
+   });
+   $('#tag-dialog form').submit(function() {
+   	   $.post($(this).attr('action'),$(this).serialize(),function(data) {
+   	      if (data) {
+   	         $('#notification').jnotifyAddMessage({
+               text: data,
+               permanent: false
+            });
+   	      }
+   	   });
+   	   return false;
+   });
+   $("#tag-dialog form input").tagInput({
+      	jsonUrl:"/torrent/tags.json",
+      	sortBy:"frequency",
+      	//suggestedTags: {{user.profile.entitlements}},
+      	tagSeparator:" ",
+      	autoFilter:true,
+      	autoStart:true,
+      	//suggestedTagsPlaceHolder:$("#suggested"),
+      	boldify:true
+   });
 });
 
 function gufrt(id) {
@@ -67,6 +102,14 @@ function mailit(id) {
    $('#share-mail-dialog').dialog('open');
 }
 
+function tagit(id) {
+	$('#tag-dialog form').attr('action','/torrent/'+id+'/tags.json');
+	$.getJSON('/torrent/'+id+'/tags.json',function(data) {
+		$('#tag-dialog form input').attr('value',data.join(" "));
+	});
+	$('#tag-dialog').dialog('open');
+}
+
 </script>
 {% endblock %}
 
@@ -77,7 +120,13 @@ function mailit(id) {
 </div>
 
 <div id="tag-dialog" class="modal-dialog" title="Tag this data">
-	<div id="tags" class="text"></div>
+	<form action="">
+	   <fieldset>
+	      <label for="tags">Tags</label>
+	      <input type="text" size="80" name="tags" id="tags" class="text"></input><br/>
+          Suggested tags: <span id="suggested" class="tabInputSuggestedTagList"></span>
+       </fieldset>
+    </form>
 </div>
 
 <div id="share-link-dialog" class="modal-dialog" title="A link to this data">
@@ -136,6 +185,11 @@ function mailit(id) {
                       <span class="ui-icon ui-icon-trash"></span>
                    </a>
                 </li>
+                <li style="float: right;">
+                   <a class="tip" title="Tag this torrent" href="javascript:void(0);" onClick="tagit('{{t.id}}')">
+                   	<span class="ui-icon ui-icon-star"></span>
+                   </a> 
+                </li>
                 <!-- li style="float: right;">
                    <a class="tip" title="Modify settings for this torrent" href="/torrent/{{t.id}}.html">
                       <span class="ui-icon ui-icon-wrench"></span>
@@ -163,6 +217,6 @@ function mailit(id) {
 <h4>Tag cloud</h4>
 {% tag_cloud_for_model share.Torrent as tags with steps=6 min_count=1 distribution=log %}
 {% for tag in tags %}
-<a style="font-size: {{tag.font_size}}" href="/torrent/tag/{{tag.name}}.html">{{tag.name}}</a>  
+<font class="tag" size="{{tag.font_size}}"><a href="/torrent/tag/{{tag.name}}.html">{{tag.name}}</a></font>  
 {% endfor %}
 {% endblock %}
