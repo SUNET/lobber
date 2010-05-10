@@ -97,7 +97,7 @@ $(function() {
 			buttons: {
 				'Remove torrent': function() {
 					$.getJSON($("#remove-torrent-dialog form").attr('action'),function(data) {
-					   $("#"+data).detach();
+					   $("#"+data).detach(); // works better than remove which breaks the accordion
 					});
 					$(this).dialog('close');
 				},
