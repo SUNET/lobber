@@ -97,7 +97,7 @@ $(function() {
 			buttons: {
 				'Remove torrent': function() {
 					$.getJSON($("#remove-torrent-dialog form").attr('action'),function(data) {
-					   $("#"+data).remove();
+					   $("#"+data).detach();
 					});
 					$(this).dialog('close');
 				},
