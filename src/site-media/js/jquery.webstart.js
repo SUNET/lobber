@@ -25,7 +25,6 @@ jQuery.fn.webstart = function(options) {
 		}
 		
 		$(this).click(function() {
-			alert(jnlp)
 	    	if (!deployJava.isWebStartInstalled(options.minVersion)) {
 	    	   if (deployJava.installLatestJRE()) {
 	    	      if (deployJava.launch(jnlp)) {}
