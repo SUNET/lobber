@@ -106,7 +106,7 @@ $(function() {
 				}
 			}
 		});
-   
+   $("#launch-dlmanager").webstart({jnlp: 'jnlp',minVersion: '1.6.0'});
 });
 
 function gufrt(id) {
@@ -138,7 +138,7 @@ function removeit(id) {
 
 {% block main %}
 <div class="button">
-  <a href="/torrent/jnlp/">Upload using Java Web Start</a>
+  <a id="launch-dlmanager" href="javascript:void(0);">Upload using Java Web Start</a>
   <a href="/torrent/add/">Upload a torrent file</a>
 </div>
 
