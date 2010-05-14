@@ -13,22 +13,45 @@ import lobber.log
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 def create_key_user(creator, urlfilter, tagconstraints, entitlements, expires=None):
-    """Create a user profile named key:<random text>.  
-    Each space separated entitlement in ENTITLEMENTS is prepended with
-    'user:<username>:', where username is the name of CREATOR.  Also,
-    '$self' is substituted for the name of the newly created key-user.
     """
+    Create a user profile named key:<random text>.  
+
+    Each space separated entitlement in ENTITLEMENTS is checked.
+    Invalid entitlements are stripped.  Valid entitlements are
+    - user:<CREATOR> and "below" (i.e. user:<CREATOR>:$self)
+    - exact match of any entitlement carried by CREATOR
+
+    Also, '$self' is substituted for the name of the newly created key-user.
+    """
+    creator_profile = None
+    try:
+        creator_profile = creator.profile.get()
+    except ObjectDoesNotExist:
+        pass
+    if not creator_profile:
+        return None
+
     secret = binascii.hexlify(open('/dev/urandom').read(13))
     username = 'key:%s' % secret
+
     user = User.objects.create_user(username, 'nomail@dev.null', username)
-    # Fix entitlements by i) s/$self/<username>/g and ii) prepend 'user:<creator.username>'
-    entls = ' '.join(map(lambda e: 'user:%s:%s' % (creator.username, e),
-                         map(lambda s: s.replace('$self', username), entitlements.split())))
+    urlfilter = ' '.join(urlfilter.split())
+    tagconstraints = ' '.join(tagconstraints.split())
+
+    entls = []
+    lst = map(lambda s: s.replace('$self', username), entitlements.split())
+    for e in lst:
+        if e.startswith('user:%s' % creator.username):
+            entls.append(e)
+        elif e in creator_profile.get_entitlements():
+            entls.append(e)
+    entitlements=' '.join(entls)
+
     profile = UserProfile(user=user,
                           creator=creator,
-                          urlfilter=' '.join(urlfilter.split()),
+                          urlfilter=urlfilter,
                           tagconstraints=tagconstraints,
-                          entitlements=entls,
+                          entitlements=entitlements,
                           expiration_date=expires)
     profile.save()
     return secret
