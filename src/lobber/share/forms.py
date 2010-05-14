@@ -17,3 +17,5 @@ class CreateKeyForm(forms.Form):
     entitlements = forms.CharField(label="Entitlements", widget=forms.Textarea)
     expires = forms.DateTimeField(label="Expiration date")
 
+class TagForm(forms.Form):
+    tags = forms.CharField(label="Tags")

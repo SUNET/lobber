@@ -19,6 +19,7 @@ $(function() {
    });
    $('.tip').tooltip({showURL: false});
    stomp = new STOMPClient();
+   {% if debug %}
    stomp.onopen = function() {
        $('#notification').jnotifyAddMessage({
           text: "STOMP connection opened",
@@ -33,6 +34,7 @@ $(function() {
           type: 'error'
        });
    };
+   {% endif %}
    stomp.onerror = function(error) {
        $('#notification').jnotifyAddMessage({
           text: error,
@@ -81,12 +83,8 @@ $(function() {
    #linklist ul{ list-style: none; padding: 0; margin: 0; }
    #linklist li{ float: left; margin: 0 0.15em}
    #linklist a{ font: 120% "Trebuchet MS", sans-serif; }
-   .tagform { border-right: 2px solid black; padding-right: 20px; }
-   .tag { padding-left: 4px; padding-bottom: -1px; }
-   .tags { float: right; }
-   .tags li { float: right;}
-   .tags li a { text-align: middle}
-   .tags li span { float: right }
+   a { text-decoration: none; }
+   a:hover { text-decoration: underline; }
    .clear { clear: both; }
    #content{ }
    #rhs{ float: right; width: 20%; position:absolute; top: 100px; right: 300px; font-size: 150%;}

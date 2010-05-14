@@ -53,69 +53,61 @@ $(function() {
       });
       return false;
    });
-   function _add_tag_li(elt,name) {
-	   elt.append($("<li class=\"tag text ui-state-highlight ui-widget-content ui-corner-all\"><a class=\"tip\" title=\"Search for torrets with tag "+name+"\" href=\"/torrent/tag/"+name+".html\">"+name+"</a><a class=\"remove\" href=\"javascript:void(0);\" onClick=\"remove_tag_li(this);\"><span class=\"ui-icon ui-icon-close\"></span></a></li>"));
-   }
-   function _add_tag(tags,tid,name,tf) {
-	   $.get("/torrent/"+tid+"/tag/add/"+name,function(data) {
-        	_add_tag_li(tags,name);
-        	tf.attr('value','')
-       });
-   }
-   $('.tags').each(function(index) {
-	   var elt = $(this);
-	   var tid = $(this).closest('.torrent').attr('id');
-	   $.getJSON("/torrent/"+tid+"/tags",{},function(data,status) {
-		   var length = data.length;
-		   for (var i = 0; i < length; i++) {
-	          _add_tag_li(elt,data[i]);
-		   }
-	   });
+   $('#tag-dialog').dialog({
+       autoOpen: false,
+       height: 200,
+       width: 600,
+       modal: true,
+       buttons: {
+          'Ok': function() {
+          	 $('#tag-dialog form').submit();
+             $(this).dialog('close');
+          },
+          'Cancel': function() {
+          	 $(this).dialog('close');
+          }
+       },
    });
-   $('.tagfield').autocomplete({
-      source: "/torrent/tags",
-      minLength: 2,  
-      select: function(event, ui) {
-	      var tag;
-	      var tf = $(this).closest('.tagfield').first();
-	      if (ui.item) {
-		    tag = ui.item.value;
-		    tf.attr('value',tag);
-	      } else {
-			tag = tf.attr('value');
-	      }
-	      torrent_elt = $(this).closest('.torrent');
-	      tags = torrent_elt.find('.tags').first();
-	      tid = torrent_elt.attr('id');
-	     _add_tag(tags,tid,tag,tf);
-      }
+   $('#tag-dialog form').submit(function() {
+   	   $.post($(this).attr('action'),$(this).serialize(),function(data) {
+   	      if (data) {
+   	         $('#notification').jnotifyAddMessage({
+               text: data,
+               permanent: false
+            });
+   	      }
+   	   });
+   	   return false;
    });
-   $('.tag .remove').click(function() {
-	  var tid = $(this).closest('.torrent').attr('id');
-	  var elt = $(this).closest('.tag');
-      $.get("/torrent/"+tid+"/tag/remove/"+$(this).prev().text(),function(data) {
-      	  elt.remove();
-      });
+   $("#tag-dialog form input").tagInput({
+      	jsonUrl:"/torrent/tags.json",
+      	sortBy:"frequency",
+      	//suggestedTags: {{user.profile.entitlements}},
+      	tagSeparator:" ",
+      	autoFilter:true,
+      	autoStart:true,
+      	//suggestedTagsPlaceHolder:$("#suggested"),
+      	boldify:true
    });
-   function _add_nav_tag_li(elt,name) {
-	   elt.append($("<li class=\"ui-state-highlight ui-widget-content ui-corner-all\">"+name+"</li>"));
-   }
-   $('#tagnavfield').autocomplete({
-      source: "/torrent/tags/assigned",
-      minLength: 2,
-      select: function(event, ui) {
-         $(this).parent().submit();
-      }
-   });
+   $("#remove-torrent-dialog").dialog({
+			autoOpen: false,
+			resizable: false,
+			height: 160,
+			modal: true,
+			buttons: {
+				'Remove torrent': function() {
+					$.getJSON($("#remove-torrent-dialog form").attr('action'),function(data) {
+					   $("#"+data).detach(); // works better than remove which breaks the accordion
+					});
+					$(this).dialog('close');
+				},
+				'Cancel': function() {
+					$(this).dialog('close');
+				}
+			}
+		});
+   $("#launch-dlmanager").webstart({jnlp: 'jnlp',minVersion: '1.6.0'});
 });
-
-function remove_tag_li(a) {
-	   var tid = $(a).closest('.torrent').attr('id');
-	   var li = $(a).closest('.tag');
-	   $.get("/torrent/"+tid+"/tag/remove/"+$(a).prev().text(),function(data) {
-	      li.remove();
-	   });
-}
 
 function gufrt(id) {
    $('#link').load("/torrent/gufrt/"+id);
@@ -128,17 +120,47 @@ function mailit(id) {
    $('#share-mail-dialog').dialog('open');
 }
 
+function tagit(id) {
+	$('#tag-dialog form').attr('action','/torrent/'+id+'/tags.json');
+	$.getJSON('/torrent/'+id+'/tags.json',function(data) {
+		$('#tag-dialog form input').attr('value',data.join(" "));
+	});
+	$('#tag-dialog').dialog('open');
+}
+
+function removeit(id) {
+   $('#remove-torrent-dialog form').attr('action','/torrent/remove/'+id+'.json');
+   $('#remove-torrent-dialog').dialog('open');
+}
+
 </script>
 {% endblock %}
 
 {% block main %}
 <div class="button">
-  <a href="/torrent/jnlp/">Upload using Java Web Start</a>
+  <a id="launch-dlmanager" href="javascript:void(0);">Upload using Java Web Start</a>
   <a href="/torrent/add/">Upload a torrent file</a>
+</div>
+
+<div id="tag-dialog" class="modal-dialog" title="Tag this data">
+	<form action="">
+	   <fieldset>
+	      <label for="tags">Tags</label>
+	      <input type="text" size="80" name="tags" id="tags" class="text"></input><br/>
+          Suggested tags: <span id="suggested" class="tabInputSuggestedTagList"></span>
+       </fieldset>
+    </form>
 </div>
 
 <div id="share-link-dialog" class="modal-dialog" title="A link to this data">
    <div id="link" class="text"></div>
+</div>
+
+<div id="remove-torrent-dialog" class="modal-dialog" title="Really remove this torrent?">
+    <form action="">
+		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+			This torrent will be permanently deleted and cannot be recovered. Are you sure?</p>
+	</form>
 </div>
 
 <div id="share-mail-dialog" class="modal-dialog" title="Send a link to this data">
@@ -162,57 +184,58 @@ function mailit(id) {
 <div style="clear: both;"></div>
 
 <div id="accordion">
-    {% for t in torrents %}
+  {% for t in torrents %}
   <div id="{{t.id}}" class="torrent">
-	<h3><a href="#{{t.id}}">{{ t.name }} - created at {{t.creation_date}}</a></h3>
-        <div>
-	   <div class="navlist">
-             <ul>
-                <li>
-                   <a class="tip" title="Download this data using a torrent client" href="{{t.url}}">
-                      <span class="ui-icon ui-icon-arrowthickstop-1-s"></span>
-                   </a>
-                </li>
-                <!-- li>
-                   <a class="tip" title="Download this data using the download manager" href="/torrent/{{t.id}}.jnlp">
-                      <span class="ui-icon ui-icon-folder-open"></span>
-                   </a>
-                </li -->
-                <li>
-                   <a class="tip" title="Share a link to this data" href="javascript:void(0);" onClick="gufrt('{{t.id}}')">
-                      <span class="ui-icon ui-icon-extlink"></span>
-                   </a>
-                </li>
-                <li>
-                   <a class="tip" title="Send a link to this data" href="javascript:void(0);" onClick="mailit('{{t.id}}')">
-                      <span class="ui-icon ui-icon-mail-closed"></span>
-                   </a>
-                </li>
-                <li style="float: right;">
-                   <a class="tip" title="Remove this torrent" href="/torrent/remove/{{t.id}}">
-                      <span class="ui-icon ui-icon-trash"></span>
-                   </a>
-                </li>
-                <!-- li style="float: right;">
-                   <a class="tip" title="Modify settings for this torrent" href="/torrent/{{t.id}}.html">
-                      <span class="ui-icon ui-icon-wrench"></span>
-                   </a>
-                </li -->
-                <ul style="float: left;" class="tags"></ul>
-                <li style="float: right;">
-                   <input type="text" name="name" value="" class="tagfield"/>
-                </li>
-             <ul> 
-           </div>
-           {% if t.description %}
-           <div class="description">
-              <h4>Description:</h4>
-              <p>{{t.description}}</p>
-           </div>
-           {% endif %} 
-        </div>
-      </div>
-    {% endfor %}
+    <h3><a href="#{{t.id}}">{{ t.name }} - created at {{t.creation_date}}</a></h3>
+    <div>
+       <div class="navlist">
+         <ul>
+            <li>
+               <a class="tip" title="Download this data using a torrent client" href="{{t.url}}">
+                  <span class="ui-icon ui-icon-arrowthickstop-1-s"></span>
+               </a>
+            </li>
+            <!-- li>
+               <a class="tip" title="Download this data using the download manager" href="/torrent/{{t.id}}.jnlp">
+                  <span class="ui-icon ui-icon-folder-open"></span>
+               </a>
+            </li -->
+            <li>
+               <a class="tip" title="Share a link to this data" href="javascript:void(0);" onClick="gufrt('{{t.id}}')">
+                  <span class="ui-icon ui-icon-extlink"></span>
+               </a>
+            </li>
+            <li>
+               <a class="tip" title="Send a link to this data" href="javascript:void(0);" onClick="mailit('{{t.id}}')">
+                  <span class="ui-icon ui-icon-mail-closed"></span>
+               </a>
+            </li>
+            <li style="float: right;">
+               <a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{t.id}}')">
+                  <span class="ui-icon ui-icon-trash"></span>
+               </a>
+            </li>
+            <li style="float: right;">
+               <a class="tip" title="Tag this torrent" href="javascript:void(0);" onClick="tagit('{{t.id}}')">
+               	<span class="ui-icon ui-icon-star"></span>
+               </a> 
+            </li>
+            <!-- li style="float: right;">
+               <a class="tip" title="Modify settings for this torrent" href="/torrent/{{t.id}}.html">
+                  <span class="ui-icon ui-icon-wrench"></span>
+               </a>
+            </li -->
+         </ul> 
+       </div>
+       {% if t.description %}
+       <div class="description">
+          <h4>Description:</h4>
+          <p>{{t.description}}</p>
+       </div>
+       {% endif %} 
+    </div>
+  </div>
+  {% endfor %}
 </div>
 {% else %}
   <p>Nothing matched your search or we're simply out of shared material...</p>
@@ -224,6 +247,6 @@ function mailit(id) {
 <h4>Tag cloud</h4>
 {% tag_cloud_for_model share.Torrent as tags with steps=6 min_count=1 distribution=log %}
 {% for tag in tags %}
-<a style="font-size: {{tag.font_size}}" href="/torrent/tag/{{tag.name}}.html">{{tag.name}}</a>  
+<font class="tag" size="{{tag.font_size}}"><a href="/torrent/tag/{{tag.name}}.html">{{tag.name}}</a></font>  
 {% endfor %}
 {% endblock %}

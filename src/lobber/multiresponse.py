@@ -3,9 +3,12 @@ import re
 from django.conf import settings
 from django.shortcuts import render_to_response
 from django.core.exceptions import ObjectDoesNotExist
-from lobber.settings import STOMP_HOST, STOMP_PORT, ORBITED_PREFIX, ANNOUNCE_URL
+from lobber.settings import STOMP_HOST, STOMP_PORT, ORBITED_PREFIX, ANNOUNCE_URL, DEBUG
 from lobber.share.models import UserProfile
 from datetime import datetime
+from pprint import pprint
+from django.http import HttpResponse
+from orbited import json
 
 default_suffix_mapping = {"\.htm(l?)$": "text/html",
                           "\.json$": "application/json",
@@ -40,10 +43,19 @@ def make_response_dict(request,d={}):
     d['orbited_prefix'] = ORBITED_PREFIX
     d['announce_url'] = ANNOUNCE_URL
     d['date'] = timeAsrfc822(datetime.now())
+    if DEBUG is not None:
+        d['debug'] = True
 
     return d
+
+def json_response(data): 
+    r = HttpResponse(json.encode(data),content_type='application/json')
+    r['Cache-Control'] = 'no-cache, must-revalidate'
+    r['Pragma'] = 'no-cache'
     
-def respond_to(request, template_mapping, dict, suffix_mapping=default_suffix_mapping):
+    return r
+    
+def respond_to(request, template_mapping, dict={}, suffix_mapping=default_suffix_mapping):
     accept = _accept_types(request, suffix_mapping)
     if accept is None:
         accept = (request.META['HTTP_ACCEPT'].split(','))[0]
@@ -55,6 +67,9 @@ def respond_to(request, template_mapping, dict, suffix_mapping=default_suffix_ma
         template = template_mapping["text/html"]
     if callable(template):
         response = template(make_response_dict(request,dict))
+    elif isinstance(template, HttpResponse):
+        response = template
+        response['Content-Type'] = "%s; charset=%s" % (content_type, settings.DEFAULT_CHARSET)
     else:
         response = render_to_response(template,make_response_dict(request,dict))
         response['Content-Type'] = "%s; charset=%s" % (content_type, settings.DEFAULT_CHARSET)
