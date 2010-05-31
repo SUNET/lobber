@@ -17,7 +17,9 @@ class Torrent(models.Model):
     acl = models.TextField()
 
     def __unicode__(self):
-        return '%s (%d / %s) (acl=%s)' % (self.name, self.id, self.hashval, self.acl)
+        return '%s (%d / %s) (acl=%s) (expire=%s)' % \
+               (self.name, self.id, self.hashval, self.acl,
+                self.expiration_date)
 
     def url(self):
         return "/torrent/%d.torrent" % self.id
