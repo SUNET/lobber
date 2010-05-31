@@ -36,27 +36,50 @@ def _torrent_info(data):
 
 def _store_torrent(req, form):
     """
-    Store torrent file in the file system and add its hash to the
-    trackers whitelist.
+    Check if req.user already has the torrent file (req.FILES) in the
+    database.  Note that the identity of a torrent is Torrent.hashval.
+
+    If the torrent is already in the system, update the entry with new
+    meta data (name, description, expiration date).
+
+    If this is a new torrent (for this user), create a new Torrent
+    object in the database and store the torrent file in the file
+    system.
     """
     torrent_file = req.FILES['file']
     # FIXME: Limit amount read and check length of returned data.
     torrent_file_content = torrent_file.read()
     torrent_file.close()
     torrent_name, torrent_hash = _torrent_info(torrent_file_content)
+
     name_on_disk = '%s/%s' % (TORRENTS, '%s.torrent' % torrent_hash)
     f = file(name_on_disk, 'w')
     f.write(torrent_file_content)
     f.close()
-    t = Torrent(acl='user:%s#w urn:x-lobber:storagenode#r' % req.user.username,
-                creator=req.user,
-                name=torrent_name,
-                description=form.cleaned_data['description'],
-                expiration_date=form.cleaned_data['expires'],
-                data='%s.torrent' % torrent_hash,
-                hashval=torrent_hash)
+
+    t = None
+    notification = None
+    try:
+        t = Torrent.objects.get(hashval=torrent_hash)
+    except ObjectDoesNotExist:
+        t = Torrent(acl='user:%s#w urn:x-lobber:storagenode#r' % req.user.username,
+                    creator=req.user,
+                    name=torrent_name,
+                    description=form.cleaned_data['description'],
+                    expiration_date=form.cleaned_data['expires'],
+                    data='%s.torrent' % torrent_hash,
+                    hashval=torrent_hash)
+        notification = '"/torrent/add'
+    if t:
+        assert(t.data == '%s.torrent' % torrent_hash)
+        assert(t.hashval == torrent_hash)
+        t.name = torrent_name
+        t.description = form.cleaned_data['description']
+        t.expiration_date=form.cleaned_data['expires']
+        notification = '"/torrent/update'
     t.save()
-    notifyJSON("/torrent/add", t.id);
+
+    notifyJSON(notification, t.id)
     return t
     
 def _urlesc(s):
