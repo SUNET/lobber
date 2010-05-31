@@ -289,6 +289,73 @@ announce url..: http://nordushare-dev.nordu.net:4711/announce
 - that bit in torrents the DHT article was talking about
 ** Keys
 https://beta.lobber.se/torrent/0b62f69a143df7708c9a0fe74a9f83b1ec4a01af.torrent?lkey=3ee568053f160f7eed0f327f92
+** TREF demo <2010-05-06 Thu>
+*** tracker bugs -- perm is totally broken here
+ttp_hashisvalid: found f80aa4bda5ed172784d28d4eb3142f2927a7b184, perm 1, expiration 1273145013
+achttp_hashisvalid: enter, hash=f80aa4bda5ed172784d28d4eb3142f2927a7b184
+achttp_hashisvalid: found f80aa4bda5ed172784d28d4eb3142f2927a7b184, perm 1, expiration 1273145013
+achttp_worker: adding f80aa4bda5ed172784d28d4eb3142f2927a7b184 to table: yes / 1273145023 (10s)
+achttp_hashisvalid: enter, hash=4ac072cdca71063fa34312f10e8fd7cecebc634e
+achttp_hashisvalid: found 4ac072cdca71063fa34312f10e8fd7cecebc634e, perm 1, expiration 1273143276
+achttp_worker: ignoring f80aa4bda5ed172784d28d4eb3142f2927a7b184 already in table (perm=-1828713971, lifetime=2)
+achttp_hashisvalid: enter, hash=1d971aa5619f771b28d0cb17c3da0542551254a6
+achttp_worker: ignoring f80aa4bda5ed172784d28d4eb3142f2927a7b184 already in table (perm=-1828713971, lifetime=2)
+achttp_hashisvalid: enter, hash=1d971aa5619f771b28d0cb17c3da0542551254a6
+achttp_worker: ignoring f80aa4bda5ed172784d28d4eb3142f2927a7b184 already in table (perm=-1828713971, lifetime=2)
+
+
+achttp_hashisvalid: enter, hash=1d971aa5619f771b28d0cb17c3da0542551254a6
+achttp_worker: ignoring f80aa4bda5ed172784d28d4eb3142f2927a7b184 already in table (perm=-1828713971, lifetime=2)
+achttp_hashisvalid: enter, hash=1d971aa5619f771b28d0cb17c3da0542551254a6
+achttp_worker: ignoring f80aa4bda5ed172784d28d4eb3142f2927a7b184 already in table (perm=-1828713971, lifetime=2)
+achttp_hashisvalid: enter, hash=1d971aa5619f771b28d0cb17c3da0542551254a6
+achttp_worker: ignoring f80aa4bda5ed172784d28d4eb3142f2927a7b184 already in table (perm=-1828713971, lifetime=2)
+
+
+achttp_hashisvalid: enter, hash=1d971aa5619f771b28d0cb17c3da0542551254a6
+achttp_worker: ignoring f80aa4bda5ed172784d28d4eb3142f2927a7b184 already in table (perm=-1828713971, lifetime=2)
+achttp_hashisvalid: enter, hash=1d971aa5619f771b28d0cb17c3da0542551254a6
+achttp_worker: ignoring f80aa4bda5ed172784d28d4eb3142f2927a7b184 already in table (perm=-1828713971, lifetime=2)
+achttp_hashisvalid: enter, hash=1d971aa5619f771b28d0cb17c3da0542551254a6
+achttp_worker: ignoring f80aa4bda5ed172784d28d4eb3142f2927a7b184 already in table (perm=-1828713971, lifetime=2)
+achttp_hashisvalid: enter, hash=1d971aa5619f771b28d0cb17c3da0542551254a6
+achttp_worker: ignoring f80aa4bda5ed172784d28d4eb3142f2927a7b184 already in table (perm=-1828713971, lifetime=2)
+achttp_hashisvalid: enter, hash=1d971aa5619f771b28d0cb17c3da0542551254a6
+achttp_worker: ignoring f80aa4bda5ed172784d28d4eb3142f2927a7b184 already in table (perm=-1828713971, lifetime=2)
+
+
+
+^Ctracker@tracker-dev:~/src/opentracker$ ./opentracker.debug -f ../../opentracker.conf  -a https://beta.lobber.se/trent/exists/
+Binding socket type TCP to address [0.0.0.0]:4711... success.
+Binding socket type UDP to address [0.0.0.0]:4711... success.
+Setting config option: stats-xyzzy
+Setting config option: /home/tracker/torrents
+Setting config option: https://beta.lobber.se/torrent/exists/
+chdir'ing to directory /home/tracker/torrents.
+achttp_hashisvalid: enter, hash=97722769642ecdd69db497ad7d2db9f4b9a5380b
+achttp_hashisvalid: enter, hash=97722769642ecdd69db497ad7d2db9f4b9a5380b
+achttp_worker: adding 97722769642ecdd69db497ad7d2db9f4b9a5380b to table: yes / 1273145209 (10s)
+achttp_hashisvalid: enter, hash=97722769642ecdd69db497ad7d2db9f4b9a5380b
+achttp_hashisvalid: found 97722769642ecdd69db497ad7d2db9f4b9a5380b, perm 1, expiration 1273145209
+achttp_hashisvalid: enter, hash=97722769642ecdd69db497ad7d2db9f4b9a5380b
+achttp_hashisvalid: found 97722769642ecdd69db497ad7d2db9f4b9a5380b, perm 1, expiration 1273145209
+achttp_worker: adding 97722769642ecdd69db497ad7d2db9f4b9a5380b to table: yes / 1273145219 (10s)
+achttp_hashisvalid: enter, hash=d06d03fb3736d54264bf1d5d3b9827c745d54555
+achttp_worker: ignoring 97722769642ecdd69db497ad7d2db9f4b9a5380b already in table (perm=32, lifetime=2)
+achttp_hashisvalid: enter, hash=97722769642ecdd69db497ad7d2db9f4b9a5380b
+achttp_hashisvalid: found 97722769642ecdd69db497ad7d2db9f4b9a5380b, perm 1, expiration 1273145219
+achttp_hashisvalid: enter, hash=97722769642ecdd69db497ad7d2db9f4b9a5380b
+achttp_hashisvalid: found 97722769642ecdd69db497ad7d2db9f4b9a5380b, perm 1, expiration 1273145219
+achttp_hashisvalid: enter, hash=97722769642ecdd69db497ad7d2db9f4b9a5380b
+achttp_hashisvalid: found 97722769642ecdd69db497ad7d2db9f4b9a5380b, perm 1, expiration 1273145219
+achttp_worker: adding 97722769642ecdd69db497ad7d2db9f4b9a5380b to table: yes / 1273145229 (10s)
+achttp_hashisvalid: enter, hash=97722769642ecdd69db497ad7d2db9f4b9a5380b
+achttp_hashisvalid: found 97722769642ecdd69db497ad7d2db9f4b9a5380b, perm 1, expiration 1273145229
+achttp_hashisvalid: enter, hash=97722769642ecdd69db497ad7d2db9f4b9a5380b
+achttp_hashisvalid: found 97722769642ecdd69db497ad7d2db9f4b9a5380b, perm 1, expiration 1273145229
+achttp_hashisvalid: enter, hash=8cb4bf390e8e68785166f2de13cd76db059a46d3
+achttp_worker: adding d06d03fb3736d54264bf1d5d3b9827c745d54555 to table: yes / 1273145247 (10s)
+
 * Progress
 ** For TREFpunkt [13/21]
 - [X] genral constraints, with url-filter and tag-constraints
@@ -440,5 +507,6 @@ https://beta.lobber.se/torrent/0b62f69a143df7708c9a0fe74a9f83b1ec4a01af.torrent?
   [0] http://curl.haxx.se/libcurl/
   [1] http://library.gnome.org/devel/glib/
 ** debugging
-printf '%s\r\n\r\n' 'GET /announce?info_hash=%2EZc%15b%BA%7F%EE%24E%E0%CB5^C2%0Bv%F22X7 HTTP/1.1' | nc localhost 4711
+printf '%s\r\n\r\n' 'GET /announce?info_hash=J%C0r%CD%CAq%06%3F%A3C%12%F1%0E%8F%D7%CE%CE%BCcN HTTP/1.1' | nc localhost 4711
 twistd -n lobberstoragenode -k 662485b707d535868d951329c7 -h beta.lobber.se -d /tmp --script="transmission-remote -n transmission:transmission -a" https://beta.lobber.se/torrent/tag/foo.rss /torrent/tag/foo
+./dev-django-admin.sh dbshell
