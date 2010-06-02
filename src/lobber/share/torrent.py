@@ -69,14 +69,14 @@ def _store_torrent(req, form):
                     expiration_date=form.cleaned_data['expires'],
                     data='%s.torrent' % torrent_hash,
                     hashval=torrent_hash)
-        notification = '"/torrent/add'
+        notification = '/torrent/add'
     if t:
         assert(t.data == '%s.torrent' % torrent_hash)
         assert(t.hashval == torrent_hash)
         t.name = torrent_name
         t.description = form.cleaned_data['description']
         t.expiration_date=form.cleaned_data['expires']
-        notification = '"/torrent/update'
+        notification = '/torrent/update'
     t.save()
 
     notifyJSON(notification, t.id)
