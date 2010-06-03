@@ -60,6 +60,6 @@ def gimme_url_for_reading_tag(request, tagstr):
     key = create_key_user(creator=request.user,
                           urlfilter='/torrent/tag/%s /torrent/.*[^/]+$' % tagstr,
                           tagconstraints=tagstr,
-                          entitlements='user:%s:$self' % req.user.username)
+                          entitlements='user:%s:$self' % request.user.username)
     link = '%s/torrent/tag/%s.rss?lkey=%s' % (NORDUSHARE_URL, tagstr, key)
     return HttpResponse('<a href=\"%s\">%s</a>' % (link, link))
