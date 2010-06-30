@@ -71,6 +71,7 @@ def login_federated(request):
 
     if request.user.password == "":
         request.user.password = "(not used for federated logins)"
+        request.user.set_unusable_password()
         update_user = True
 
     if update_user:
