@@ -35,7 +35,6 @@ def tags(request,tid):
                 return respond_to(request, {'application/json': lambda dict: json_response(dict.get('tags')),
                                             'text/html': "share/tags.html" }, {'tags': tags, 'form': TagForm()})
             except Exception,e:
-                pprint(e)
                 raise e
         
         if request.method == 'POST':
@@ -46,7 +45,7 @@ def tags(request,tid):
             
             try:
                 to_tags = parse_tag_input(form.cleaned_data['tags'])
-                from_tags = Tag.objects.get_for_object(t)
+                from_tags = map(lambda t: t.name, Tag.objects.get_for_object(t))
                 Tag.objects.update_tags(t, form.cleaned_data['tags'])
                 
                 # figure out the diff and notify subscribers
@@ -58,10 +57,9 @@ def tags(request,tid):
                         notifyJSON("/torrent/tag/add",tag)
             except Exception,e:
                 pprint(e)
-            
-            return respond_to(request, {'application/json': HttpResponse("Tagged "+t.name+" with "+to_tags.join(',')),
+
+            return respond_to(request, {'application/json': lambda dict: json_response(tid),
                                         'text/html': HttpResponseRedirect("/torrent/#"+tid)})
-            
 
         raise "Bad method: "+request.method
         
