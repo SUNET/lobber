@@ -17,6 +17,7 @@ ANNOUNCE_URL = ANNOUNCE_BASE_URL + '/announce'
 
 ADMINS = (
     ('Linus Nordberg', 'linus@nordu.net'),
+    ('Leif Johansson', 'leifj@sunet.se')
 )
 
 MANAGERS = ADMINS
@@ -110,6 +111,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'django_extensions',
     'tagging',
     'lobber.share',
     'lobber.auth'
