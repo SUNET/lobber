@@ -8,7 +8,29 @@ var link = $('#link'),
     message = $('#message'),
     allFields = $([]).add(to).add(message);
 
+function _update_tags(id) {
+	if (id) {
+   		$.getJSON('/torrent/'+id+'/tags.json',function(data) {
+   			links = $.map(data,function(elt) {
+   				return "<a href=\"/torrent/tag/"+elt+".html\">"+elt+"</a>";
+   			});
+			$("#"+id).find('div.tags').html(links.join("&nbsp;"));
+		});
+	}
+}
+
 $(function() {
+   $("#torrents").accordion({ 
+   			header: "h3", 
+   			event: "mouseover", 
+   			collapsible: true,
+   			active: false,
+   			changestart: function(event,ui) {
+   			    var content = ui.newContent;
+   				var id = $(content).closest('.torrent').attr('id');
+   				_update_tags(id);
+   			}
+   });
    $('#share-mail-dialog').dialog({
        position: ['center','center'],
        autoOpen: false,
@@ -71,10 +93,7 @@ $(function() {
    $('#tag-dialog form').submit(function() {
    	   $.post($(this).attr('action'),$(this).serialize(),function(data) {
    	      if (data) {
-   	         $('#notification').jnotifyAddMessage({
-               text: data,
-               permanent: false
-            });
+            _update_tags(data);
    	      }
    	   });
    	   return false;
@@ -183,7 +202,7 @@ function removeit(id) {
 </div -->
 <div style="clear: both;"></div>
 
-<div id="accordion">
+<div id="torrents">
   {% for t in torrents %}
   <div id="{{t.id}}" class="torrent">
     <h3><a href="#{{t.id}}">{{ t.name }} - created at {{t.creation_date}}</a></h3>
@@ -218,7 +237,10 @@ function removeit(id) {
             <li style="float: right;">
                <a class="tip" title="Tag this torrent" href="javascript:void(0);" onClick="tagit('{{t.id}}')">
                	<span class="ui-icon ui-icon-star"></span>
-               </a> 
+               </a>
+            </li>
+            <li style="float: right;">
+               <div class="tags"></div>
             </li>
             <!-- li style="float: right;">
                <a class="tip" title="Modify settings for this torrent" href="/torrent/{{t.id}}.html">
