@@ -212,6 +212,8 @@ class TorrentViewBase(Resource):
         form = UploadForm(req.POST, req.FILES)    
         if form.is_valid():
             t = _store_torrent(req, form)
+            if not t:
+                return HttpResponse('error creating torrent')
             _prefetch_existlink(t.hashval)
             return HttpResponseRedirect('/torrent/#%d' % t.id)
         else:
@@ -223,6 +225,8 @@ class TorrentViewBase(Resource):
         form = UploadForm(req.POST, req.FILES)
         if form.is_valid():
             t = _store_torrent(req, form)
+            if not t:
+                return HttpResponse('error creating torrent')
             _prefetch_existlink(t.hashval)
             return HttpResponseRedirect('/torrent/#%d' % t.id)
         else:
