@@ -35,7 +35,7 @@ def create_key_user(creator, urlfilter, tagconstraints, entitlements, expires=No
     secret = binascii.hexlify(open('/dev/urandom').read(13))
     username = 'key:%s' % secret
 
-    user = User.objects.create_user(username, 'nomail@dev.null')
+    user = User.objects.create_user(username, 'nomail@dev.null', username)
     urlfilter = ' '.join(urlfilter.split())
     tagconstraints = ' '.join(tagconstraints.split())
 
