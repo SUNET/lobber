@@ -50,7 +50,6 @@ def create_key_user(creator, urlfilter, tagconstraints, entitlements, expires=No
 
     profile = UserProfile(user=user,
                           creator=creator,
-                          priv_create_torrent=False,
                           urlfilter=urlfilter,
                           tagconstraints=tagconstraints,
                           entitlements=entitlements,
