@@ -15,32 +15,38 @@ import lobber.log
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
-def _make_share_link(req, tid):
-    try:
-        t = Torrent.objects.get(id=int(tid))
-    except ObjectDoesNotExist:
-        return None
-    key = create_key_user(creator=req.user,
-                          urlfilter='/torrent/%d.torrent[^/]*$' % t.id,
+def _make_share_link(user, torrent):
+    key = create_key_user(creator=user,
+                          urlfilter='/torrent/%d.torrent[^/]*$' % torrent.id,
                           tagconstraints='',
-                          entitlements='user:%s:$self' % req.user.username)
-    t.add_ace(req.user, 'user:%s:%s#r' % (req.user.username, key))
-    return '%s/torrent/%d.torrent?lkey=%s' % (NORDUSHARE_URL, t.id, key)
+                          entitlements='user:%s:$self' % user.username)
+    if not key:
+        return None
+    torrent.add_ace(user, 'user:%s:%s#r' % (user.username, key))
+    return '%s/torrent/%d.torrent?lkey=%s' % (NORDUSHARE_URL, torrent.id, key)
 
 @login_required
 def gimme_url_for_reading_torrent(req, tid):
-    link = _make_share_link(req,tid)
-    if link is None:
+    try:
+        t = Torrent.objects.get(id=int(tid))
+    except ObjectDoesNotExist:
         return HttpResponse('Sorry, torrent %s not found'  % escape(tid))
+    link = _make_share_link(req.user, t)
+    if link is None:
+        return HttpResponse('error: unable to create key user')
     return HttpResponse('<a href=\"%s\">%s</a>' % (link, link))
 
 @login_required
 def send_link_mail(req,tid):
     to = req.REQUEST.get('to')
     message = req.REQUEST.get('message')
-    link = _make_share_link(req,tid)
-    if link is None:
+    try:
+        t = Torrent.objects.get(id=int(tid))
+    except ObjectDoesNotExist:
         return HttpResponse('Sorry, torrent %s not found'  % escape(tid))
+    link = _make_share_link(req.user, t)
+    if link is None:
+        return HttpResponse('error: unable to create key user')
     msg = "Data: "+strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())+"\n"
     msg += "From: "+req.user.email+"\n"
     msg += "To: "+to+"\n"
@@ -61,5 +67,7 @@ def gimme_url_for_reading_tag(request, tagstr):
                           urlfilter='/torrent/tag/%s /torrent/.*[^/]+$' % tagstr,
                           tagconstraints=tagstr,
                           entitlements='user:%s:$self' % request.user.username)
+    if not key:
+        return HttpResponse('error: unable to create key user')
     link = '%s/torrent/tag/%s.rss?lkey=%s' % (NORDUSHARE_URL, tagstr, key)
     return HttpResponse('<a href=\"%s\">%s</a>' % (link, link))

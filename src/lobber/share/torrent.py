@@ -46,6 +46,13 @@ def _store_torrent(req, form):
     object in the database and store the torrent file in the file
     system.
     """
+    try:
+        profile = req.user.profile.get()
+    except ObjectDoesNotExist:
+        return None
+    if not profile.priv_create_torrent:
+        return None
+
     torrent_file = req.FILES['file']
     # FIXME: Limit amount read and check length of returned data.
     torrent_file_content = torrent_file.read()
@@ -70,16 +77,22 @@ def _store_torrent(req, form):
                     data='%s.torrent' % torrent_hash,
                     hashval=torrent_hash)
         notification = '/torrent/add'
-    if t:
+    except MultipleObjectsReturned, e:
+        # Pathological case that can happen with corrupt (or old) database.
+        # FIXME: Handle error case.
+        pass
+    else:                            # Found torrent, update database.
         assert(t.data == '%s.torrent' % torrent_hash)
         assert(t.hashval == torrent_hash)
         t.name = torrent_name
         t.description = form.cleaned_data['description']
-        t.expiration_date=form.cleaned_data['expires']
+        t.expiration_date = form.cleaned_data['expires']
         notification = '/torrent/update'
-    t.save()
 
-    notifyJSON(notification, t.id)
+    if t:
+        t.save()
+        notifyJSON(notification, t.id)
+
     return t
     
 def _urlesc(s):
@@ -199,6 +212,8 @@ class TorrentViewBase(Resource):
         form = UploadForm(req.POST, req.FILES)    
         if form.is_valid():
             t = _store_torrent(req, form)
+            if not t:
+                return HttpResponse('error creating torrent')
             _prefetch_existlink(t.hashval)
             return HttpResponseRedirect('/torrent/#%d' % t.id)
         else:
@@ -210,6 +225,8 @@ class TorrentViewBase(Resource):
         form = UploadForm(req.POST, req.FILES)
         if form.is_valid():
             t = _store_torrent(req, form)
+            if not t:
+                return HttpResponse('error creating torrent')
             _prefetch_existlink(t.hashval)
             return HttpResponseRedirect('/torrent/#%d' % t.id)
         else:

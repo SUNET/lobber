@@ -510,3 +510,12 @@ achttp_worker: adding d06d03fb3736d54264bf1d5d3b9827c745d54555 to table: yes / 1
 printf '%s\r\n\r\n' 'GET /announce?info_hash=J%C0r%CD%CAq%06%3F%A3C%12%F1%0E%8F%D7%CE%CE%BCcN HTTP/1.1' | nc localhost 4711
 twistd -n lobberstoragenode -k 662485b707d535868d951329c7 -h beta.lobber.se -d /tmp --script="transmission-remote -n transmission:transmission -a" https://beta.lobber.se/torrent/tag/foo.rss /torrent/tag/foo
 ./dev-django-admin.sh dbshell
+* Bittorrent client
+** Transmission
+./configure --disable-gtk --disable-nls && make
+* Parts and pieces of lobber.se
+** sn-dev -- storage node
+- /var/lib/transmission-daemon/ is where Transmission keeps its stuff
+
+** tracker-dev -- the tracker
+** app-dev -- web app
