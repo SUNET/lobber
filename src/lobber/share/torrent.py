@@ -47,7 +47,7 @@ def _store_torrent(req, form):
     system.
     """
     try:
-        profile = creator.profile.get()
+        profile = req.user.profile.get()
     except ObjectDoesNotExist:
         return None
     if not profile.priv_create_torrent:
