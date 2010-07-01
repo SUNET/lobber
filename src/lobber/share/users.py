@@ -1,6 +1,7 @@
 from datetime import datetime as dt
 import binascii
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -49,6 +50,7 @@ def create_key_user(creator, urlfilter, tagconstraints, entitlements, expires=No
 
     profile = UserProfile(user=user,
                           creator=creator,
+                          priv_create_torrent=False,
                           urlfilter=urlfilter,
                           tagconstraints=tagconstraints,
                           entitlements=entitlements,

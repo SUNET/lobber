@@ -46,6 +46,9 @@ def _store_torrent(req, form):
     object in the database and store the torrent file in the file
     system.
     """
+    if not req.user.priv_create_torrent:
+        return None
+
     torrent_file = req.FILES['file']
     # FIXME: Limit amount read and check length of returned data.
     torrent_file_content = torrent_file.read()
