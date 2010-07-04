@@ -58,8 +58,8 @@ def _store_torrent(req, form):
     f.close()
 
     acl = []
-    ro = form.cleaned_data['acl']
-    if ro:
+    publicAccess = form.cleaned_data['publicAccess']
+    if publicAccess:
         acl.append("#r")
     acl.append('user:%s#w' % req.user.username)
     acl.append('urn:x-lobber:storagenode#r')
