@@ -57,12 +57,19 @@ def _store_torrent(req, form):
     f.write(torrent_file_content)
     f.close()
 
+    acl = []
+    ro = form.cleaned_data['acl']
+    if ro:
+        acl.append("#r")
+    acl.append('user:%s#w' % req.user.username)
+    acl.append('urn:x-lobber:storagenode#r')
+
     t = None
     notification = None
     try:
         t = Torrent.objects.get(hashval=torrent_hash)
     except ObjectDoesNotExist:
-        t = Torrent(acl='user:%s#w urn:x-lobber:storagenode#r' % req.user.username,
+        t = Torrent(acl=" ".join(acl),
                     creator=req.user,
                     name=torrent_name,
                     description=form.cleaned_data['description'],

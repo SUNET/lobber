@@ -2,7 +2,6 @@
 {%block code %}
 <script type="text/javascript">
 $(function() {
-   $("#id_expires").datepicker({'dateFormat': 'yy-mm-dd'});
    $("input:submit, input:button, a",".button").button();
    $('#notification').jnotifyInizialize({
       oneAtTime: false,
@@ -67,7 +66,7 @@ $(function() {
 {%block style %}
 <style type="text/css">
    body{ font: 61.8% "Trebuchet MS", sans-serif; margin: 50px; width: 70% }
-   label, input { display:block; }
+   label { display:block; }
    #modal-dialog { font-size: 110%; }
    #modal-dialog input.text textarea { margin-bottom:12px; width:95%; padding: .4em; }
    #modal-dialog fieldset { padding:0; border:0; margin-top:25px; }
@@ -90,8 +89,10 @@ $(function() {
    #main{ font: 100% "Trebuchet MS", sans-serif; margin: 50px; width:70%}
    .code{font: 110% "Courier", fixed}
    .infopanel {font-size: 130%; width: 100%; padding: 5px; margin-bottom: 10px; }
-   .infopanel label, div { display:block; }
+   .infopanel label { display:block; }
    div .hidden {visibility:hidden;}
+   div .ms2side__div {width: 300%;}
+   option .ms2side__select {font-size: 61.8%;}
 </style>
 {% endblock %}
 
@@ -110,7 +111,7 @@ $(function() {
 {% endif %}
 <div id="header">
    {% if user.is_authenticated %}
-   <div style="float: right; margin-right: 50px;" class="button"><a id="logout" href="/auth/logout">Logout</a></div>
+   <div style="float: right; margin-right: 50px;" class="button"><a id="logout" href="/auth/logout/">Logout</a></div>
    <div id="linklist">
       <ul>
          <li><a href="/user"><span class="ui-icon ui-icon-locked" style="float: left;"></span>{{ user.get_full_name }}</a></li>

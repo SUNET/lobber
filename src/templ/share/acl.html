@@ -1,0 +1,70 @@
+{% extends "share/base_ui.html" %}
+
+{% block title %}Lobber: Torrent Access Setting{% endblock %}
+{% block js %}
+<script type="text/javascript">
+$(function() {
+	function is_available(select,value) {
+		return select.find('option[value=\''+value+'\']').size() > 0;
+	}
+
+	function is_selected(select,value) {
+		return select.find('option:selected','[value=\''+value+'\']').size() > 0;
+	}
+
+	$.getJSON("/ace/suggest",function (data) {
+	    var acl = $("#id_acl");
+		$.each(data,function (pos,elt) {
+			if (!is_available(acl,elt[0])) {
+				acl.append($("<option></option>").attr("value",elt[0]).text(elt[1]));
+			} 
+		});
+		acl.multiselect2side({selectedPosition: 'right', moveOptions: false});
+	});
+	
+	$("#aclform").submit(function() {
+		var acl = $("#id_acl");
+		var user = "user:{{user}}";
+		if (!is_selected(acl,user+"#w")) {
+		    if (!confirm("This will remove your own rights to the data - are you ABSOLUTELY sure?"))
+				return false;
+		}
+		
+		if (!is_selected(acl,"urn:x-lobber:storagenode")) {
+			if (!confirm("Storage nodes will not be able to serve your data - are you sure?"))
+				return false;
+		}
+		
+		this.submit();
+		return true;
+	});
+});
+</script>
+{% endblock %}
+{% block main %}
+<h1>Modify access control settings for {{torrent.name}}</h1>
+
+<form id="aclform" enctype="multipart/form-data" method="post" action="/torrent/"+torrent.id+"/ace">
+  <div class="ui-widget-content ui-corner-all infopanel" style="margin-top: 20px;">
+    <table>
+      {% for field in form %}
+        <tr>
+          {% if field.errors %}
+            <td colspan="2">{{ field.errors }}</td>
+          {% endif %}
+        </tr>
+        <tr>
+          <td colspan="2"><!-- {{ field.label_tag }}<br/> -->
+	      <div class="ui-widget">{{ field }}</div></td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <br/>
+  <div class="button">
+    <input type="submit" value="Save Changes" />
+    <input type="button" onClick="document.location='/torrent'" value="Cancel"/>
+  </div>
+</form>
+{% endblock %}
