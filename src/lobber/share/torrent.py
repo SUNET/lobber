@@ -179,6 +179,28 @@ def remove_torrent(request, tid):
                        'text/html': HttpResponseRedirect("/torrent")})
 
 @login_required
+def scrape(request,inst):
+    t = None
+    try:
+        t = Torrent.objects.get(id=inst)
+    except ObjectDoesNotExist:
+        return None
+    
+    url = '/scrape/?info_hash='+t.eschash()
+    dict = {}
+    try:
+        c = httplib.HTTPConnection(TRACKER_ADDR)
+        c.request('GET', url)
+        txt = c.getresponse().read()
+        response = bdecode(txt)
+        dict = response['files'][t.hashval.decode('hex')]
+    except Exception,e:
+        pprint(e)
+        pass
+    
+    return json_response(dict)
+
+@login_required
 def upload_jnlp(req):
     d = {'sessionid': req.session.session_key,
          'announce_url': ANNOUNCE_URL,

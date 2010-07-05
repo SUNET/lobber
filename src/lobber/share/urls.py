@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     (r'^torrent/(?P<inst>[0-9]+)\.([^\.]+)$', "lobber.share.torrent.TorrentView"),
     (r'^torrent/(?P<inst>.+)\.torrent$', "lobber.share.torrent.torrent_by_hashval"),
     (r'^torrent/exists/(?P<inst>.+)$', "lobber.share.torrent.exists"),
+    (r'^torrent/scrape/(?P<inst>[0-9]+)\.([^\.]+)$', "lobber.share.torrent.scrape"),
     # Tagging.
     (r'^torrent/tags.json$', "lobber.share.tag.tag_usage"),
     (r'^torrent/tag/(?P<name>.+)\.([^\.]+)$', "lobber.share.tag.list_torrents_for_tag"),

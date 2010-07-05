@@ -20,6 +20,9 @@ function _update_tags(id) {
 }
 
 $(function() {
+   $("#torrents").ajaxError(function(event, request, settings, exception) {
+      _e("Error requesting page " + settings.url + " " + exception)
+   });
    $("#torrents").accordion({ 
    			header: "h3", 
    			event: "mouseover", 
@@ -27,8 +30,15 @@ $(function() {
    			active: false,
    			changestart: function(event,ui) {
    			    var content = ui.newContent;
-   				var id = $(content).closest('.torrent').attr('id');
-   				_update_tags(id);
+   			    var torrent = $(content).closest('.torrent');
+   			    if (torrent.size() > 0) {
+	   				var id = torrent.attr('id');
+	   				_update_tags(id);
+	   				
+	   				$.getJSON('/torrent/scrape/'+id+'.json',function(data) {
+	   					torrent.find('.scrape').text('seeders: '+data['downloaded']+' leechers: '+data['incomplete']);
+	   				});
+		   		}
    			}
    });
    $('#share-mail-dialog').dialog({
@@ -207,6 +217,7 @@ function removeit(id) {
   <div id="{{t.id}}" class="torrent">
     <h3><a href="#{{t.id}}">{{ t.name }} - created at {{t.creation_date}}</a></h3>
     <div>
+       <div class="info_hash hidden">{{t.eschash}}</div>
        <div class="navlist">
          <ul>
             <li>
@@ -228,6 +239,9 @@ function removeit(id) {
                <a class="tip" title="Send a link to this data" href="javascript:void(0);" onClick="mailit('{{t.id}}')">
                   <span class="ui-icon ui-icon-mail-closed"></span>
                </a>
+            </li>
+            <li>
+               <div class="scrape"></div>
             </li>
             <li style="float: right;">
                <a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{t.id}}')">
