@@ -1,6 +1,21 @@
 {% extends "share/base_ui.html" %}
 {% block title %}Lobber{% endblock %}
-
+{% block js %}
+<script type="text/javascript">
+$(function() {
+	$("#id_expires").datepicker({'dateFormat': 'yy-mm-dd', minDate: "+1D"});
+	/*
+	$.getJSON("/ace/suggest",function (data) {
+	    var acl = $("#id_acl");
+		$.each(data,function (pos,elt) {
+			acl.append($("<option></option>").attr("value",elt[0]).text(elt[1])); 
+		});
+		acl.multiselect2side({selectedPosition: 'right', moveOptions: false});
+	});
+	*/
+});
+</script>
+{% endblock %}
 {% block main %}
 <h1>Please upload a torrent file (.torrent)</h1>
 

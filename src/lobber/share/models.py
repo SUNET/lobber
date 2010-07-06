@@ -6,6 +6,12 @@ from lobber.settings import TORRENTS,BASE_URL
 import tagging
 from tagging.models import Tag
 
+def _urlesc(s):
+    r = ''
+    for n in range(0, len(s), 2):
+        r += '%%%s' % s[n:n+2].upper()
+    return r
+
 class Torrent(models.Model):
     name = models.CharField(max_length=256, blank=True)
     description = models.TextField(blank=True)
@@ -23,6 +29,9 @@ class Torrent(models.Model):
 
     def url(self):
         return "/torrent/%d.torrent" % self.id
+    
+    def eschash(self):
+        return _urlesc(self.hashval)
 
     def abs_url(self):
         return "%s%s" % (BASE_URL,self.url())

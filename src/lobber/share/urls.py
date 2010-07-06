@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     (r'^torrent/(?P<inst>[0-9]+)\.([^\.]+)$', "lobber.share.torrent.TorrentView"),
     (r'^torrent/(?P<inst>.+)\.torrent$', "lobber.share.torrent.torrent_by_hashval"),
     (r'^torrent/exists/(?P<inst>.+)$', "lobber.share.torrent.exists"),
+    (r'^torrent/scrape/(?P<inst>[0-9]+)\.([^\.]+)$', "lobber.share.torrent.scrape"),
     # Tagging.
     (r'^torrent/tags.json$', "lobber.share.tag.tag_usage"),
     (r'^torrent/tag/(?P<name>.+)\.([^\.]+)$', "lobber.share.tag.list_torrents_for_tag"),
@@ -23,6 +24,8 @@ urlpatterns = patterns('',
     # ACL handling.
     (r'^torrent/(?P<tid>.+)/ace/add/(?P<ace>.+)$', "lobber.share.acl.add_ace"),
     (r'^torrent/(?P<tid>.+)/ace/remove/(?P<ace>.+)$', "lobber.share.acl.remove_ace"),
+    (r'^torrent/(?P<tid>.+)/ace$', "lobber.share.acl.edit"),
+    (r'^ace/suggest$', "lobber.share.acl.suggested_ace"),
     # Constraints.
     (r'^key/(?P<key>.+)/constraint/add/url/(?P<pattern>.+)$', "lobber.share.constraint.add_urlfilter"),
     (r'^key/(?P<key>.+)/constraint/remove/url/(?P<pattern>.+)$', "lobber.share.constraint.remove_urlfilter"),
