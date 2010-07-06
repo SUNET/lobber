@@ -34,6 +34,10 @@ def _torrent_info(data):
     info = bdecode(data)['info']
     return info['name'], sha1(bencode(info)).hexdigest()
 
+from BitTorrent.btmakemetafile import make_meta_file
+def _create_torrent(filename, announce_url, comment=None):
+    make_meta_file(filename, announce_url, comment)
+
 def _store_torrent(req, form):
     """
     Check if req.user already has the torrent file (req.FILES) in the
