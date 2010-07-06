@@ -475,6 +475,9 @@ achttp_worker: adding d06d03fb3736d54264bf1d5d3b9827c745d54555 to table: yes / 1
            allow from all
            SetHandler None
         </LocationMatch>
+** shibd not running on app
+mkdir /var/run/shibboleth
+/etc/init.d/shibd start
 * Tracker
 ** Correspondance
 - talked to nrkbeta <knut-olav.hoven@nrk.no> 2009-09-22 about opentracker
@@ -512,6 +515,15 @@ twistd -n lobberstoragenode -k 662485b707d535868d951329c7 -h beta.lobber.se -d /
 ./dev-django-admin.sh dbshell
 * Bittorrent client
 ** Transmission
+*** Build
+apt-get install subversion autoconf automake libtool intltool libssl-dev libcurl4-openssl-dev libevent-dev
+sh autogen.sh
+
+(or, if repports about missing po/Makefile.in.in and such become
+overwhelming, try fetching tar ball from
+https://build.transmissionbt.com/job/trunk-linux/ and use that
+instead)
+
 ./configure --disable-gtk --disable-nls && make
 * Parts and pieces of lobber.se
 ** sn-dev -- storage node
