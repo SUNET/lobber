@@ -71,4 +71,5 @@ def list_torrents_for_tag(request,name):
                            'text/rss': 'share/rss2.xml'},
                           {'torrents': find_torrents(request.user, [('tag',[name])]),
                            'title': 'Torrents tagged with '+name,
+                           'tag': name,
                            'description': 'Torrents tagged with '+name})

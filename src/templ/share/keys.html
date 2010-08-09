@@ -32,6 +32,12 @@ $(function() {
 		});
 		return false;
 	});
+	$("#keys").accordion({ 
+   			header: "h3", 
+   			event: "mouseover", 
+   			collapsible: true,
+   			active: false
+   	});
 });
 </script>
 {% endblock %}
@@ -50,7 +56,7 @@ $(function() {
 
 
 <h1>Keys</h1>
-<div id="accordion">
+<div id="keys">
   {% for profile in keys %}
     <div class="key" id="{{ profile.get_username }}">
       <h3><a href="#{{ profile.get_username }}">{{ profile.get_username }}</a></h3>

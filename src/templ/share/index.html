@@ -143,6 +143,11 @@ function gufrt(id) {
    $('#share-link-dialog').dialog('open');
 }
 
+function gufrtag(tag) {
+   $('#link').load("/torrent/tag/gufrt/"+tag);
+   $('#share-link-dialog').dialog('open');
+}
+
 function mailit(id) {
    allFields.val('');
    $('#share-mail-dialog form').attr('action','/torrent/sendlink/'+id);
@@ -204,7 +209,13 @@ function removeit(id) {
 </div>
 
 {% if torrents %}
-<h1>{{title}}</h1>
+<h1 style="display: inline; float: left;">{{title}}
+{% if tag %}
+<a class="tip" title="Share a link to torrents tagged with '{{tag}}'" href="javascript:void(0);" onClick="gufrtag('{{tag}}')">
+   <span style="float: right; margin-top: 2px;" class="ui-icon ui-icon-extlink"></span>
+</a>
+{% endif %}
+</h1>
 <!-- div class="tagnav navlist">
     <form>
 		<input type="text" name="tag" class="ui-widget" id="tagnavfield"></input>
