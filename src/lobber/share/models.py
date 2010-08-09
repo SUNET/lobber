@@ -113,7 +113,10 @@ class Torrent(models.Model):
         Add ACE to ACL of self.  Return True on success, False if
         permission is denied.
         """
-        return self.set_acl(user, self.get_acl(user) + [ace])
+        acl = self.get_acl(user)
+        if not ace in acl:
+            acl = self.set_acl(user, acl+[ace])
+        return acl
     
     def remove_ace(self, user, ace):
         """

@@ -25,7 +25,6 @@ urlpatterns = patterns('',
     (r'^torrent/(?P<tid>.+)/ace/add/(?P<ace>.+)$', "lobber.share.acl.add_ace"),
     (r'^torrent/(?P<tid>.+)/ace/remove/(?P<ace>.+)$', "lobber.share.acl.remove_ace"),
     (r'^torrent/(?P<tid>.+)/ace$', "lobber.share.acl.edit"),
-    (r'^ace/suggest$', "lobber.share.acl.suggested_ace"),
     # Constraints.
     (r'^key/(?P<key>.+)/constraint/add/url/(?P<pattern>.+)$', "lobber.share.constraint.add_urlfilter"),
     (r'^key/(?P<key>.+)/constraint/remove/url/(?P<pattern>.+)$', "lobber.share.constraint.remove_urlfilter"),
@@ -35,4 +34,5 @@ urlpatterns = patterns('',
     (r'^key\.[^\.]+$',"lobber.share.keys.keys"),
     # The user.
     (r'^user/$',"lobber.share.users.user_self"),
+    (r'^user/ace_subjects$',"lobber.share.users.ace_subjects"),
     )

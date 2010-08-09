@@ -10,6 +10,7 @@ from lobber.multiresponse import make_response_dict
 from lobber.settings import LOBBER_LOG_FILE
 from lobber.share.models import Torrent, UserProfile
 import lobber.log
+from lobber.multiresponse import json_response
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
@@ -69,3 +70,18 @@ def user_self(req):
     return render_to_response('share/user.html', 
                               make_response_dict(req,{'torrents': lst}))
 
+@login_required
+def ace_subjects(req):
+    term = req.GET['term']
+    subjects = []
+    if term:
+        profile = req.user.profile.get()
+        subjects = [{'label': "Members of %s" % (x),'value': x} for x in filter(lambda e: e.find(term) > -1,profile.get_entitlements())]
+        if term.find('@') > -1:
+            subjects.append({'label': "User '%s'" % (term),'value': "user:%s" % (term)})
+        else:
+            subjects.append({'label': "Members of '%s'" % (term),'value': term})
+        subjects.append({'label': 'All storage nodes', 'value': 'urn:x-lobber:storagenode'})
+        subjects.append({'label': 'All users','value': ''})
+        
+    return json_response(subjects)
