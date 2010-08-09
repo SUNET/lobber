@@ -5,7 +5,7 @@ class UploadForm(forms.Form):
     description = forms.CharField(label="Description", widget=forms.Textarea)
     expires = forms.DateTimeField(label="Expiration date")
     file = forms.FileField(label="Torrent file")
-    publicAccess = forms.BooleanField(label="Allow public access?")
+    publicAccess = forms.BooleanField(required=False,label="Allow public access?")
 
     def clean_file(self):
         file = self.cleaned_data['file']
