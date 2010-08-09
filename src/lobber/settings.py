@@ -11,7 +11,7 @@ APPLICATION_CTX = ''
 NORDUSHARE_URL = BASE_UI_URL 
 TRACKER_EXIST_URL = '%s/torrent/exists' % BASE_URL
 
-TRACKER_ADDR = 'localhost:4711'
+TRACKER_ADDR = 'tracker-dev.lobber.se:4711'
 ANNOUNCE_BASE_URL = 'http://' + TRACKER_ADDR
 ANNOUNCE_URL = ANNOUNCE_BASE_URL + '/announce'
 
@@ -112,6 +112,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django_extensions',
+    'lobber.extensions',
     'tagging',
     'lobber.share',
     'lobber.auth'

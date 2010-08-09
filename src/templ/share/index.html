@@ -1,5 +1,5 @@
 {% extends "share/base_ui.html" %}
-
+{%load datehumanize %}
 {% block title %}Lobber{% endblock %}
 {% block js %}
 <script type="text/javascript">
@@ -215,7 +215,7 @@ function removeit(id) {
 <div id="torrents">
   {% for t in torrents %}
   <div id="{{t.id}}" class="torrent">
-    <h3><a href="#{{t.id}}">{{ t.name }} - created at {{t.creation_date}}</a></h3>
+    <h3><a href="#{{t.id}}">{{ t.name }} - created {{t.creation_date|datehumanize}}</a></h3>
     <div>
        <div class="info_hash hidden">{{t.eschash}}</div>
        <div class="navlist">
