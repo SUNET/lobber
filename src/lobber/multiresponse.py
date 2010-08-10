@@ -9,6 +9,9 @@ from datetime import datetime
 from pprint import pprint
 from django.http import HttpResponse
 from orbited import json
+from lobber.share.models import Torrent
+from tagging.models import TaggedItem, Tag
+from tagging.utils import calculate_cloud
 
 default_suffix_mapping = {"\.htm(l?)$": "text/html",
                           "\.json$": "application/json",
@@ -43,10 +46,19 @@ def make_response_dict(request,d={}):
     d['orbited_prefix'] = ORBITED_PREFIX
     d['announce_url'] = ANNOUNCE_URL
     d['date'] = timeAsrfc822(datetime.now())
+    d['tagcloud'] = make_tag_cloud(request)
     if DEBUG is not None:
         d['debug'] = True
 
     return d
+
+
+def _adjust_count_to_readable(tag,user):
+    tag.count = len(filter(lambda t: t.authz(user,'r'),TaggedItem.objects.get_by_model(Torrent, tag).all()))
+    return tag
+
+def make_tag_cloud(request):
+    return calculate_cloud([_adjust_count_to_readable(tag,request.user) for tag in Tag.objects.usage_for_model(Torrent, counts=True)])
 
 def json_response(data): 
     r = HttpResponse(json.encode(data),content_type='application/json')

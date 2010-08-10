@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from tagging.models import Tag
+from tagging.models import Tag, TaggedItem
 from lobber.share.models import Torrent
 from django.utils.datastructures import MultiValueDictKeyError
 from orbited import json
@@ -62,7 +62,7 @@ def tags(request,tid):
                                         'text/html': HttpResponseRedirect("/torrent/#"+tid)})
 
         raise "Bad method: "+request.method
-        
+    
 @login_required
 def list_torrents_for_tag(request,name):
         return respond_to(request,
