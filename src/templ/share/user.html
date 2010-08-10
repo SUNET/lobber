@@ -3,7 +3,9 @@
 {% block title %}Lobber{% endblock %}
 {% block js %}
 <script type="text/javascript">
+$(function() {
    $("#gravatar").append($.gravatar($('#email').contents().text()));
+});
 </script>
 {% endblock %}
 

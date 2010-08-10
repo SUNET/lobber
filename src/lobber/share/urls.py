@@ -31,7 +31,7 @@ urlpatterns = patterns('',
     (r'^key/(?P<key>.+)/constraint/add/tag/(?P<tag>.+)$', "lobber.share.constraint.add_tagconstraint"),
     (r'^key/(?P<key>.+)/constraint/remove/tag/(?P<tag>.+)$', "lobber.share.constraint.remove_tagconstraint"),
     # Keys
-    (r'^key\.[^\.]+$',"lobber.share.keys.keys"),
+    (r'^key(?:\.[^\.]+)?$',"lobber.share.keys.keys"),
     # The user.
     (r'^user/$',"lobber.share.users.user_self"),
     (r'^user/ace_subjects$',"lobber.share.users.ace_subjects"),

@@ -32,6 +32,20 @@
         {% block code %}{% endblock %}
 </head>
 <body>
+<div id="notification"></div>
+{% if error %}
+<script type="text/javascript">
+$(function() {
+   $('#notification').jnotifyAddMessage({
+      text: {{error}},
+      permanent: false,
+      type: 'error'
+   });
+});
+</script>
+{% endif %}
+<div id="container">
 {% block body %}{% endblock %}
+</div>
 </body>
 </html>

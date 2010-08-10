@@ -76,32 +76,25 @@ $(function() {
 </script>
 {% block js %}{% endblock %}
 {% endblock %}
-
 {% block body %}
-<div id="notification"></div>
-{% if error %}
-<script type="text/javascript">
-$(function() {
-   $('#notification').jnotifyAddMessage({
-      text: {{error}},
-      permanent: false,
-      type: 'error'
-   });
-});
-</script>
-{% endif %}
+
 <div id="header">
    {% if user.is_authenticated %}
-   <div style="float: right; margin-right: 50px;" class="button"><a id="logout" href="/auth/logout/">Logout</a></div>
-   <div id="linklist">
+   <div class="ui-widget ui-state-default ui-corner-all navlist toolbar">
       <ul>
-         <li><a href="/user"><span class="ui-icon ui-icon-locked" style="float: left;"></span>{{ user.get_full_name }}</a></li>
+         <li><a title="{{ user.get_full_name }}" class="tip" href="/user"><span class="ui-icon ui-icon-home"></span></a></li>
+         <li><a title="Logout" class="tip" id="logout" href="/auth/logout/"><span class="ui-icon ui-icon-power"></span></a></li>
       </ul>
-   {% endif %}
    </div>
-   <div id="branding"><a style="text-decoration: none" href="/">{% block title %}{% endblock %}</a></div>
+   {% endif %}
+   <div class="ui-widget ui-state-default ui-corner-all navlist toolbar">
+	  <ul>
+		 <li><a class="tip" title="Application keys" href="/key"><span class="ui-icon ui-icon-key"></span></a></li>
+		 <li><a class="tip" title="Torrents" href="/torrent"><span class="ui-icon ui-icon-transferthick-e-w"></span></a></li>
+	   </ul>
+   </div>
+   <div class="clear"></div>
 </div>
-<div class="clear"></div>
 <div id="content">
 	<div id="main">
 	   	{% block main %}{% endblock %}
@@ -109,7 +102,6 @@ $(function() {
 	<div id="rhs">
 	    {% block rhs %}{% endblock %}
 	</div>
-	<div class="clear"></div>
 </div>
 <div class="clear"></div>
 <div id="footer">

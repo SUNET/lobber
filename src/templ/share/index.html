@@ -290,10 +290,10 @@ function removeit(id) {
 {% endblock %}
 
 {% block rhs %}
-{% load tagging_tags %}
+<div style="padding: 5px;">
 <h4>Tag cloud</h4>
-{% tag_cloud_for_model share.Torrent as tags with steps=6 min_count=1 distribution=log %}
 {% for tag in tagcloud %}
 <font class="tag" size="{{tag.font_size}}"><a href="/torrent/tag/{{tag.name}}.html">{{tag.name}}</a></font>  
 {% endfor %}
+</div>
 {% endblock %}
