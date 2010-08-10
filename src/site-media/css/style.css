@@ -8,12 +8,12 @@ label { display:block; }
 div#footer { font: 100% "Trebuchet MS", sans-serif; border-top: 1px solid #CECECE; position: absolute; bottom: 0; width: 100%; padding-bottom: 50px;}
 div#footer ul { margin-right: 50px; list-style: none; padding: 0; margin: 0; }
 div#footer li { float: left; margin: 0 0.15em}
-div#header { margin-top: 0px; }
+div#header { margin-top: 6px; }
 .navlist ul { list-style: none; padding: 0; margin: 0; }
 .navlist li { float: left; display: inline; margin: 0 0.15em; }
 .description { clear: both; margin-top: 25px; padding-top: 5px; border-top: 1px solid black; }
 #branding{ font: 500% "Trebuchet MS", sans-serif; margin-left: 50px; margin-bottom: 20px; float: left}
-div.toolbar{ padding: 4px; float: right; margin-right: 20px; margin-top: 6px; margin-bottom: 20px;}
+div.toolbar{ padding: 4px; float: right; margin-right: 20px; margin-bottom: 20px;}
 #linklist { float: right; }
 #linklist ul{ list-style: none; padding: 0; margin: 0; }
 #linklist li{ float: left; margin: 0 0.15em}
