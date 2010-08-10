@@ -58,7 +58,7 @@ def _adjust_count_to_readable(tag,user):
     return tag
 
 def make_tag_cloud(request):
-    return calculate_cloud([_adjust_count_to_readable(tag,request.user) for tag in Tag.objects.usage_for_model(Torrent, counts=True)])
+    return calculate_cloud(filter(lambda x: x.count > 0,[_adjust_count_to_readable(tag,request.user) for tag in Tag.objects.usage_for_model(Torrent, counts=True)]))
 
 def json_response(data): 
     r = HttpResponse(json.encode(data),content_type='application/json')
