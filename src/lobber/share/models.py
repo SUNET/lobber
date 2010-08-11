@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from lobber.settings import TORRENTS,BASE_URL
 import tagging
 from tagging.models import Tag
+from BitTorrent.bencode import bdecode
+from pprint import pprint
 
 def _urlesc(s):
     r = ''
@@ -144,6 +146,10 @@ class Torrent(models.Model):
             else:
                 raise
         return f
+    
+    def meta_info(self):
+        data = self.file().read()
+        return bdecode(data)['info']
 
 class UserProfile(models.Model):
     """This is how we represent a key, as well as an ordinary user."""
