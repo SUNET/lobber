@@ -13,7 +13,8 @@ function _e(message) {
    });
 }
 $(function() {
-   $("input:submit, input:button, a",".button").button();
+   $("input:submit, input:button").button();
+   $("a",".button").button();
    $('#notification').jnotifyInizialize({
       oneAtTime: false,
       appendType: 'append'
