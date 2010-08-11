@@ -76,12 +76,14 @@ $(function() {
 {{torrent.description}}
 </p>
 <div id="settings">
+   {% if write %}
    <div id="general" class="ui-widget-content ui-corner-all altitem">
       <h3 class="altheader">General</h3>
       <div class="altcontent">
       	
       </div>
    </div>
+   {% endif %}
    <div id="info" class="ui-widget-content ui-corner-all altitem">
    	  <h3 class="altheader">Information</h3>
    	  <div class="altcontent">
@@ -95,6 +97,7 @@ $(function() {
    	  	</ul>
    	  </div>
    </div>
+   {% if write %}
    <div id="tags" class="ui-widget-content ui-corner-all altitem">
       <h3 class="altheader">Tags</h3>
       <div class="altcontent">
@@ -110,7 +113,8 @@ $(function() {
 		</form>
       </div>
    </div>
-   {% if forms.permissions %}
+   {% endif %}
+   {% if write and forms.permissions %}
    <div id="permissions" class="ui-widget-content ui-corner-all altitem">
 	<h3 class="altheader">Permissions</h3>
 	<div class="altcontent">
