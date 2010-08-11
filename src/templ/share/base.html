@@ -1,25 +1,21 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US">
-<head>
+	<head>
+	    <link type="text/css" href="/site-media/css/style.css" rel="stylesheet" />
+	    <link type="text/css" href="/site-media/css/jquery.ui.autocomplete.custom.css" rel="stylesheet" />
         <link type="text/css" href="/site-media/css/redmond/jquery-ui-1.8.1.custom.css" rel="stylesheet" />
         <link type="text/css" href="/site-media/css/jquery.jnotify.css" rel="stylesheet" />
         <link type="text/css" href="/site-media/css/jquery.tooltip.css" rel="stylesheet" />
-        <link type="text/css" href="/site-media/css/jquery.tagInput.css" rel="stylesheet" />
-        <link type="text/css" href="/site-media/css/style.css" rel="stylesheet" />
         <script type="text/javascript" src="/site-media/js/jquery-1.4.2.min.js"></script>
         <script type="text/javascript" src="/site-media/js/jquery-ui-1.8.1.custom.min.js"></script>
-        <!--
-        <script type="text/javascript" src="/site-media/js/jquery.bgiframe.js"></script>
-        <script type="text/javascript" src="/site-media/js/jquery.dimensions.pack.js"></script>
-        -->
         <script type="text/javascript" src="/site-media/js/jquery.tooltip.pack.js"></script>
         <script type="text/javascript" src="/site-media/js/jquery.gravatar.js"></script>
         <script type="text/javascript" src="/site-media/js/md5.js"></script>
+        <script type="text/javascript" src="/site-media/js/tag-it.js"></script>
         <script type="text/javascript" src="/site-media/js/jquery.jnotify.js"></script>
         <script type="text/javascript" src="/site-media/js/jquery.cookie.js"></script>
         <script type="text/javascript" src="/site-media/js/jquery.timers.js"></script>
-        <script type="text/javascript" src="/site-media/js/jquery.tagInput.js"></script>
-        <script type="text/javascript" src="http://java.com/js/deployJava.js"></script>
+        <script type="text/javascript" src="/site-media/js/deployJava.js"></script> <!-- http://java.com/js/deployJava.js -->
         <script type="text/javascript" src="/site-media/js/jquery.webstart.js"></script>
         <script src="{{orbited_prefix}}/static/Orbited.js"></script>
         <script>
@@ -27,25 +23,55 @@
            document.domain = document.domain;
         </script>
         <script src="{{orbited_prefix}}/static/protocols/stomp/stomp.js"></script>
+        <script type="text/javascript">
+           debug = {% if debug %}1{% else %}0{% endif %}
+           stomp_host = '{{stomp_host}}'
+           stomp_port = {{stomp_port}}
+        </script>
+        <script type="text/javascript" src="/site-media/js/lobber-common.js"></script>
+        {% if error %}
+		<script type="text/javascript">
+		$(function() {
+		   _e('{{error}}');
+		});
+		</script>
+		{% endif %}
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title>{% block title %}{% endblock %}</title>
-        {% block code %}{% endblock %}
-</head>
-<body>
-<div id="notification"></div>
-{% if error %}
-<script type="text/javascript">
-$(function() {
-   $('#notification').jnotifyAddMessage({
-      text: {{error}},
-      permanent: false,
-      type: 'error'
-   });
-});
-</script>
-{% endif %}
-<div id="container">
-{% block body %}{% endblock %}
-</div>
-</body>
+        {% block js %}{% endblock %}
+	</head>
+	<body>
+		<div id="notification"></div>
+		<div id="container">
+			<div id="header">
+			   {% if user.is_authenticated %}
+			   <div class="ui-widget ui-state-default ui-corner-all navlist toolbar">
+			      <ul>
+					 <li><a class="tip" title="Application keys" href="/key"><span class="ui-icon ui-icon-key"></span></a></li>
+					 <li><a class="tip" title="Torrents" href="/torrent"><span class="ui-icon ui-icon-transferthick-e-w"></span></a></li>
+					 <li><a class="tip" title="{{ user.get_full_name }}" href="/user"><span class="ui-icon ui-icon-home"></span></a></li>
+			         <li><a class="tip" title="Logout" id="logout" href="/auth/logout/"><span class="ui-icon ui-icon-power"></span></a></li>
+				   </ul>
+			   </div>
+			   {% endif %}
+			   <div class="clear"></div>
+			</div>
+			<div id="content">
+				<div id="main">
+				   	{% block main %}{% endblock %}
+				</div>
+				<div id="rhs">
+				    {% block rhs %}{% endblock %}
+				</div>
+			</div>
+			<div class="clear"></div>
+			<div id="footer">
+			   <ul>
+			     <li><a href="#about">About Lobber</a></li>
+			     <li><a href="#about">Terms Of Use</a></li>
+			     <li><a href="#about">System Status</a></li>
+			   </ul>
+			</div>
+		</div>
+	</body>
 </html>

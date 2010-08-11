@@ -1,6 +1,155 @@
-{% extends "share/base_ui.html" %}
-
-{% block title %}Lobber{% endblock %}
+{% extends "share/base.html" %}
+{% load explainace %}
+{% load datehumanize %}
+{% load metainfo %}
+{% block title %}Lobber: Modify Torrent{% endblock %}
+{% block js %}
+<script type="text/javascript">
+$(function() {
+	$("#id_subject").autocomplete({
+			source: "/user/ace_subjects",
+			minLength: 1,
+			focus: function(event, ui) {
+				$('#id_subject').val(ui.item.label);
+				return false;
+			},
+			select: function(event, ui) {
+				$('#id_subject').val(ui.item.label);
+				$('#id_entitlement').val(ui.item.value);
+				return false;
+			}
+	});
+	$('#settings > div > h3').each(function(index) {
+		$(this).append($("<span class=\"ui-icon\" style=\"float: left;\"></span>"));
+		$(this).attr("style","clear: both;");
+	});
+	var cookieValue = $.cookie('menuCookie') || '';
+	$('#settings > div').each(function(index) {
+	    var h3 = $(this).children('h3');
+		if (cookieValue.indexOf($(this).attr('id')) > -1) {
+			h3.children('.ui-icon').addClass("ui-icon-triangle-1-s");
+		   	h3.next().show();
+		} else {
+			h3.children('.ui-icon').addClass("ui-icon-triangle-1-e");
+			h3.next().hide();
+		}
+	});
+	$('#settings > div > h3').click(function() {
+		var id = $(this).parent().attr('id');
+		if ($(this).next().is(':visible')) {
+		    cookieValue = cookieValue.replace(id,"");
+			cookieValue = cookieValue.replace("--","-");
+			var span = $(this).children('span');
+			span.addClass("ui-icon-triangle-1-e");
+			span.removeClass("ui-icon-triangle-1-s");
+			$(this).next().hide();
+		} else {
+			if (cookieValue.indexOf(id) == -1)
+			   cookieValue = cookieValue + "-" + id
+			var span = $(this).children('span');
+			span.addClass("ui-icon-triangle-1-s");
+			span.removeClass("ui-icon-triangle-1-e");
+			$(this).next().show();
+		}
+		$.cookie('menuCookie', cookieValue);
+		return false;
+	});
+	$.getJSON('/torrent/scrape/{{torrent.id}}.json',function(data) {
+	   $('#scrape').text('seeders: '+data['downloaded']+' leechers: '+data['incomplete']);
+	});
+	$.getJSON('/torrent/tags.json',function(data) {
+	   tags = data.map(function(item) {
+	      return item.tag;
+	   });
+	   $('#taglist').tagit({
+	      availableTags: tags,
+	      existingTags: [{% for t in tags %}'{{t}}',{% endfor%}],
+	      namePrefix: 'tags'
+	   });
+	}); 
+});
+</script>
+{% endblock %}
 {% block main %}
-{{ torrent }}
+<h1>{{torrent.name}} - created {{torrent.creation_date|datehumanize}}</h1>
+<p>
+{{torrent.description}}
+</p>
+<div id="settings">
+   <div id="general" class="ui-widget-content ui-corner-all altitem">
+      <h3 class="altheader">General</h3>
+      <div class="altcontent">
+      	
+      </div>
+   </div>
+   <div id="info" class="ui-widget-content ui-corner-all altitem">
+   	  <h3 class="altheader">Information</h3>
+   	  <div class="altcontent">
+   	    <h4>Download status</h4>
+   	  	<p id="scrape"></p>
+   	  	<h4>Files</h4>
+   	  	<ul class="links">
+   	  	{% for f in torrent.meta_info.files %}
+   	  	   <li>{{f|metainfofile}}</li>
+   	  	{% endfor %}
+   	  	</ul>
+   	  </div>
+   </div>
+   <div id="tags" class="ui-widget-content ui-corner-all altitem">
+      <h3 class="altheader">Tags</h3>
+      <div class="altcontent">
+      	<form id="tagform" enctype="multipart/form-data" method="POST" action="/torrent/{{torrent.id}}/tags">
+		  <div style="margin-top: 20px;">
+		    <ul id="taglist"></ul>
+		  </div>
+		  <br/>
+		  <div class="button">
+		    <input type="submit" value="Save Changes" />
+			<input type="button" onClick="document.location='/torrent'" value="Cancel"/>
+		  </div>
+		</form>
+      </div>
+   </div>
+   {% if forms.permissions %}
+   <div id="permissions" class="ui-widget-content ui-corner-all altitem">
+	<h3 class="altheader">Permissions</h3>
+	<div class="altcontent">
+		<div>
+			<table>
+			{% for ace in acl %}
+			   <tr>
+			      <td>{{ace|explainace}}</td>
+			      <td><a href="/torrent/{{torrent.id}}/ace/remove/{{ace|urlencode}}"><span class="ui-icon ui-icon-trash"></span></a></td>
+			   </tr>
+			{% endfor %}
+			</table>
+		</div>
+		<form id="aclform" enctype="multipart/form-data" method="POST" action="/torrent/{{torrent.id}}/ace">
+		  <div style="margin-top: 20px;">
+		    <table>
+		      {% for field in forms.permissions %}
+		        <tr>
+			      <td>
+			          {% if not field.is_hidden %}
+			          <div class="ui-widget fieldlabel">{{ field.label_tag }}</div>
+			          {% endif %}
+			          {% if field.errors %}
+			          <div class="ui-widget ui-state-error">{{ field.errors }}</div>
+			          {% endif %}
+			          <div class="ui-widget">{{ field }}</div>
+			      </td>
+				</tr>
+		      {% endfor %}
+		    </table>
+		  </div>
+		  <br/>
+		  <div class="button">
+		    <input type="submit" value="Save Changes" />
+			<input type="button" onClick="document.location='/torrent'" value="Cancel"/>
+		  </div>
+		</form>
+	</div>
+   </div>
+   {% endif %}
+</div>
 {% endblock %}

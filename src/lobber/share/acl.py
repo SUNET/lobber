@@ -7,6 +7,9 @@ from lobber.share.models import Torrent
 from django.core.exceptions import ObjectDoesNotExist
 from lobber.multiresponse import respond_to
 from lobber.share.forms import AddACEForm
+from django.shortcuts import get_object_or_404
+from lobber.share.torrent import torrentdict
+from lobber.share.forms import formdict
 
 def valid_ace_p(ace):
     """Return True if ACE is a valid access control entry, otherwise
@@ -56,21 +59,16 @@ def remove_ace(req, tid, ace):
     return HttpResponseRedirect("/torrent/%d/ace" % (t.id))
 
 @login_required
-def edit(req,tid):
-    try:
-        t = Torrent.objects.get(id=int(tid))
-    except ObjectDoesNotExist:
-        return HttpResponse("Torrent with id %d not found." % int(tid), status=404)
- 
-    if req.method == 'POST':
-        form = AddACEForm(req.POST)
+def edit(request,tid):
+    t = get_object_or_404(Torrent,pk=int(tid))
+    
+    forms = formdict()
+    if request.method == 'POST':
+        form = forms['permissions'] = AddACEForm(request.POST)
         if form.is_valid():
             ace = "%s#%s" % (form.cleaned_data['entitlement'],''.join(form.cleaned_data['permissions']))
-            t.add_ace(req.user,ace)
+            t.add_ace(request.user,ace)
             t.save()
-    else:
-        form = AddACEForm()
-          
-    return respond_to(req, 
-                      {'text/html': 'share/acl.html'}, 
-                      {'torrent': t, 'acl': t.get_acl(req.user), 'form': form})
+    
+    d = torrentdict(request,t,forms)
+    return respond_to(request,{'text/html': 'share/torrent.html'},d)

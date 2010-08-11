@@ -27,6 +27,6 @@ class CreateKeyForm(forms.Form):
     tagconstraints = forms.CharField(label="Tag constraints", widget=forms.Textarea)
     entitlements = forms.CharField(label="Entitlements",widget=forms.Textarea)
     expires = forms.DateTimeField(label="Expiration date")
-
-class TagForm(forms.Form):
-    tags = forms.CharField(label="Tags")
+    
+def formdict():
+    return {'permissions': AddACEForm()}

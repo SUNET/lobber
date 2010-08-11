@@ -1,23 +1,25 @@
-from django.http import HttpResponse, HttpResponseRedirect
-from tagging.models import Tag, TaggedItem
+from tagging.models import Tag
 from lobber.share.models import Torrent
 from django.utils.datastructures import MultiValueDictKeyError
-from orbited import json
 from pprint import pprint
 from torrent import find_torrents
 from lobber.multiresponse import respond_to, json_response
 from django.contrib.auth.decorators import login_required
 from lobber.notify import notifyJSON
-from django.core.exceptions import ObjectDoesNotExist
-from lobber.share.forms import TagForm
 from tagging.utils import parse_tag_input
+from django.shortcuts import get_object_or_404
+from lobber.share.torrent import torrentdict
+from lobber.share.forms import formdict
 
 @login_required
 def tag_usage(request):
-        q = request.GET['search']
         r = None
         try:
-            tags = filter(lambda x: x.name.startswith(q),Tag.objects.usage_for_model(Torrent,counts=True))
+            tags = []
+            if request.GET.has_key('search'): 
+                tags = filter(lambda x: x.name.startswith(request.GET['search']),Tag.objects.usage_for_model(Torrent,counts=True))
+            else:
+                tags = Tag.objects.usage_for_model(Torrent,counts=True)
             r = json_response([{'tag': tag.name, 'freq': tag.count} for tag in tags])
         except MultiValueDictKeyError,e:
             pprint(e)
@@ -25,43 +27,27 @@ def tag_usage(request):
     
 @login_required
 def tags(request,tid):
-        t = Torrent.objects.get(id=tid)
-        if t is None:
-            return HttpResponse(status=404)
-        
-        if request.method == 'GET':
-            try:
-                tags = map(lambda t: t.name,t.readable_tags(request.user))
-                return respond_to(request, {'application/json': lambda dict: json_response(dict.get('tags')),
-                                            'text/html': "share/tags.html" }, {'tags': tags, 'form': TagForm()})
-            except Exception,e:
-                raise e
+        t = get_object_or_404(Torrent,pk=tid)
         
         if request.method == 'POST':
-            form = TagForm(request.POST)
-            if not form.is_valid():
-                return respond_to(request, {'application/json': json_response(dict.get('form').errors),
-                                            'text/html': "share/tags.html" }, {'tags': tags, 'form': form})
+            to_tags = request.POST.getlist('tags[]')
+            pprint(to_tags)
+            from_tags = [tag.name for tag in Tag.objects.get_for_object(t)]
+            pprint(from_tags)
+            pprint(' '.join(to_tags))
+            Tag.objects.update_tags(t,' '.join(to_tags))
             
-            try:
-                to_tags = parse_tag_input(form.cleaned_data['tags'])
-                from_tags = map(lambda t: t.name, Tag.objects.get_for_object(t))
-                Tag.objects.update_tags(t, form.cleaned_data['tags'])
-                
-                # figure out the diff and notify subscribers
-                for tag in from_tags:
-                    if not tag in to_tags:
-                        notifyJSON("/torrent/tag/remove",tag)
-                for tag in to_tags:
-                    if not tag in from_tags:
-                        notifyJSON("/torrent/tag/add",tag)
-            except Exception,e:
-                pprint(e)
-
-            return respond_to(request, {'application/json': lambda dict: json_response(tid),
-                                        'text/html': HttpResponseRedirect("/torrent/#"+tid)})
-
-        raise "Bad method: "+request.method
+            # figure out the diff and notify subscribers
+            for tag in from_tags:
+                if not tag in to_tags:
+                    notifyJSON("/torrent/tag/remove",tag)
+            for tag in to_tags:
+                if not tag in from_tags:
+                    notifyJSON("/torrent/tag/add",tag)
+        
+        d = torrentdict(request,t,formdict())
+        return respond_to(request, {'application/json': json_response(d.get('tags')),
+                                    'text/html': "share/torrent.html" },d)
     
 @login_required
 def list_torrents_for_tag(request,name):

@@ -1,4 +1,4 @@
-{% extends "share/base_ui.html" %}
+{% extends "share/base.html" %}
 {%load datehumanize %}
 {% block title %}Lobber{% endblock %}
 {% block js %}
@@ -85,39 +85,6 @@ $(function() {
       });
       return false;
    });
-   $('#tag-dialog').dialog({
-       autoOpen: false,
-       height: 200,
-       width: 600,
-       modal: true,
-       buttons: {
-          'Ok': function() {
-          	 $('#tag-dialog form').submit();
-             $(this).dialog('close');
-          },
-          'Cancel': function() {
-          	 $(this).dialog('close');
-          }
-       },
-   });
-   $('#tag-dialog form').submit(function() {
-   	   $.post($(this).attr('action'),$(this).serialize(),function(data) {
-   	      if (data) {
-            _update_tags(data);
-   	      }
-   	   });
-   	   return false;
-   });
-   $("#tag-dialog form input").tagInput({
-      	jsonUrl:"/torrent/tags.json",
-      	sortBy:"frequency",
-      	//suggestedTags: {{user.profile.entitlements}},
-      	tagSeparator:" ",
-      	autoFilter:true,
-      	autoStart:true,
-      	//suggestedTagsPlaceHolder:$("#suggested"),
-      	boldify:true
-   });
    $("#remove-torrent-dialog").dialog({
 			autoOpen: false,
 			resizable: false,
@@ -154,14 +121,6 @@ function mailit(id) {
    $('#share-mail-dialog').dialog('open');
 }
 
-function tagit(id) {
-	$('#tag-dialog form').attr('action','/torrent/'+id+'/tags.json');
-	$.getJSON('/torrent/'+id+'/tags.json',function(data) {
-		$('#tag-dialog form input').attr('value',data.join(" "));
-	});
-	$('#tag-dialog').dialog('open');
-}
-
 function removeit(id) {
    $('#remove-torrent-dialog form').attr('action','/torrent/remove/'+id+'.json');
    $('#remove-torrent-dialog').dialog('open');
@@ -174,16 +133,6 @@ function removeit(id) {
 <div class="button">
   <a id="launch-dlmanager" href="javascript:void(0);">Upload using Java Web Start</a>
   <a href="/torrent/add/">Upload a torrent file</a>
-</div>
-
-<div id="tag-dialog" class="modal-dialog" title="Tag this data">
-	<form action="">
-	   <fieldset>
-	      <label for="tags">Tags</label>
-	      <input type="text" size="80" name="tags" id="tags" class="text"></input><br/>
-          Suggested tags: <span id="suggested" class="tabInputSuggestedTagList"></span>
-       </fieldset>
-    </form>
 </div>
 
 <div id="share-link-dialog" class="modal-dialog" title="A link to this data">
@@ -216,11 +165,6 @@ function removeit(id) {
 </a>
 {% endif %}
 </h1>
-<!-- div class="tagnav navlist">
-    <form>
-		<input type="text" name="tag" class="ui-widget" id="tagnavfield"></input>
-	</form>
-</div -->
 <div style="clear: both;"></div>
 
 <div id="torrents">
@@ -259,18 +203,23 @@ function removeit(id) {
                   <span class="ui-icon ui-icon-trash"></span>
                </a>
             </li>
-            <li style="float: right;">
-               <a class="tip" title="Tag this torrent" href="javascript:void(0);" onClick="tagit('{{t.id}}')">
+            <!-- li style="float: right;">
+               <a class="tip" title="Modify tags for this torrent" href="/torrent/{{t.id}}/tags">
                	<span class="ui-icon ui-icon-star"></span>
+               </a>
+            </li -->
+            <!-- li style="float: right;">
+               <a class="tip" title="Modify access settings for this torrent" href="/torrent/{{t.id}}/ace">
+                  <span class="ui-icon ui-icon-locked"></span>
+               </a>
+            </li -->
+            <li style="float: right;">
+               <a class="tip" title="Modify torrent" href="/torrent/{{t.id}}">
+                  <span class="ui-icon ui-icon-wrench"></span>
                </a>
             </li>
             <li style="float: right;">
                <div class="tags"></div>
-            </li>
-            <li style="float: right;">
-               <a class="tip" title="Modify access settings for this torrent" href="/torrent/{{t.id}}/ace">
-                  <span class="ui-icon ui-icon-locked"></span>
-               </a>
             </li>
          </ul> 
        </div>
