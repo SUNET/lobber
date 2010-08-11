@@ -4,7 +4,7 @@
 {% block js %}
 <script type="text/javascript">
 $(function() {
-   $("#gravatar").append($.gravatar($('#email').contents().text()));
+   $("#gravatar").append($.gravatar($('#email').contents().text()),{image: 'identicon'});
 });
 </script>
 {% endblock %}
@@ -14,32 +14,22 @@ $(function() {
    <h1>{{user.get_full_name}}</h1>
 </div>
 <div class="ui-widget-content ui-corner-all infopanel">
-   <ul class="navlist">
-   <li><table>
-      <tr><td>Username</td><td>{{user.username}}</td></tr>
-{% if profile.display_name %}
-      <tr><td>Displayname</td><td>{{profile.display_name}}</td></tr>
-{% endif %}
+   <div style="float: left; padding-right: 20px;">
+      <a class="tip" title="This is your gravatar" id="gravatar" href="http://www.gravatar.com"></a>
+   </div>
+   <div style="padding-bottom: 20px;">
+     <table class="ui-widget">
+       <tr><th>Login</th><td>{{user.username}}</td></tr>
+       <tr><th>Name</th><td>{{user.get_full_name}}</td></tr>
 {% if user.email %}
-      <tr><td>Email</td><td><div id="email">{{user.email}}</div></td><tr>
+       <tr><th>Email</th><td><div id="email">{{user.email}}</div></td><tr>
 {% endif %}
 {% if profile.entitlements %}
-      <tr><td>Entitlements</td><td>{{profile.entitlements}}</td></tr>
+       <tr><th>Entitlements</th><td>{{profile.entitlements}}</td></tr>
 {% endif %}
-     <tr>
-        <td colspan="2">
-           <ul class="" style="bullet-style: none">
-              <li><a href="/key.html">Manage application keys</a></li>
-              <li><a href="/torrent/">Manage torrents</a></li>
-           </ul>
-        </td>
-     </tr>
-   </table></li>
-   <li style="float: right; padding: 2px; margin: 10px;">
-      <div id="gravatar"></div>
-      <div style="font-size: 80%">This is your <a href="http://www.gravatar.com">Gravatar</a></div>
-   </li>
- </ul>
-<div style="clear:both;"></div>
+     </table>
+   </div>
+ </div>
+ <div style="clear:both;"></div>
 </div>
 {% endblock %}
