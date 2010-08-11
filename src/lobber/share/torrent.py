@@ -158,7 +158,8 @@ def _torrentlist(request, torrents):
     return respond_to(request,
                       {'text/html': 'share/index.html',
                        'application/rss+xml': 'share/rss2.xml',
-                       'text/rss': 'share/rss2.xml'},
+                       'text/rss': 'share/rss2.xml',
+                       'application/json': json_response([{'label': t.name,'link': "/torrent/%d" % (t.id)} for t in torrents])},
                       {'torrents': torrents, 'title': 'Search result',
                        'description': 'Search result'})
 
@@ -167,7 +168,13 @@ def torrentdict(request,t,forms=None):
         forms = formdict()
     tags = map(lambda t: t.name,t.readable_tags(request.user))
     acl = t.get_acl(request.user)
-    return {'torrent': t, 'forms': forms, 'tags': tags, 'acl': acl}
+    return {'torrent': t, 
+            'forms': forms, 
+            'tags': tags, 
+            'acl': acl,
+            'read': t.authz(request.user,'r'), 
+            'write': t.authz(request.user,'w'), 
+            'delete': t.authz(request.user,'d')}
 
 ####################
 # External functions, called from urls.py.
@@ -300,3 +307,21 @@ def torrent_by_hashval(request, inst):
                       {'text/html': 'share/torrent.html',
                        'application/x-bittorrent': _torrent_file_response},
                       {'torrent': t})
+
+@login_required
+def search(request):
+    term = None
+    if request.REQUEST.has_key('q'):
+        term = request.REQUEST['q']
+    elif request.REQUEST.has_key('term'):
+        term = request.REQUEST['term']
+    
+    if term:
+        tag = find_torrents(request.user, [('tag',[term])])
+        txt = find_torrents(request.user, [('txt',[term])])
+        torrents = tag;
+        torrents.extend(txt);
+        pprint(torrents)
+        return _torrentlist(request, torrents);
+    else:
+        return HttpResponseRedirect("/torrent")

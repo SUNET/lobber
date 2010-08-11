@@ -36,6 +36,23 @@
 		});
 		</script>
 		{% endif %}
+		<script type="text/javascript">
+		$(function() {
+		   $("#searchbox").autocomplete({
+		   	  source: '/torrent/search.json',
+		   	  minLength: 1,
+		   	  focus: function(event, ui) {
+				$('#searchbox').val(ui.item.label);
+				return false;
+			  },
+			  select: function(event, ui) {
+				$('#searchbox').val(ui.item.label);
+				document.location = ui.item.link;
+				return false;
+			  }
+		   });
+		});
+		</script>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <title>{% block title %}{% endblock %}</title>
         {% block js %}{% endblock %}
@@ -47,11 +64,16 @@
 			   {% if user.is_authenticated %}
 			   <div class="ui-widget ui-state-default ui-corner-all navlist toolbar">
 			      <ul>
-					 <li><a class="tip" title="Application keys" href="/key"><span class="ui-icon ui-icon-key"></span></a></li>
-					 <li><a class="tip" title="Torrents" href="/torrent"><span class="ui-icon ui-icon-transferthick-e-w"></span></a></li>
-					 <li><a class="tip" title="{{ user.get_full_name }}" href="/user"><span class="ui-icon ui-icon-home"></span></a></li>
-			         <li><a class="tip" title="Logout" id="logout" href="/auth/logout/"><span class="ui-icon ui-icon-power"></span></a></li>
-				   </ul>
+			         <li style="padding-right: 10px; margin-right: 20px; border-right: 1px solid #CECECE">
+			            <form method="POST" action="/torrent/search">
+			               <input type="text" id="searchbox" name="q" style="margin-right: 5px;"></input><input type="submit" value="search"/>
+			            </form>
+			         </li>
+					 <li style="margin-top: 4px;"><a class="tip" title="Application keys" href="/key"><span class="ui-icon ui-icon-key"></span></a></li>
+					 <li style="margin-top: 4px;"><a class="tip" title="Torrents" href="/torrent"><span class="ui-icon ui-icon-transferthick-e-w"></span></a></li>
+					 <li style="margin-top: 4px;"><a class="tip" title="{{ user.get_full_name }}" href="/user"><span class="ui-icon ui-icon-home"></span></a></li>
+			         <li style="margin-top: 4px;"><a class="tip" title="Logout" id="logout" href="/auth/logout/"><span class="ui-icon ui-icon-power"></span></a></li>
+			      </ul>
 			   </div>
 			   {% endif %}
 			   <div class="clear"></div>

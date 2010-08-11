@@ -7,6 +7,7 @@ urlpatterns = patterns('',
     # Torrents.
     (r'^torrent/$',"lobber.share.torrent.TorrentView"),
     (r'^torrent/all.rss$',"lobber.share.torrent.TorrentView"),
+    (r'^torrent/search(?:\.(?:[^\.]+))?$',"lobber.share.torrent.search"),
     (r'^torrent/remove/(?P<tid>[0-9]+)\.([^\.]+)$', "lobber.share.torrent.remove_torrent"),
     (r'^torrent/sendlink/(?P<tid>[0-9]+)$',"lobber.share.links.send_link_mail"),
     (r'^torrent/gufrt/(?P<tid>[0-9]+)$', "lobber.share.links.gimme_url_for_reading_torrent"),
