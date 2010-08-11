@@ -3,7 +3,7 @@ import httplib
 from datetime import datetime as dt
 
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
@@ -21,7 +21,6 @@ from lobber.notify import notifyJSON
 from django.utils.http import urlencode
 from django import forms
 from pprint import pprint
-from lobber.share.forms import formdict
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 ####################
@@ -162,11 +161,6 @@ def _torrentlist(request, torrents):
                       {'torrents': torrents, 'title': 'Search result',
                        'description': 'Search result'})
 
-def torrentdict(request,t):
-    tags = map(lambda t: t.name,t.readable_tags(request.user))
-    acl = t.get_acl(request.user)
-    return {'torrent': t, 'forms': formdict(), 'tags': tags, 'acl': acl}
-
 ####################
 # External functions, called from urls.py.
 
@@ -277,12 +271,16 @@ class TorrentView(TorrentViewBase):
     def get(self, request, inst=None):
         if not inst:
             return _torrentlist(request, find_torrents(request.user, request.GET.lists()))
-        
-        t = get_object_or_404(Torrent,pk=inst)
-        d = torrentdict(request, t)
+        try:
+            t = Torrent.objects.get(id=inst)
+        except ObjectDoesNotExist:
+            return render_to_response('share/index.html',
+                                      make_response_dict(request, {'error': "No such torrent: %s" % inst}))
+
         return respond_to(request,
                           {'text/html': 'share/torrent.html',
-                           'application/x-bittorrent': _torrent_file_response},d)
+                           'application/x-bittorrent': _torrent_file_response},
+                          {'torrent': t})
 
 @login_required
 def torrent_by_hashval(request, inst):
