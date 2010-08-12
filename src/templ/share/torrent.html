@@ -58,11 +58,8 @@ $(function() {
 	   $('#scrape').text('seeders: '+data['downloaded']+' leechers: '+data['incomplete']);
 	});
 	$.getJSON('/torrent/tags.json',function(data) {
-	   tags = data.map(function(item) {
-	      return item.tag;
-	   });
 	   $('#taglist').tagit({
-	      availableTags: tags,
+	      availableTags: data,
 	      existingTags: [{% for t in tags %}'{{t}}',{% endfor%}],
 	      namePrefix: 'tags'
 	   });

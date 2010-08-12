@@ -6,10 +6,10 @@ from torrent import find_torrents
 from lobber.multiresponse import respond_to, json_response
 from django.contrib.auth.decorators import login_required
 from lobber.notify import notifyJSON
-from tagging.utils import parse_tag_input
 from django.shortcuts import get_object_or_404
 from lobber.share.torrent import torrentdict
 from lobber.share.forms import formdict
+from lobber.share.models import user_profile
 
 @login_required
 def tag_usage(request):
@@ -17,10 +17,14 @@ def tag_usage(request):
         try:
             tags = []
             if request.GET.has_key('search'): 
-                tags = filter(lambda x: x.name.startswith(request.GET['search']),Tag.objects.usage_for_model(Torrent,counts=True))
+                tags = filter(lambda x: x.name.startswith(request.GET['search']),Tag.objects.usage_for_model(Torrent,counts=False))
             else:
                 tags = Tag.objects.usage_for_model(Torrent,counts=True)
-            r = json_response([{'tag': tag.name, 'freq': tag.count} for tag in tags])
+            tagnames = [tag.name for tag in tags]
+            profile = user_profile(request.user)
+            tagnames.extend(profile.get_entitlements())
+            pprint(tags)
+            r = json_response(tagnames)
         except MultiValueDictKeyError,e:
             pprint(e)
         return r
