@@ -12,14 +12,16 @@ from lobber.settings import NORDUSHARE_URL, LOBBER_LOG_FILE
 from lobber.share.models import Torrent
 from lobber.notify import notify
 import lobber.log
+from django.shortcuts import get_object_or_404
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
-def _make_share_link(user, torrent):
+def _make_share_link(user, torrent, expires=None):
     key = create_key_user(creator=user,
                           urlfilter='/torrent/%d.torrent[^/]*$' % torrent.id,
                           tagconstraints='',
-                          entitlements='user:%s:$self' % user.username)
+                          entitlements='user:%s:$self' % user.username,
+                          expires=expires)
     if not key:
         return None
     torrent.add_ace(user, 'user:%s:%s#r' % (user.username, key))
@@ -27,24 +29,22 @@ def _make_share_link(user, torrent):
 
 @login_required
 def gimme_url_for_reading_torrent(req, tid):
-    try:
-        t = Torrent.objects.get(id=int(tid))
-    except ObjectDoesNotExist:
-        return HttpResponse('Sorry, torrent %s not found'  % escape(tid))
-    link = _make_share_link(req.user, t)
+    t = get_object_or_404(Torrent,pk=tid);
+    
+    expiration = req.REQUEST.get('expiration');
+    link = _make_share_link(req.user, t, expiration)
     if link is None:
         return HttpResponse('error: unable to create key user')
     return HttpResponse('<a href=\"%s\">%s</a>' % (link, link))
 
 @login_required
 def send_link_mail(req,tid):
+    t = get_object_or_404(Torrent,pk=tid);
+    
+    expiration = req.REQUEST.get('expiration');
     to = req.REQUEST.get('to')
     message = req.REQUEST.get('message')
-    try:
-        t = Torrent.objects.get(id=int(tid))
-    except ObjectDoesNotExist:
-        return HttpResponse('Sorry, torrent %s not found'  % escape(tid))
-    link = _make_share_link(req.user, t)
+    link = _make_share_link(req.user, t, expiration)
     if link is None:
         return HttpResponse('error: unable to create key user')
     msg = "Data: "+strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())+"\n"
