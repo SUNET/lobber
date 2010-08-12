@@ -18,7 +18,7 @@ class ACLForm(forms.Form):
     acl = forms.MultipleChoiceField(label="Permissions")
     
 class AddACEForm(forms.Form):
-    entitlement = forms.CharField(max_length=255,widget=HiddenInput)
+    entitlement = forms.CharField(required=False,max_length=255,widget=HiddenInput)
     subject = forms.CharField(max_length=255,widget=TextInput(attrs={'size':'40'}))
     permissions = forms.MultipleChoiceField(widget=CheckboxSelectMultiple,choices=[('r','read'),('w','write'),('d','delete')])
         

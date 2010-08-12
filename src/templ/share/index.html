@@ -41,6 +41,8 @@ $(function() {
 		   		}
    			}
    });
+   
+   $("#mail-expiration").datepicker({'dateFormat': 'yy-mm-dd', minDate: "+1D"});
    $('#share-mail-dialog').dialog({
        position: ['center','center'],
        autoOpen: false,
@@ -60,13 +62,24 @@ $(function() {
           allFields.val('').removeClass('ui-state-error');
        }
    });
+   $('#share-mail-dialog form').submit(function() {
+      $.get($(this).attr('action'),$(this).serialize(),function(data) {
+         if (data) { _i(data); }
+      });
+      return false;
+   });
+   
+   $("#link-expiration").datepicker({'dateFormat': 'yy-mm-dd', minDate: "+1D"});
    $('#share-link-dialog').dialog({
        autoOpen: false,
        height: 200,
        width: 500,
        modal: true,
        buttons: {
-          'Ok': function() {
+          'Create Link': function() {
+             $('#share-link-dialog form').submit();
+          },
+          'Done': function() {
              $(this).dialog('close');
           }
        },
@@ -74,17 +87,13 @@ $(function() {
           allFields.val('').removeClass('ui-state-error');
        }
    });
-   $('#share-mail-dialog form').submit(function() {
+   $('#share-link-dialog form').submit(function() {
       $.get($(this).attr('action'),$(this).serialize(),function(data) {
-         if (data) {
-            $('#notification').jnotifyAddMessage({
-               text: data,
-               permanent: false
-            });
-         }
+         $('#link').append(data);
       });
       return false;
    });
+   
    $("#remove-torrent-dialog").dialog({
 			autoOpen: false,
 			resizable: false,
@@ -106,12 +115,12 @@ $(function() {
 });
 
 function gufrt(id) {
-   $('#link').load("/torrent/gufrt/"+id);
+   $('#share-link-dialog form').attr('action',"/torrent/gufrt/"+id);
    $('#share-link-dialog').dialog('open');
 }
 
 function gufrtag(tag) {
-   $('#link').load("/torrent/tag/gufrt/"+tag);
+   $('#share-link-dialog form').attr('action',"/torrent/tag/gufrt/"+tag);
    $('#share-link-dialog').dialog('open');
 }
 
@@ -135,8 +144,14 @@ function removeit(id) {
   <a href="/torrent/add/">Upload a torrent file</a>
 </div>
 
-<div id="share-link-dialog" class="modal-dialog" title="A link to this data">
+<div id="share-link-dialog" class="modal-dialog" title="Share this data">
    <div id="link" class="text"></div>
+   <form action="">
+      <fieldset>
+         <label for="expiration">Expiration date
+         <input type="text" name="expiration" id="link-expiration" value="" size="20" class="text ui-widget-content ui-corner-all" /></label>
+      </fieldset>
+   </form>
 </div>
 
 <div id="remove-torrent-dialog" class="modal-dialog" title="Really remove this torrent?">
@@ -149,8 +164,8 @@ function removeit(id) {
 <div id="share-mail-dialog" class="modal-dialog" title="Send a link to this data">
    <form action="">
       <fieldset>
-         <label for="to">Email</label>
-         <input type="text" name="to" id="to" value="" size="40" class="text ui-widget-content ui-corner-all" />
+         <label for="to">Email<input type="text" name="to" id="to" value="" size="20" class="text ui-widget-content ui-corner-all" /></label>
+         <label for="expiration">Expiration date<input type="text" name="expiration" id="mail-expiration" value="" size="40" class="text ui-widget-content ui-corner-all" /></label>
          <label for="message">Message</label>
          <textarea name="message" id="message" value="" rows="4" cols="40" class="text ui-widget-content ui-corner-all"></textarea>
       </fieldset>
