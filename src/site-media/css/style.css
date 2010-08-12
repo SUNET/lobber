@@ -1,6 +1,6 @@
 html { height: 100%; margin: 0; padding: 0;}
 body { font: 61.8% "Trebuchet MS", sans-serif; width: 80%; height: 99%; margin:0; padding:0;}
-div#container { position: relative; height:auto !important; height:100%; min-height: 80%; margin-left: 50px; margin-top: 0; padding-bottom: 50px;}
+div#container { position: relative; height:auto !important; height: 99%; min-height: 80%; margin-left: 50px; margin-top: 0; padding-bottom: 50px;}
 label { display:block; }
 #modal-dialog { font-size: 110%; }
 #modal-dialog input.text textarea { margin-bottom:12px; width:95%; padding: .4em; }
@@ -12,7 +12,7 @@ div#header { margin-top: 6px; }
 .navlist ul { list-style: none; padding: 0; margin: 0; }
 .navlist li { float: left; display: inline; margin: 0 0.15em; }
 .description { clear: both; margin-top: 25px; padding-top: 5px; border-top: 1px solid black; }
-#branding{ font: 500% "Trebuchet MS", sans-serif; margin-left: 50px; margin-bottom: 20px; float: left}
+#branding{ font: 500% "Trebuchet MS", sans-serif; margin-left: 50px; padding-bottom: 20px; float: left}
 div.toolbar{ padding: 4px; float: right; margin-right: 20px; margin-bottom: 20px;}
 #linklist { float: right; }
 #linklist ul{ list-style: none; padding: 0; margin: 0; }
