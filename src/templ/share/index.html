@@ -101,6 +101,7 @@ $(function() {
    });
    $('#share-link-dialog form').submit(function() {
       $.get($(this).attr('action'),$(this).serialize(),function(data) {
+         $('#link-explain').show();
          $('#link').html(data);
          var button = getDialogButton( '.link-dialog', 'Create Link' );
 		 if ( button ) {
@@ -166,7 +167,7 @@ function removeit(id) {
          <label for="expiration">Expiration date
          <input type="text" name="expiration" id="link-expiration" value="" size="20" class="text required ui-widget-content ui-corner-all" /></label>
       </fieldset>
-      <p class="hidden">Give this link to someone who should have access to this data:</p>
+      <p id="link-explain" style="display: none;">Give this link to someone who should have access to this data:</p>
       <div id="link" class="text"></div>
    </form>
 </div>
