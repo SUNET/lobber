@@ -257,4 +257,13 @@ class UserProfile(models.Model):
                 return True
         return False
 
+def user_profile(user,default=True):
+        try:
+            return user.profile.get();
+        except ObjectDoesNotExist:
+            if default:
+                return UserProfile(user=user,creator=user)
+            else:
+                return None
+
 tagging.register(Torrent)
