@@ -12,6 +12,20 @@ function _e(message) {
        type: 'error'
    });
 }
+function getDialogButton( dialog_selector, button_name )
+{
+  var buttons = $( dialog_selector + ' .ui-dialog-buttonpane button' );
+  for ( var i = 0; i < buttons.length; ++i )
+  {
+     var jButton = $( buttons[i] );
+     if ( jButton.text() == button_name )
+     {
+         return jButton;
+     }
+  }
+
+  return null;
+}
 $(function() {
    $("input:submit, input:button").button();
    $("a",".button").button();
