@@ -64,7 +64,7 @@ class Torrent(models.Model):
             ace_user, ace_perm = ace.split('#')
             #print 'DEBUG: ace_user: %s, ace_perm: %s, usernames: %s' % (ace_user, ace_perm, usernames)
             for username in usernames:
-                if ace_user.startswith(username):
+                if not ace_user or ace_user.startswith(username):
                     if ace_perm == 'w': # Write permission == all.
                         return True
                     if ace_perm == '%c' % perm:
