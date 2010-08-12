@@ -122,8 +122,8 @@ def find_torrents(user, args, max=40):
     """
     q = Torrent.objects.filter(expiration_date__gt=dt.now()).order_by('-creation_date')
     empty_set = Torrent.objects.in_bulk([])
-    
-    for e, vals in args:            # e=(field, [search strings])
+
+    for e, vals in args:            # args=(field, [search strings])
         if e == 'user':
             try:
                 u = User.objects.get(username=vals[0])
