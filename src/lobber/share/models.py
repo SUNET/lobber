@@ -7,6 +7,7 @@ import tagging
 from tagging.models import Tag
 from BitTorrent.bencode import bdecode
 from pprint import pprint
+import os
 
 def _urlesc(s):
     r = ''
@@ -150,6 +151,11 @@ class Torrent(models.Model):
     def meta_info(self):
         data = self.file().read()
         return bdecode(data)['info']
+    
+    def remove(self):
+        Tag.objects.update_tags(self,None)
+        os.unlink(self.file().name)
+        self.delete();
 
 class UserProfile(models.Model):
     """This is how we represent a key, as well as an ordinary user."""

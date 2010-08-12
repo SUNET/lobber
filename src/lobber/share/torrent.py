@@ -184,15 +184,8 @@ def welcome(req):
 
 @login_required
 def remove_torrent(request, tid):
-    # TODO write a html version of this with a form confirmation
-    t = None
-    try:
-        t = Torrent.objects.get(id=tid)
-    except ObjectDoesNotExist:
-        return respond_to(request,
-                          {'application/json': json_response("No such torrent: "+tid),
-                           'text/html': 'share/index.html'},{'error': "No such torrent: %s" % tid});
-    t.delete()
+    t = get_object_or_404(Torrent,pk=tid)
+    t.remove()
     return respond_to(request,
                       {'application/json': json_response(tid),
                        'text/html': HttpResponseRedirect("/torrent")})
