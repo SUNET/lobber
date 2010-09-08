@@ -104,7 +104,6 @@ See [[file:src/lobber/share/models.py][file:~/p/nordushare/lobber/src/lobber/sha
 
   https://HOST.DOMAIN.TLD/APPLICATION/OBJECT-TYPE/[INSTANCE][.REPRESENTATION]][?lkey=SECRET]
 
-
   | instance / request method | GET  | POST/PUT | DELETE |
   |---------------------------+------+----------+--------|
   | no instance given         | list | create   | -      |
@@ -435,6 +434,22 @@ achttp_worker: adding d06d03fb3736d54264bf1d5d3b9827c745d54555 to table: yes / 1
 #+END_EXAMPLE
      
 * Operations
+** postgresql setup
+# apt-get install postgresql
+# $EDITOR /etc/postgresql/8.4/main/postgresql.conf  # set listen_addresses
+# echo 'hostssl lobber lobber-beta 192.36.171.184/32 md5' >> /etc/postgresql/8.4/main/pg_hba.conf
+# /etc/init.d/postgresql-8.4 start
+# sudo -u postgres createuser -P lobber-beta
+Enter password for new role: 
+Enter it again: 
+Shall the new role be a superuser? (y/n) n
+Shall the new role be allowed to create databases? (y/n) n
+Shall the new role be allowed to create more new roles? (y/n) n
+# sudo -u postgres psql
+postgres=# CREATE DATABASE lobber;
+CREATE DATABASE
+postgres=# \q
+# 
 ** Apache configuration
         <Location "/">
            SetHandler python-program
@@ -478,6 +493,44 @@ achttp_worker: adding d06d03fb3736d54264bf1d5d3b9827c745d54555 to table: yes / 1
 ** shibd not running on app
 mkdir /var/run/shibboleth
 /etc/init.d/shibd start
+** permanent fix for shibd not running
+diff -c /etc/init.d/shibd\~ /etc/init.d/shibd
+*** /etc/init.d/shibd~	2009-05-04 17:59:16.000000000 +0200
+--- /etc/init.d/shibd	2010-08-10 13:02:06.272997807 +0200
+***************
+*** 27,33 ****
+  LD_LIBRARY_PATH=/usr/lib
+  DAEMON=/usr/sbin/$NAME
+  SCRIPTNAME=/etc/init.d/$NAME
+! PIDFILE=/var/run/shibboleth/$NAME.pid
+  DAEMON_OPTS=""
+  
+  # Force removal of socket
+--- 27,34 ----
+  LD_LIBRARY_PATH=/usr/lib
+  DAEMON=/usr/sbin/$NAME
+  SCRIPTNAME=/etc/init.d/$NAME
+! PIDFILEDIR=/var/run/shibboleth
+! PIDFILE=${PIDFILEDIR}/$NAME.pid
+  DAEMON_OPTS=""
+  
+  # Force removal of socket
+***************
+*** 55,60 ****
+--- 56,65 ----
+          echo "Not starting $DESC (see /etc/default/$NAME)"
+          exit 0
+      fi
++     # Create pidfile dir.
++     if [ -d $PIDFILEDIR ] ; then : ; else
++ 	mkdir -p $PIDFILEDIR
++     fi
+      echo -n "Starting $DESC: "
+      start-stop-daemon --background --start --quiet \
+          --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_OPTS
+
+Diff finished.  Tue Aug 10 13:02:21 2010
+
 * Tracker
 ** Correspondance
 - talked to nrkbeta <knut-olav.hoven@nrk.no> 2009-09-22 about opentracker
@@ -525,9 +578,59 @@ https://build.transmissionbt.com/job/trunk-linux/ and use that
 instead)
 
 ./configure --disable-gtk --disable-nls && make
+** rtorrent / libtorrent (rakshasa)
+sudo apt-get install libtorrent-dev libtorrent11 rtorrent
 * Parts and pieces of lobber.se
 ** sn-dev -- storage node
 - /var/lib/transmission-daemon/ is where Transmission keeps its stuff
-
+  --config-dir /var/lib/transmission-daemon/info
+- lobberstoragenode
 ** tracker-dev -- the tracker
-** app-dev -- web app
+- opentracker -- http://git.nordu.net/?p=opentracker.git;a=summary
+** app-dev -- web application
+- apache
+- shibd
+- orbited
+** db-dev -- database server
+- postgresql
+* OAuth
+We should use OAuth for authentication of users.  See
+[[http://tools.ietf.org/html/draft-ietf-oauth-v2-10][draft-ietf-oauth-v2]] for a specification.  We should use the [[http://tools.ietf.org/html/draft-ietf-oauth-v2-10#section-1.4.1][web server
+client profile]].
+
+* Bugs
+** TLS errors talking to web server
+Update <2010-09-08 Wed 17:29>: This happened because we used the
+threaded worker MPM rather than the prefork MPM, see
+http://docs.djangoproject.com/en/dev/howto/deployment/modpython/.
+
+Fixed by
+
+  $ sudo apt-get install apache2-mpm-prefork
+
+** Problem
+linus@sn-dev:/tmp$ curl -v https://beta.lobber.se/torrent/all.rss
+ * About to connect() to beta.lobber.se port 443 (#0)
+ *   Trying 192.36.171.184... connected
+ * Connected to beta.lobber.se (192.36.171.184) port 443 (#0)
+ * successfully set certificate verify locations:
+ *   CAfile: none
+  CApath: /etc/ssl/certs
+ * SSLv3, TLS handshake, Client hello (1):
+ * SSLv3, TLS handshake, Server hello (2):
+ * SSLv3, TLS handshake, CERT (11):
+ * SSLv3, TLS handshake, Server key exchange (12):
+ * SSLv3, TLS alert, Server hello (2):
+ * error:0407006A:rsa routines:RSA_padding_check_PKCS1_type_1:block type is not 01
+ * Closing connection #0
+curl: (35) error:0407006A:rsa routines:RSA_padding_check_PKCS1_type_1:block type is not 01
+
+linus@sn-dev:/tmp$ openssl s_client -connect beta.lobber.se:443
+CONNECTED(00000003)
+depth=3 /C=SE/O=AddTrust AB/OU=AddTrust External TTP Network/CN=AddTrust External CA Root
+verify error:num=19:self signed certificate in certificate chain
+verify return:0
+9048:error:0407006A:rsa routines:RSA_padding_check_PKCS1_type_1:block type is not 01:rsa_pk1.c:100:
+9048:error:04067072:rsa routines:RSA_EAY_PUBLIC_DECRYPT:padding check failed:rsa_eay.c:697:
+9048:error:1408D07B:SSL routines:SSL3_GET_KEY_EXCHANGE:bad signature:s3_clnt.c:1448:
+
