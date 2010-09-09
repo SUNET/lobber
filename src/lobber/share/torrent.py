@@ -26,7 +26,8 @@ logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 ####################
 # Helper functions. FIXME: Move to some other file.
-from deluge.bencode import bdecode, bencode, make_meta_file
+from deluge.bencode import bdecode, bencode
+from deluge.metafile import make_meta_file
 from hashlib import sha1
 
 def _torrent_info(data):
