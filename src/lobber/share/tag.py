@@ -1,7 +1,6 @@
 from tagging.models import Tag
 from lobber.share.models import Torrent
 from django.utils.datastructures import MultiValueDictKeyError
-from pprint import pprint
 from torrent import find_torrents
 from lobber.multiresponse import respond_to, json_response
 from django.contrib.auth.decorators import login_required
@@ -11,22 +10,23 @@ from lobber.share.torrent import torrentdict
 from lobber.share.forms import formdict
 from lobber.share.models import user_profile
 
+logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
+
 @login_required
 def tag_usage(request):
         r = None
         try:
-            tags = []
-            if request.GET.has_key('search'): 
-                tags = filter(lambda x: x.name.startswith(request.GET['search']),Tag.objects.usage_for_model(Torrent,counts=False))
-            else:
-                tags = Tag.objects.usage_for_model(Torrent,counts=True)
-            tagnames = [tag.name for tag in tags]
-            profile = user_profile(request.user)
-            tagnames.extend(profile.get_entitlements())
-            pprint(tags)
-            r = json_response(tagnames)
+		tags = []
+		if request.GET.has_key('search'): 
+			tags = filter(lambda x: x.name.startswith(request.GET['search']),Tag.objects.usage_for_model(Torrent,counts=False))
+		else:
+			tags = Tag.objects.usage_for_model(Torrent,counts=True)
+		tagnames = [tag.name for tag in tags]
+		profile = user_profile(request.user)
+		tagnames.extend(profile.get_entitlements())
+		r = json_response(tagnames)
         except MultiValueDictKeyError,e:
-            pprint(e)
+		logger.error(e)
         return r
     
 @login_required
@@ -35,10 +35,7 @@ def tags(request,tid):
         
         if request.method == 'POST':
             to_tags = request.POST.getlist('tags[]')
-            pprint(to_tags)
             from_tags = [tag.name for tag in Tag.objects.get_for_object(t)]
-            pprint(from_tags)
-            pprint(' '.join(to_tags))
             Tag.objects.update_tags(t,' '.join(to_tags))
             
             # figure out the diff and notify subscribers

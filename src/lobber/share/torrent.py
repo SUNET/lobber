@@ -20,7 +20,6 @@ from lobber.share.models import Torrent
 from lobber.notify import notifyJSON
 from django.utils.http import urlencode
 from django import forms
-from pprint import pprint
 from lobber.share.forms import formdict
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
@@ -207,7 +206,6 @@ def scrape(request,inst):
         response = bdecode(txt)
         dict = response['files'][t.hashval.decode('hex')]
     except Exception,e:
-        pprint(e)
         pass
     
     return json_response(dict)
@@ -314,7 +312,6 @@ def search(request):
         txt = find_torrents(request.user, [('txt',[term])])
         torrents = tag;
         torrents.extend(txt);
-        pprint(torrents)
         return _torrentlist(request, torrents);
     else:
         return HttpResponseRedirect("/torrent")

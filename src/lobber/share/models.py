@@ -6,7 +6,6 @@ from lobber.settings import TORRENTS,BASE_URL
 import tagging
 from tagging.models import Tag
 from BitTorrent.bencode import bdecode
-from pprint import pprint
 import os
 
 def _urlesc(s):

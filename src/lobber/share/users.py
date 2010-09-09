@@ -12,8 +12,6 @@ from lobber.share.models import Torrent, UserProfile
 import lobber.log
 from lobber.multiresponse import json_response
 
-logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
-
 def create_key_user(creator, urlfilter, tagconstraints, entitlements, expires=None):
     """
     Create a user profile named key:<random text>.  

@@ -8,8 +8,6 @@ from lobber.share.models import UserProfile
 from lobber.multiresponse import respond_to, json_response
 import lobber.log
 
-logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
-
 def _list_keys(user):
         lst = []
         for p in UserProfile.objects.filter(creator=user).order_by('-id'):

@@ -14,8 +14,6 @@ from lobber.notify import notify
 import lobber.log
 from django.shortcuts import get_object_or_404
 
-logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
-
 def _make_share_link(user, torrent, expires=None):
     key = create_key_user(creator=user,
                           urlfilter='/torrent/%d.torrent[^/]*$' % torrent.id,
