@@ -213,7 +213,7 @@ class UserProfile(models.Model):
         if not flt in f:
             return True
         f.remove(flt)
-        if self.set_urlfilter(user, f) == False:
+        if not self.set_urlfilter(user, f):
             return False
         return flt
 
@@ -248,7 +248,7 @@ class UserProfile(models.Model):
         if not tag in t:
             return True
         t.remove(tag)
-        if self.set_tagconstraint(user, t) == False:
+        if not self.set_tagconstraint(user, t):
             return False
         return tag
 
