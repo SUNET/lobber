@@ -451,6 +451,7 @@ CREATE DATABASE
 postgres=# \q
 # 
 ** Apache configuration
+*** Using mod_python (not preferred)
         <Location "/">
            SetHandler python-program
            PythonHandler django.core.handlers.modpython
@@ -490,6 +491,32 @@ postgres=# \q
            allow from all
            SetHandler None
         </LocationMatch>
+*** Using mod_wsgi (preferred)
+root@app-dev:~# dpkg -l \*wsgi | egrep ^ii
+ii  libapache2-mod-wsgi                       2.8-2ubuntu1                      Python WSGI adapter module for Apache
+root@app-dev:~# ls -l /etc/apache2/mods-enabled/wsgi.*
+lrwxrwxrwx 1 root root 27 2010-09-09 14:06 /etc/apache2/mods-enabled/wsgi.conf -> ../mods-available/wsgi.conf
+lrwxrwxrwx 1 root root 27 2010-09-09 14:06 /etc/apache2/mods-enabled/wsgi.load -> ../mods-available/wsgi.load
+root@app-dev:~# cat /etc/apache2/conf.d/wsgi 
+WSGIScriptAlias / /var/www/lobber/src/lobber.wsgi
+
+From /etc/apache2/sites-enabled/default-ssl:
+        <Location "/">
+           AuthType shibboleth
+           ShibRequireSession Off
+           require shibboleth
+           RequestHeader set X_REMOTE_USER %{eppn}e
+           RequestHeader set EPPN %{eppn}e
+           RequestHeader set GIVENNAME %{givenName}e
+           RequestHeader set SN %{sn}e
+           RequestHeader set MAIL %{mail}e
+           RequestHeader set AFFILIATION %{affiliation}e
+           RequestHeader set ENTITLEMENT %{entitlement}e
+        </Location>
+
+Still need 'prefork' rather than 'worker' though.
+root@app-dev:~# dpkg -l \*prefork | egrep ^ii
+ii  apache2-mpm-prefork                       2.2.14-5ubuntu8                   Apache HTTP Server - traditional non-threaded model
 ** shibd not running on app
 mkdir /var/run/shibboleth
 /etc/init.d/shibd start
