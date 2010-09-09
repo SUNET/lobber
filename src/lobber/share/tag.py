@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from lobber.share.torrent import torrentdict
 from lobber.share.forms import formdict
 from lobber.share.models import user_profile
+from lobber.settings import LOBBER_LOG_FILE
 import lobber.log
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
