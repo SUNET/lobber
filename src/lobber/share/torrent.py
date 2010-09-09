@@ -21,12 +21,14 @@ from lobber.notify import notifyJSON
 from django.utils.http import urlencode
 from django import forms
 from lobber.share.forms import formdict
+
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 ####################
 # Helper functions. FIXME: Move to some other file.
-from BitTorrent.bencode import bdecode, bencode
+from deluge.bencode import bdecode, bencode, make_meta_file
 from hashlib import sha1
+
 def _torrent_info(data):
     """
     Return (name, hash) of torrent file.
@@ -34,9 +36,8 @@ def _torrent_info(data):
     info = bdecode(data)['info']
     return info['name'], sha1(bencode(info)).hexdigest()
 
-from BitTorrent.btmakemetafile import make_meta_file
 def _create_torrent(filename, announce_url, target_file, comment=None):
-    make_meta_file(filename, announce_url, comment=comment, target=target_file)
+    make_meta_file(filename, announce_url, 2 ** 18, comment=comment, target=target_file)
 
 def _store_torrent(req, form):
     """

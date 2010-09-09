@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from lobber.settings import TORRENTS,BASE_URL
 import tagging
 from tagging.models import Tag
-from BitTorrent.bencode import bdecode
+from deluge.bencode import bdecode
 import os
 
 def _urlesc(s):
