@@ -29,6 +29,9 @@ DATABASE_PASSWORD = ''
 DATABASE_HOST = ''
 DATABASE_PORT = ''
 
+DROPBOX_DIR = '/var/lib/transmission/downloads'
+TRANSMISSION_RPC = 'http://transmission:transmission@localhost:9091'
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -111,6 +114,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'oauth_provider',
     'django_extensions',
     'lobber.extensions',
     'tagging',

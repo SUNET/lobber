@@ -7,6 +7,9 @@ import tagging
 from tagging.models import Tag
 from deluge.bencode import bdecode
 import os
+from django.db.models.fields import CharField
+from django.db.models.fields.related import ForeignKey
+from oauth_provider.models import Consumer
 
 def _urlesc(s):
     r = ''
@@ -261,7 +264,7 @@ class UserProfile(models.Model):
             if entl == 'user:' + self.creator.username:
                 return True
         return False
-
+    
 def user_profile(user,default=True):
         try:
             return user.profile.get();

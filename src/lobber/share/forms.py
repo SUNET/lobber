@@ -7,12 +7,6 @@ class UploadForm(forms.Form):
     expires = forms.DateTimeField(label="Expiration date")
     file = forms.FileField(label="Torrent file")
     publicAccess = forms.BooleanField(required=False,label="Allow public access?")
-
-    def clean_file(self):
-        file = self.cleaned_data['file']
-        if not file.content_type == 'application/x-bittorrent':
-            raise forms.ValidationError('Not a BitTorrent file...')
-        return file
     
 class ACLForm(forms.Form):
     acl = forms.MultipleChoiceField(label="Permissions")
@@ -28,5 +22,9 @@ class CreateKeyForm(forms.Form):
     entitlements = forms.CharField(label="Entitlements",widget=forms.Textarea)
     expires = forms.DateTimeField(label="Expiration date")
     
+class CreateConsumerForm(forms.Form):
+    name = forms.CharField(max_length=255)
+    description = forms.CharField(label="Description",widget=forms.Textarea)
+
 def formdict():
     return {'permissions': AddACEForm()}

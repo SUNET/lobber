@@ -5,34 +5,7 @@
 {% block js %}
 <script type="text/javascript">
 $(function() {
-	$('#expdate').datepicker({'dateFormat': 'yy-mm-dd'});
-	$('#newkey-dialog').dialog({
-		autoOpen: false,
-	   	height: 200,
-	   	width: 500,
-	   	modal: true,
-	   	buttons: {
-	   	   'Ok': function() {
-	   	      $('#expdate-dialog form').submit();
-	   	      $(this).dialog('close');
-	   	   }
-	   	},
-	   	close: function() {
-	   	   $('#expdate').val('').removeClass('ui-state-error');
-	   	}
-	});
-	$('#expdate-dialog form').submit(function() {
-		$.post($(this).attr('action'),$(this).serialize(),function(data) {
-		   if (data) {
-   	          $('#notification').jnotifyAddMessage({
-                 text: data,
-                 permanent: false
-              });
-   	       }
-		});
-		return false;
-	});
-	$("#keys").accordion({ 
+	$("#consumers").accordion({ 
    			header: "h3", 
    			event: "click", 
    			collapsible: true,
@@ -43,35 +16,58 @@ $(function() {
 {% endblock %}
 
 {% block main %}
-{% if keys %}
-<div id="newkey-dialog" class="modal-dialog" title="Create new key">
-   <form action="/key.html">
-      <fieldset>
-         <input type="hidden" name="username" id="username" value=""/>
-         <label for="expdate">Expiration date</label>
-         <input type="text" name="expdate" id="expdate" value="" class="text ui-widget-content ui-corner-all"></input>
-      </fieldset>
-   </form>
-</div>
-
-
-<h1>Keys</h1>
-<div id="keys">
-  {% for profile in keys %}
-    <div class="key" id="{{ profile.get_username }}">
-      <h3><a href="#{{ profile.get_username }}">{{ profile.get_username }}</a></h3>
+<h1>OAuth Consumers</h1>
+<form action="/consumers" method="POST">
+	<div class="ui-widget-content ui-corner-all infopanel" style="margin-top: 20px;">
+    <table>
+      {% for field in form %}
+        <tr>
+          {% if field.errors %}
+            <td colspan="2">{{ field.errors }}</td>
+          {% endif %}
+        </tr>
+        <tr>
+          <td>{{ field.label_tag }}</td>
+	      <td><div class="ui-widget">{{ field }}</div></td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <br/>
+  <div class="button">
+    <input type="submit" value="Create consumer" />
+    <input type="button" onClick="document.location='/torrent'" value="Cancel"/>
+  </div>
+</form>
+<br/>
+{% if consumers %}
+<div id="consumers">
+  {% for consumer in consumers %}
+    <div class="consumer" id="{{ consumer.name }}">
+      <h3><a href="#{{ consumer.key }}">{{ consumer.name }} ({{consumer.key}})</a></h3>
       <div>
-		<table>
-	      <tr><td>Entitlements</td><td>{{ profile.entitlements }}</td></tr>
-		  <tr><td>URL filter</td><td>{{ profile.urlfilter }}</td></tr>
-		  <tr><td>Tag constraints</td><td>{{ profile.tagconstraints }}</td></tr>
-		  <tr><td>Expiration date</td><td>{{ profile.expiration_date }}</td></tr>
-		</table>
+	      <div class="navlist">
+	         <ul>
+	         	<li style="float: right;">
+	               <a class="tip" title="Remove this consumer" href="/consumer/{{consumer.key}}/remove">
+	                  <span class="ui-icon ui-icon-trash"></span>
+	               </a>
+	            </li>
+	         </ul>
+	      </div>
+	      <div>
+		     <table>
+		        <tr><th>Key</th><td>{{ consumer.key }}</td></tr>
+			    <tr><th>Name</th><td>{{ consumer.name }}</td></tr>
+			    <!-- tr><th>Status</th><td>{{ consumer.status }}</td></tr -->
+		     </table>
+		     <p>{{consumer.description}}</p>
+	      </div>
       </div>
     </div>
   {% endfor %}
 </div>
 {% else %}
-  <p>No keys.</p>
+  <p>No consumers defined for this user...</p>
 {% endif %}
 {% endblock %}

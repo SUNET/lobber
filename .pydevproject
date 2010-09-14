@@ -14,5 +14,8 @@
 </pydev_pathproperty>
 <pydev_pathproperty name="org.python.pydev.PROJECT_EXTERNAL_SOURCE_PATH">
 <path>/usr/local/lib/python2.6/dist-packages/orbited-0.7.10-py2.6.egg</path>
+<path>/usr/share/pyshared</path>
+<path>/usr/local/lib/python2.6/dist-packages/transmissionrpc-0.5-py2.6.egg</path>
+<path>/usr/local/lib/python2.6/dist-packages/django_oauth-1.1-py2.6.egg</path>
 </pydev_pathproperty>
 </pydev_project>

@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from tagging.models import Tag, TaggedItem
 
 from lobber.multiresponse import respond_to, make_response_dict, json_response
-from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE, TRACKER_ADDR
+from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE, TRACKER_ADDR, DROPBOX_DIR, TRANSMISSION_RPC
 from lobber.resource import Resource
 import lobber.log
 from lobber.share.forms import UploadForm
@@ -21,6 +21,10 @@ from lobber.notify import notifyJSON
 from django.utils.http import urlencode
 from django import forms
 from lobber.share.forms import formdict
+from tempfile import TemporaryFile
+import shutil
+from urlparse import urlparse
+import transmissionrpc
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
@@ -52,12 +56,20 @@ def _store_torrent(req, form):
     object in the database and store the torrent file in the file
     system.
     """
-    torrent_file = req.FILES['file']
-    # FIXME: Limit amount read and check length of returned data.
-    torrent_file_content = torrent_file.read()
-    torrent_file.close()
+    ff = form.cleaned_data['file']
+    datafile = None
+    if ff.content_type == 'application/x-bittorrent':
+        # FIXME: Limit amount read and check length of returned data.
+        torrent_file_content = ff.read()
+        ff.close()
+    else:
+        tmptf = TemporaryFile()
+        make_meta_file(ff.name,ANNOUNCE_URL, 2**18, comment=form.cleaned_data['description'], target=tmptf)
+        torrent_file_content = tmptf.read()
+        tmptf.close()
+        datafile = file
+    
     torrent_name, torrent_hash = _torrent_info(torrent_file_content)
-
     name_on_disk = '%s/%s' % (TORRENTS, '%s.torrent' % torrent_hash)
     f = file(name_on_disk, 'w')
     f.write(torrent_file_content)
@@ -70,35 +82,25 @@ def _store_torrent(req, form):
     acl.append('user:%s#w' % req.user.username)
     acl.append('urn:x-lobber:storagenode#r')
 
-    t = None
-    notification = None
-    try:
-        t = Torrent.objects.get(hashval=torrent_hash)
-    except ObjectDoesNotExist:
-        t = Torrent(acl=" ".join(acl),
-                    creator=req.user,
-                    name=torrent_name,
-                    description=form.cleaned_data['description'],
-                    expiration_date=form.cleaned_data['expires'],
-                    data='%s.torrent' % torrent_hash,
-                    hashval=torrent_hash)
-        notification = '/torrent/add'
-    except MultipleObjectsReturned, e:
-        # Pathological case that can happen with corrupt (or old) database.
-        # FIXME: Handle error case.
-        pass
-    else:                            # Found torrent, update database.
-        assert(t.data == '%s.torrent' % torrent_hash)
-        assert(t.hashval == torrent_hash)
-        t.name = torrent_name
-        t.description = form.cleaned_data['description']
-        t.expiration_date = form.cleaned_data['expires']
-        notification = '/torrent/update'
-
-    if t:
-        t.save()
-        notifyJSON(notification, t.id)
-
+    t = Torrent(acl=" ".join(acl),
+                creator=req.user,
+                name=torrent_name,
+                description=form.cleaned_data['description'],
+                expiration_date=form.cleaned_data['expires'],
+                data='%s.torrent' % torrent_hash,
+                hashval=torrent_hash)
+    t.save()
+    notifyJSON('/torrent/add', t.id)
+    if datafile:
+        dst = "%s%s%s" % (DROPBOX_DIR,os.pathsep,torrent_hash)
+        os.mkdir(dst)
+        shutil.move(datafile, dst)
+        rpc = urlparse(TRANSMISSION_RPC)
+        tc = transmissionrpc.Client(address=rpc.hostname,
+                                        port=rpc.port,
+                                        user=rpc.username,
+                                        password=rpc.password)
+        tc.add_uri(name_on_disk,download_dir=dst)
     return t
     
 def _urlesc(s):
