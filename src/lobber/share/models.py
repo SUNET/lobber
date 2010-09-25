@@ -7,9 +7,6 @@ import tagging
 from tagging.models import Tag
 from deluge.bencode import bdecode
 import os
-from django.db.models.fields import CharField
-from django.db.models.fields.related import ForeignKey
-from oauth_provider.models import Consumer
 
 def _urlesc(s):
     r = ''
@@ -158,6 +155,12 @@ class Torrent(models.Model):
         Tag.objects.update_tags(self,None)
         os.unlink(self.file().name)
         self.delete();
+ 
+class DataLocation(models.Model):
+    torrent = models.ForeignKey(Torrent)
+    owner = models.ForeignKey(User)
+    url = models.CharField(max_length=1024)
+    expires = models.DateTimeField(null=True,blank=True)
 
 class UserProfile(models.Model):
     """This is how we represent a key, as well as an ordinary user."""

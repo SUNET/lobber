@@ -21,10 +21,10 @@ class CreateKeyForm(forms.Form):
     tagconstraints = forms.CharField(label="Tag constraints", widget=forms.Textarea)
     entitlements = forms.CharField(label="Entitlements",widget=forms.Textarea)
     expires = forms.DateTimeField(label="Expiration date")
-    
-class CreateConsumerForm(forms.Form):
-    name = forms.CharField(max_length=255)
-    description = forms.CharField(label="Description",widget=forms.Textarea)
+
+class DataLocationForm(forms.Form):
+    url = forms.URLField()
+    expires = forms.DateTimeField(label="Expiration date")
 
 def formdict():
     return {'permissions': AddACEForm()}

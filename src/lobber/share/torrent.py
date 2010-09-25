@@ -25,6 +25,9 @@ from tempfile import TemporaryFile
 import shutil
 from urlparse import urlparse
 import transmissionrpc
+from lobber.share.forms import DataLocationForm
+from lobber.share.models import DataLocation
+import time
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
@@ -182,6 +185,12 @@ def torrentdict(request,t,forms=None):
 ####################
 # External functions, called from urls.py.
 
+def ihave(request,hash):
+    url = "torrent:%s" % hash
+    for t in Torrent.objects.filter(hashval=hash):
+        loc = DataLocation.objects.get_or_create(owner=request.user,url=url,torrent=t)
+        loc.expires = time.time()+3600 ## TODO: This needs improvement
+    
 def welcome(req):
     return HttpResponseRedirect("/torrent/")
 
