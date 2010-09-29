@@ -5,22 +5,7 @@
 {% block js %}
 <script type="text/javascript">
 $(function() {
-	$('#expdate').datepicker({'dateFormat': 'yy-mm-dd'});
-	$('#newkey-dialog').dialog({
-		autoOpen: false,
-	   	height: 200,
-	   	width: 500,
-	   	modal: true,
-	   	buttons: {
-	   	   'Ok': function() {
-	   	      $('#expdate-dialog form').submit();
-	   	      $(this).dialog('close');
-	   	   }
-	   	},
-	   	close: function() {
-	   	   $('#expdate').val('').removeClass('ui-state-error');
-	   	}
-	});
+	$('#id_expires').datepicker({'dateFormat': 'yy-mm-dd'});
 	$('#expdate-dialog form').submit(function() {
 		$.post($(this).attr('action'),$(this).serialize(),function(data) {
 		   if (data) {
@@ -43,35 +28,65 @@ $(function() {
 {% endblock %}
 
 {% block main %}
+<h1>Application Keys</h1>
+<form enctype="multipart/form-data" method="post">
+  <div class="ui-widget-content ui-corner-all infopanel" style="margin-top: 20px;">
+    <table>
+      {% for field in form %}
+        <tr>
+          {% if field.errors %}
+            <td colspan="2">{{ field.errors }}</td>
+          {% endif %}
+        </tr>
+        <tr>
+          <td>{{ field.label_tag }}</td>
+	  <td><div class="ui-widget">{{ field }}</div></td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <br/>
+  <div class="button">
+    <input type="submit" value="Create key" />
+    <input type="button" onClick="document.location='/torrent'" value="Cancel"/>
+  </div>
+</form>
+<br/>
 {% if keys %}
-<div id="newkey-dialog" class="modal-dialog" title="Create new key">
-   <form action="/key.html">
-      <fieldset>
-         <input type="hidden" name="username" id="username" value=""/>
-         <label for="expdate">Expiration date</label>
-         <input type="text" name="expdate" id="expdate" value="" class="text ui-widget-content ui-corner-all"></input>
-      </fieldset>
-   </form>
-</div>
-
-
-<h1>Keys</h1>
 <div id="keys">
   {% for profile in keys %}
     <div class="key" id="{{ profile.get_username }}">
       <h3><a href="#{{ profile.get_username }}">{{ profile.get_username }}</a></h3>
       <div>
-		<table>
-	      <tr><td>Entitlements</td><td>{{ profile.entitlements }}</td></tr>
-		  <tr><td>URL filter</td><td>{{ profile.urlfilter }}</td></tr>
-		  <tr><td>Tag constraints</td><td>{{ profile.tagconstraints }}</td></tr>
-		  <tr><td>Expiration date</td><td>{{ profile.expiration_date }}</td></tr>
-		</table>
+      	<div class="navlist">
+         <ul>
+            <li style="float: right;">
+               <a class="tip" title="Remove this key" href="/key/{{profile.get_username}}/remove">
+                  <span class="ui-icon ui-icon-trash"></span>
+               </a>
+            </li>
+         </ul>
+        </div>
+        <div class="description">
+			<table>
+			  <tr><td>Lobber Key</td><td>{{ profile.get_username}}</td></tr>
+			  {% if profile.entitlements %}
+		      <tr><td>Delegated Entitlements</td><td>{{ profile.entitlements}}</td></tr>
+		      {% endif %}
+			  {% if profile.urlfilter %}
+			  <tr><td>URL filter</td><td>{{ profile.urlfilter }}</td></tr>
+			  {% endif %}
+			  {% if profile.tagconstraints %}
+			  <tr><td>Tag constraints</td><td>{{ profile.tagconstraints }}</td></tr>
+			  {% endif %}
+			  <tr><td>Expiration date</td><td>{{ profile.expiration_date }}</td></tr>
+			</table>
+		</div>
       </div>
     </div>
   {% endfor %}
 </div>
 {% else %}
-  <p>No keys.</p>
+  <p>You don't have any application keys.</p>
 {% endif %}
 {% endblock %}

@@ -18,6 +18,8 @@ urlpatterns = patterns('',
     (r'^torrent/exists/(?P<inst>.+)$', "lobber.share.torrent.exists"),
     (r'^torrent/scrape/(?P<inst>[0-9]+)\.([^\.]+)$', "lobber.share.torrent.scrape"),
     (r'^torrent/ihave/(?P<hash>.+)$', "lobber.share.torrent.ihave"),
+    (r'^torrent/idonthave/(?P<hash>.+)$', "lobber.share.torrent.idonthave"),
+    (r'^torrent/hazcount/(?P<hash>.+)$', "lobber.share.torrent.hazcount"),
     # Tagging.
     (r'^torrent/tags.json$', "lobber.share.tag.tag_usage"),
     (r'^torrent/tag/(?P<name>.+)\.([^\.]+)$', "lobber.share.tag.list_torrents_for_tag"),
@@ -34,6 +36,7 @@ urlpatterns = patterns('',
     (r'^key/(?P<key>.+)/constraint/remove/tag/(?P<tag>.+)$', "lobber.share.constraint.remove_tagconstraint"),
     # Keys
     (r'^key(?:\.[^\.]+)?$',"lobber.share.keys.keys"),
+    (r'^key/(?P<key>.+)/remove$',"lobber.share.keys.remove"),
     # The user.
     (r'^user/$',"lobber.share.users.user_self"),
     (r'^user/ace_subjects$',"lobber.share.users.ace_subjects"),

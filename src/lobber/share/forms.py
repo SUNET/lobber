@@ -1,6 +1,6 @@
 from django import forms
 from django.forms.widgets import CheckboxInput, CheckboxSelectMultiple,\
-    HiddenInput, TextInput
+    HiddenInput, TextInput, SelectMultiple, Textarea
 
 class UploadForm(forms.Form):
     description = forms.CharField(label="Description", widget=forms.Textarea)
@@ -17,10 +17,9 @@ class AddACEForm(forms.Form):
     permissions = forms.MultipleChoiceField(widget=CheckboxSelectMultiple,choices=[('r','read'),('w','write'),('d','delete')])
         
 class CreateKeyForm(forms.Form):
-    urlfilter = forms.CharField(label="URL filter", widget=forms.Textarea)
-    tagconstraints = forms.CharField(label="Tag constraints", widget=forms.Textarea)
-    entitlements = forms.CharField(label="Entitlements",widget=forms.Textarea)
-    expires = forms.DateTimeField(label="Expiration date")
+    entitlements = forms.MultipleChoiceField(label="Delegated entitlements",widget=SelectMultiple,required=False)
+    urlfilter = forms.CharField(label="URL filter", required=False,widget=Textarea(attrs={'rows':'4'}))
+    expires = forms.DateTimeField(label="Expiration date",required=False)
 
 class DataLocationForm(forms.Form):
     url = forms.URLField()

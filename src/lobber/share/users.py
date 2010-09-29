@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 
 from lobber.multiresponse import make_response_dict
 from lobber.settings import LOBBER_LOG_FILE
-from lobber.share.models import Torrent, UserProfile
+from lobber.share.models import Torrent, UserProfile, user_profile
 import lobber.log
 from lobber.multiresponse import json_response
 
@@ -73,7 +73,7 @@ def ace_subjects(req):
     term = req.GET['term']
     subjects = []
     if term:
-        profile = req.user.profile.get()
+        profile = user_profile(req.user)
         subjects = [{'label': "Members of %s" % (x),'value': x} for x in filter(lambda e: e.find(term) > -1,profile.get_entitlements())]
         if term.find('@') > -1:
             subjects.append({'label': "User '%s'" % (term),'value': "user:%s" % (term)})
@@ -83,3 +83,4 @@ def ace_subjects(req):
         subjects.append({'label': 'All users','value': ''})
         
     return json_response(subjects)
+    

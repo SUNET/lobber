@@ -2,7 +2,8 @@ import os
 import httplib
 from datetime import datetime as dt
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect,\
+    HttpResponseForbidden
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
@@ -16,7 +17,7 @@ from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL,
 from lobber.resource import Resource
 import lobber.log
 from lobber.share.forms import UploadForm
-from lobber.share.models import Torrent
+from lobber.share.models import Torrent, user_profile
 from lobber.notify import notifyJSON
 from django.utils.http import urlencode
 from django import forms
@@ -186,10 +187,30 @@ def torrentdict(request,t,forms=None):
 # External functions, called from urls.py.
 
 def ihave(request,hash):
+    profile = user_profile(request.user)
+    if not 'urn:x-lobber:storagenode' in profile.get_entitlements():
+        return HttpResponseForbidden("You are not permitted to announce data locations")
+    
     url = "torrent:%s" % hash
     for t in Torrent.objects.filter(hashval=hash):
         loc = DataLocation.objects.get_or_create(owner=request.user,url=url,torrent=t)
         loc.expires = time.time()+3600 ## TODO: This needs improvement
+    return json_response(url)
+        
+def idonthave(request,hash):
+    profile = user_profile(request.user)
+    if not 'urn:x-lobber:storagenode' in profile.get_entitlements():
+        return HttpResponseForbidden("You are not permitted to announce data locations")
+    
+    url = "torrent:%s" % hash
+    for loc in DataLocation.objects.filter(owner=request.user,url=url,torrent__hash=hash).all():
+        loc.delete()
+    return json_response(url)
+        
+def hazcount(request,hash):
+    url = "torrent:%s" % hash
+    count = DataLocation.objects.filter(url=url,torrent__hash=hash).count()
+    return json_response({'count': count})
     
 def welcome(req):
     return HttpResponseRedirect("/torrent/")
