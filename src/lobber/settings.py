@@ -114,7 +114,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'oauth_provider',
+    'django_evolution',
     'django_extensions',
     'lobber.extensions',
     'tagging',
