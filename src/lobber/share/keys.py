@@ -49,7 +49,7 @@ def keys(request):
         if form.is_valid():
             logger.info(form.cleaned_data['entitlements'])
             secret = create_key_user(request.user,
-                                     form.cleaned_data['urlfilter'] or "",
+                                     form.cleaned_data['urlfilter'] or "^.*$",
                                      "", #TODO: tagconstraints
                                      " ".join(form.cleaned_data['entitlements']),
                                      form.cleaned_data['expires'])

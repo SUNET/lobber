@@ -160,7 +160,11 @@ class DataLocation(models.Model):
     torrent = models.ForeignKey(Torrent)
     owner = models.ForeignKey(User)
     url = models.CharField(max_length=1024)
-    expires = models.DateTimeField(null=True,blank=True)
+    timecreated = models.DateTimeField(auto_now_add=True)
+    lastupdated = models.DateTimeField(auto_now=True)
+    
+    def __unicode__(self):
+        return '%s @ %s' % (self.torrent.name,self.url)
 
 class UserProfile(models.Model):
     """This is how we represent a key, as well as an ordinary user."""

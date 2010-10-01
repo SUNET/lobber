@@ -166,7 +166,7 @@ def _torrentlist(request, torrents):
                       {'text/html': 'share/index.html',
                        'application/rss+xml': 'share/rss2.xml',
                        'text/rss': 'share/rss2.xml',
-                       'application/json': json_response([{'label': t.name,'link': "/torrent/%d" % (t.id)} for t in torrents])},
+                       'application/json': json_response([{'label': t.name,'link': "/torrent/%d" % (t.id), 'info_hash': t.hashval} for t in torrents])},
                       {'torrents': torrents, 'title': 'Search result',
                        'description': 'Search result'})
 
@@ -194,7 +194,8 @@ def ihave(request,hash):
     url = "torrent:%s" % hash
     for t in Torrent.objects.filter(hashval=hash):
         loc = DataLocation.objects.get_or_create(owner=request.user,url=url,torrent=t)
-        loc.expires = time.time()+3600 ## TODO: This needs improvement
+        logger.warning(loc)
+        #loc.save()
     return json_response(url)
         
 def idonthave(request,hash):
@@ -209,7 +210,7 @@ def idonthave(request,hash):
         
 def hazcount(request,hash):
     url = "torrent:%s" % hash
-    count = DataLocation.objects.filter(url=url,torrent__hash=hash).count()
+    count = DataLocation.objects.filter(url=url,torrent__hashval=hash).count()
     return json_response({'count': count})
     
 def welcome(req):

@@ -23,7 +23,6 @@ class CreateKeyForm(forms.Form):
 
 class DataLocationForm(forms.Form):
     url = forms.URLField()
-    expires = forms.DateTimeField(label="Expiration date")
 
 def formdict():
     return {'permissions': AddACEForm()}
