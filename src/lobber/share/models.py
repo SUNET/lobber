@@ -8,6 +8,7 @@ from tagging.models import Tag
 from deluge.bencode import bdecode
 import os
 from lobber.notify import notifyJSON
+import shutil
 
 def _urlesc(s):
     r = ''
@@ -139,8 +140,12 @@ class Torrent(models.Model):
     def file(self):
         fn = '%s/%d.torrent' % (TORRENTS, self.id)
         if not os.path.exists(fn):
-            fn = '%s/%s.torrent' % (TORRENTS, self.hashval)
-            
+            for t in Torrent.objects.filter(hashval=self.hashval):
+                fnold = '%s/%s.torrent' % (TORRENTS, t.hashval)
+                fnnew = '%s/%d.torrent' % (TORRENTS, t.id)
+                shutil.copy(fnold, fnnew)
+            os.unlink('%s/%s.torrent' % (TORRENTS, self.hashval))
+                
         f = None
         try:
             f = file(fn)
