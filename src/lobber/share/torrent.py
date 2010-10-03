@@ -88,14 +88,14 @@ def _store_torrent(req, form):
                 description=form.cleaned_data['description'],
                 expiration_date=form.cleaned_data['expires'],
                 data='%s.torrent' % torrent_hash, # will change soon...
-                hashval=torrent_hash)    
+                hashval=torrent_hash)
     t.save()
     
-    name_on_disk = '%s/%s' % (TORRENTS, '%d.torrent' % t.id)
+    name_on_disk = '%s/%d.torrent' % (TORRENTS,t.id)
     f = file(name_on_disk, 'w')
     f.write(torrent_file_content)
     f.close()
-    t.data = '%d.torrent' % id
+    t.data = '%d.torrent' % t.id
     t.save()
     
     notifyJSON('/torrent/notify', {'add': [t.id,torrent_hash]})
