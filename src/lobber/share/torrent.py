@@ -74,10 +74,6 @@ def _store_torrent(req, form):
         datafile = file
     
     torrent_name, torrent_hash = _torrent_info(torrent_file_content)
-    name_on_disk = '%s/%s' % (TORRENTS, '%s.torrent' % torrent_hash)
-    f = file(name_on_disk, 'w')
-    f.write(torrent_file_content)
-    f.close()
 
     acl = []
     publicAccess = form.cleaned_data['publicAccess']
@@ -91,10 +87,18 @@ def _store_torrent(req, form):
                 name=torrent_name,
                 description=form.cleaned_data['description'],
                 expiration_date=form.cleaned_data['expires'],
-                data='%s.torrent' % torrent_hash,
-                hashval=torrent_hash)
+                data='%s.torrent' % torrent_hash, # will change soon...
+                hashval=torrent_hash)    
     t.save()
-    notifyJSON('/torrent/add', t.id)
+    
+    name_on_disk = '%s/%s' % (TORRENTS, '%d.torrent' % t.id)
+    f = file(name_on_disk, 'w')
+    f.write(torrent_file_content)
+    f.close()
+    t.data = '%d.torrent' % id
+    t.save()
+    
+    notifyJSON('/torrent/notify', {'add': [t.id,torrent_hash]})
     if datafile:
         dst = "%s%s%s" % (DROPBOX_DIR,os.pathsep,torrent_hash)
         os.mkdir(dst)

@@ -7,6 +7,7 @@ import tagging
 from tagging.models import Tag
 from deluge.bencode import bdecode
 import os
+from lobber.notify import notifyJSON
 
 def _urlesc(s):
     r = ''
@@ -154,7 +155,10 @@ class Torrent(models.Model):
     def remove(self):
         Tag.objects.update_tags(self,None)
         os.unlink(self.file().name)
-        self.delete();
+        id = self.id
+        hashval = self.hashval
+        self.delete()
+        notifyJSON("/torrent/notify",{'delete': [id,hashval]})
  
 class DataLocation(models.Model):
     torrent = models.ForeignKey(Torrent)
