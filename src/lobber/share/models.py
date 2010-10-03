@@ -136,7 +136,7 @@ class Torrent(models.Model):
                       Tag.objects.get_for_object(self))
 
     def file(self):
-        fn = '%s/%s.torrent' % (TORRENTS, self.hashval)
+        fn = '%s/%d.torrent' % (TORRENTS, self.id)
         f = None
         try:
             f = file(fn)
