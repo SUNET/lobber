@@ -138,6 +138,9 @@ class Torrent(models.Model):
 
     def file(self):
         fn = '%s/%d.torrent' % (TORRENTS, self.id)
+        if not os.path.exists(fn):
+            fn = '%s/%s.torrent' % (TORRENTS, self.hashval)
+            
         f = None
         try:
             f = file(fn)
