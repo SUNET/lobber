@@ -166,7 +166,7 @@ def _torrentlist(request, torrents):
                       {'text/html': 'share/index.html',
                        'application/rss+xml': 'share/rss2.xml',
                        'text/rss': 'share/rss2.xml',
-                       'application/json': json_response([{'label': t.name,'link': "/torrent/%d" % (t.id), 'info_hash': t.hashval} for t in torrents])},
+                       'application/json': json_response([{'label': t.name,'link': "/torrent/%d" % (t.id), 'id': t.id, 'info_hash': t.hashval} for t in torrents])},
                       {'torrents': torrents, 'title': 'Search result',
                        'description': 'Search result'})
 
