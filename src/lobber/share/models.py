@@ -166,7 +166,7 @@ class Torrent(models.Model):
         id = self.id
         hashval = self.hashval
         self.delete()
-        notifyJSON("/torrent/notify",{'delete': [id,hashval]})
+        notifyJSON("/torrents/notify",{'delete': [id,hashval]})
  
 class DataLocation(models.Model):
     torrent = models.ForeignKey(Torrent)

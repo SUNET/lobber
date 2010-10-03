@@ -98,16 +98,16 @@ def _store_torrent(req, form):
     t.data = '%d.torrent' % t.id
     t.save()
     
-    notifyJSON('/torrent/notify', {'add': [t.id,torrent_hash]})
+    notifyJSON('/torrents/notify', {'add': [t.id,torrent_hash]})
     if datafile:
         dst = "%s%s%s" % (DROPBOX_DIR,os.pathsep,torrent_hash)
         os.mkdir(dst)
         shutil.move(datafile, dst)
         rpc = urlparse(TRANSMISSION_RPC)
         tc = transmissionrpc.Client(address=rpc.hostname,
-                                        port=rpc.port,
-                                        user=rpc.username,
-                                        password=rpc.password)
+                                    port=rpc.port,
+                                    user=rpc.username,
+                                    password=rpc.password)
         tc.add_uri(name_on_disk,download_dir=dst)
     return t
     
