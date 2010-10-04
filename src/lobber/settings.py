@@ -29,7 +29,7 @@ DATABASE_PASSWORD = ''
 DATABASE_HOST = ''
 DATABASE_PORT = ''
 
-DROPBOX_DIR = '/var/lib/transmission/downloads'
+DROPBOX_DIR = '/tmp/dropbox'
 TRANSMISSION_RPC = 'http://transmission:transmission@localhost:9091'
 
 # Local time zone for this installation. Choices can be found here:

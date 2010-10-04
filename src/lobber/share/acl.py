@@ -5,7 +5,7 @@ from django.utils.html import escape
 
 from lobber.share.models import Torrent
 from django.core.exceptions import ObjectDoesNotExist
-from lobber.multiresponse import respond_to
+from lobber.multiresponse import respond_to, json_response
 from lobber.share.forms import AddACEForm
 from django.shortcuts import get_object_or_404
 from lobber.share.torrent import torrentdict
@@ -31,10 +31,7 @@ def valid_ace_p(ace):
 @login_required
 def add_ace(req, tid, ace):
     "Add ACE to ACL of torrent with id TID."
-    try:
-        t = Torrent.objects.get(id=int(tid))
-    except ObjectDoesNotExist:
-        return HttpResponse("Torrent with id %d not found." % int(tid), status=404)
+    t = get_object_or_404(Torrent,pk=int(tid))
 
     if not valid_ace_p(ace):
         return HttpResponse("invalid ace: %s" % escape(ace), status=400)
@@ -43,20 +40,20 @@ def add_ace(req, tid, ace):
         return HttpResponse("Permission denied.", status=403)
 
     t.save()
-    return HttpResponseRedirect("/torrent/%d/ace" % (t.id))
+    return respond_to(req,{'text/html': HttpResponseRedirect("/torrent/%d/ace" % (t.id)),
+                           'application/json': json_response(ace)})
 
 @login_required
 def remove_ace(req, tid, ace):
-    try:
-        t = Torrent.objects.get(id=int(tid))
-    except ObjectDoesNotExist:
-        return HttpResponse("Torrent with id %d not found." % int(tid), status=404)
+    "Remove ACE from ACL of torrent with id TID."
+    t = get_object_or_404(Torrent,pk=int(tid))
 
     if not t.remove_ace(req.user, ace):
         return HttpResponse("Permission denied.", status=403)
         
     t.save()
-    return HttpResponseRedirect("/torrent/%d/ace" % (t.id))
+    return respond_to(req,{'text/html': HttpResponseRedirect("/torrent/%d/ace" % (t.id)),
+                           'application/json': json_response(ace)})
 
 @login_required
 def edit(request,tid):

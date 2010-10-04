@@ -4,9 +4,10 @@ from django.forms.widgets import CheckboxInput, CheckboxSelectMultiple,\
 
 class UploadForm(forms.Form):
     description = forms.CharField(label="Description", widget=forms.Textarea)
-    expires = forms.DateTimeField(label="Expiration date")
-    file = forms.FileField(label="Torrent file")
+    expires = forms.DateTimeField(label="Expiration")
+    file = forms.FileField(label="Data")
     publicAccess = forms.BooleanField(required=False,label="Allow public access?")
+    acl = forms.HiddenInput()
     
 class ACLForm(forms.Form):
     acl = forms.MultipleChoiceField(label="Permissions")

@@ -3,7 +3,7 @@ import httplib
 from datetime import datetime as dt
 
 from django.http import HttpResponse, HttpResponseRedirect,\
-    HttpResponseForbidden
+    HttpResponseForbidden, HttpResponseServerError
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
@@ -22,13 +22,14 @@ from lobber.notify import notifyJSON
 from django.utils.http import urlencode
 from django import forms
 from lobber.share.forms import formdict
-from tempfile import TemporaryFile
+from tempfile import TemporaryFile, NamedTemporaryFile
 import shutil
 from urlparse import urlparse
 import transmissionrpc
 from lobber.share.forms import DataLocationForm
 from lobber.share.models import DataLocation
 import time
+import tempfile
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
@@ -67,11 +68,15 @@ def _store_torrent(req, form):
         torrent_file_content = ff.read()
         ff.close()
     else:
-        tmptf = TemporaryFile()
-        make_meta_file(ff.name,ANNOUNCE_URL, 2**18, comment=form.cleaned_data['description'], target=tmptf)
+        tmptf = NamedTemporaryFile(delete=False)
+        datafile = file("%s%s%s" % (tempfile.gettempdir(),os.sep,ff.name),"w")
+        datafile.write(ff.read())
+        datafile.close()
+        make_meta_file(datafile.name,ANNOUNCE_URL, 2**18, comment=form.cleaned_data['description'], target=tmptf.name)
         torrent_file_content = tmptf.read()
         tmptf.close()
-        datafile = file
+        ff.close()
+        os.unlink(tmptf.name)
     
     torrent_name, torrent_hash = _torrent_info(torrent_file_content)
 
@@ -100,15 +105,7 @@ def _store_torrent(req, form):
     
     notifyJSON('/torrents/notify', {'add': [t.id,torrent_hash]})
     if datafile:
-        dst = "%s%s%s" % (DROPBOX_DIR,os.pathsep,torrent_hash)
-        os.mkdir(dst)
-        shutil.move(datafile, dst)
-        rpc = urlparse(TRANSMISSION_RPC)
-        tc = transmissionrpc.Client(address=rpc.hostname,
-                                    port=rpc.port,
-                                    user=rpc.username,
-                                    password=rpc.password)
-        tc.add_uri(name_on_disk,download_dir=dst)
+        os.rename(datafile.name,"%s%s%s" % (DROPBOX_DIR,os.sep,torrent_name)) # must be same FS - performance would suck otherwize
     return t
     
 def _urlesc(s):
@@ -270,6 +267,24 @@ def exists(req, inst):
     except MultipleObjectsReturned:
         pass                            # Ok.
     return r;
+
+def add_torrent(request):
+    if request.method == 'POST':
+        form = UploadForm(request.POST, request.FILES)        
+        if form.is_valid():
+            t = _store_torrent(request, form)
+            if not t:
+                return HttpResponseServerError('error creating torrent')
+            _prefetch_existlink(t.hashval)
+            return respond_to(request,
+                              {'application/json': json_response(t.id),
+                               'text/html': HttpResponseRedirect("/torrent#%d" % t.id)})
+    else:
+        form = UploadForm()
+        
+    return respond_to(request,
+                      {'application/json': HttpResponseServerError("Invalid request"),
+                       'text/html': 'share/upload-torrent.html'},{'form': form})
 
 ## TODO: This class stuff wasn't so neat after all - refactor to regular methods checking for the method instead
 
