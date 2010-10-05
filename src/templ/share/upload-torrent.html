@@ -17,13 +17,13 @@ $(function() {
 </script>
 {% endblock %}
 {% block main %}
-<h1>Please upload a torrent file (.torrent)</h1>
+<h1>Please upload some data</h1>
 
 <form enctype="multipart/form-data" method="post" action="/torrent/add/">
   <div class="ui-widget infopanel">
-    <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;"> 
+    <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;"></span>
       <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
-        When creating the torrent file, the tracker announce URL must be: <br/> <code>{{ announce_url }}</p>
+        When using this form to upload a torrent file (.torrent), the tracker announce URL must be: <br/> <code>{{ announce_url }}</p>
     </div>
   </div>
 

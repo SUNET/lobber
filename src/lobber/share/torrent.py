@@ -13,22 +13,15 @@ from django.contrib.auth.models import User
 from tagging.models import Tag, TaggedItem
 
 from lobber.multiresponse import respond_to, make_response_dict, json_response
-from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE, TRACKER_ADDR, DROPBOX_DIR, TRANSMISSION_RPC
+from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE, TRACKER_ADDR, DROPBOX_DIR
 from lobber.resource import Resource
 import lobber.log
 from lobber.share.forms import UploadForm
 from lobber.share.models import Torrent, user_profile
 from lobber.notify import notifyJSON
-from django.utils.http import urlencode
-from django import forms
 from lobber.share.forms import formdict
-from tempfile import TemporaryFile, NamedTemporaryFile
-import shutil
-from urlparse import urlparse
-import transmissionrpc
-from lobber.share.forms import DataLocationForm
+from tempfile import NamedTemporaryFile
 from lobber.share.models import DataLocation
-import time
 import tempfile
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
