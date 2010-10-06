@@ -169,7 +169,7 @@ class Torrent(models.Model):
         notifyJSON("/torrents/notify",{'delete': [id,hashval]})
  
 class DataLocation(models.Model):
-    torrent = models.ForeignKey(Torrent)
+    hashval = models.CharField(max_length=40)
     owner = models.ForeignKey(User)
     url = models.CharField(max_length=1024)
     timecreated = models.DateTimeField(auto_now_add=True)

@@ -180,32 +180,52 @@ def torrentdict(request,t,forms=None):
 ####################
 # External functions, called from urls.py.
 
-def ihave(request,hash):
-    profile = user_profile(request.user)
-    if not 'urn:x-lobber:storagenode' in profile.get_entitlements():
-        return HttpResponseForbidden("You are not permitted to announce data locations")
+@login_required
+def ihaz(request,hash,url=None):
+    if url == None:
+        url = "torrent:%s" % hash
     
-    url = "torrent:%s" % hash
-    for t in Torrent.objects.filter(hashval=hash):
-        loc = DataLocation.objects.get_or_create(owner=request.user,url=url,torrent=t)
-        logger.warning(loc)
-        #loc.save()
+    DataLocation.objects.get_or_create(owner=request.user,url=url,hashval=hash)
+    
     return json_response(url)
         
-def idonthave(request,hash):
-    profile = user_profile(request.user)
-    if not 'urn:x-lobber:storagenode' in profile.get_entitlements():
-        return HttpResponseForbidden("You are not permitted to announce data locations")
-    
-    url = "torrent:%s" % hash
-    for loc in DataLocation.objects.filter(owner=request.user,url=url,torrent__hash=hash).all():
+@login_required
+def inohaz(request,hash,url=None):
+    if url == None:
+        url = "torrent:%s" % hash
+    for loc in DataLocation.objects.filter(owner=request.user,url=url,hashval=hash).all():
         loc.delete()
     return json_response(url)
+    
+def _locations(hash,entitlement,scheme):
+    locations = DataLocation.objects.filter(url__startswith=scheme,hashval=hash)
+    if entitlement != None:
+        locations = locations.filter(owner__profile__entitlements__contains=entitlement)
         
-def hazcount(request,hash):
-    url = "torrent:%s" % hash
-    count = DataLocation.objects.filter(url=url,torrent__hashval=hash).count()
+    return locations.all()
+    
+@login_required
+def hazcount(request,hash,entitlement=None,scheme="torrent"):
+    count = 0
+    for dl in _locations(hash,entitlement,scheme):
+        if entitlement != None:
+            owner_profile = user_profile(dl.owner)
+            if entitlement in owner_profile:
+                count = count+1
+        else:
+            count = count+1
     return json_response({'count': count})
+    
+@login_required
+def canhaz(request,hash,entitlement=None,scheme="http"):
+    urls = []
+    for dl in _locations(hash,entitlement,scheme):
+        if entitlement != None:
+            owner_profile = user_profile(dl.owner)
+            if entitlement in owner_profile:
+                urls.append(dl.url)
+        else:
+            urls.append(dl.url)
     
 def welcome(req):
     return HttpResponseRedirect("/torrent/")
