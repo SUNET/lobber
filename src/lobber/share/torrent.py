@@ -227,6 +227,8 @@ def canhaz(request,hash,entitlement=None,scheme="http"):
         else:
             urls.append(dl.url)
     
+    return json_response(urls)
+    
 def welcome(req):
     return HttpResponseRedirect("/torrent/")
 
