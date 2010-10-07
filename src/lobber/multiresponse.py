@@ -30,8 +30,9 @@ def timeAsrfc822 ( theTime ) :
     import rfc822
     return rfc822 . formatdate ( rfc822 . mktime_tz ( rfc822 . parsedate_tz ( theTime . strftime ( "%a, %d %b %Y %H:%M:%S" ) ) ) )
 
-def make_response_dict(request,d={}):
- 
+def make_response_dict(request,d_in={}):
+
+    d = d_in
     if request.user.is_authenticated():
         d['user'] = request.user
         profile = None
