@@ -12,8 +12,13 @@ register = template.Library()
 def userdisplay(u):
     display = user_profile(u).display_name
     if not display:
-        u, r = u.username.split('@')
-        display = '%s (at %s)' % (u, r)
+        r = None
+        try:
+            display, r = u.username.split('@')
+        except ValueError:
+            display = u.username
+        if r:
+            display = '%s (at %s)' % (display, r)
     if not display:
         display = "unknown user"
     return display
