@@ -25,6 +25,8 @@ class Torrent(models.Model):
     data = models.FileField(upload_to='.') # upload_to: directory in TORRENTS.
     hashval = models.CharField(max_length=40)
     acl = models.TextField()
+    
+    effective_rights = {}
 
     def __unicode__(self):
         return '%s (%d / %s) (acl=%s) (expire=%s)' % \
@@ -39,6 +41,12 @@ class Torrent(models.Model):
 
     def abs_url(self):
         return "%s%s" % (BASE_URL,self.url())
+
+    def compute_effective_rights(self,user):
+        for perm in ['r','w','d']:
+            if self.authz(user, perm):
+                self.effective_rights[perm] = True
+        return self
 
     def authz(self, user, perm):
         """Does USER have PERM on torrent?"""

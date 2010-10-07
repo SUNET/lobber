@@ -232,11 +232,13 @@ function removeit(id) {
             <li>
                <div class="scrape"></div>
             </li>
+            {% if t.effective_rights.w or t.effective_rights.d %}
             <li style="float: right;">
                <a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{t.id}}')">
                   <span class="ui-icon ui-icon-trash"></span>
                </a>
             </li>
+            {% endif %}
             <!-- li style="float: right;">
                <a class="tip" title="Modify tags for this torrent" href="/torrent/{{t.id}}/tags">
                	<span class="ui-icon ui-icon-star"></span>
