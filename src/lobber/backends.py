@@ -26,7 +26,7 @@ class RemoteUserBackend(ModelBackend):
     # Create a User object if not already in the database?
     create_unknown_user = True
 
-    def authenticate(self, remote_user):
+    def authenticate(self, remote_user, password=None):
         """
         The username passed as ``remote_user`` is considered trusted.  This
         method simply returns the ``User`` object with the given username,
