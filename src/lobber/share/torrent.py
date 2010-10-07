@@ -209,7 +209,7 @@ def hazcount(request,hash,entitlement=None,scheme="torrent"):
     for dl in _locations(hash,entitlement,scheme):
         if entitlement != None:
             owner_profile = user_profile(dl.owner)
-            if entitlement in owner_profile:
+            if entitlement in owner_profile.get_entitlements():
                 count = count+1
         else:
             count = count+1
@@ -220,7 +220,7 @@ def canhaz(request,hash,entitlement=None,scheme="http"):
     for dl in _locations(hash,entitlement,scheme):
         if entitlement != None:
             owner_profile = user_profile(dl.owner)
-            if entitlement in owner_profile:
+            if entitlement in owner_profile.get_entitlements():
                 urls.append(dl.url)
         else:
             urls.append(dl.url)
