@@ -240,17 +240,32 @@ def remove_torrent(request, tid):
                        'text/html': HttpResponseRedirect("/torrent")})
 
 #@login_required
-def scrape(request,hashorinst):
+def scrape(request,inst):
     t = None
     try:
-        t = Torrent.objects.get(id=hashorinst)
+        t = Torrent.objects.get(id=inst)
     except ObjectDoesNotExist:
-        try:
-            t = Torrent.objects.get(hashval=hashorinst)
-        except ObjectDoesNotExist:
-            return HttpResponseNotFound("No such torrent")
+        return HttpResponseNotFound("No such torrent")
     
     url = '/scrape/?info_hash='+t.eschash()
+    dict = {}
+    try:
+        c = httplib.HTTPConnection(TRACKER_ADDR)
+        c.request('GET', url)
+        txt = c.getresponse().read()
+        response = bdecode(txt)
+        dict = response['files'][t.hashval.decode('hex')]
+    except Exception,e:
+        pass
+    
+    return json_response(dict)
+
+def scrape_hash(request,hash):
+    t = Torrent.objects.filter(hashval=hash).first();
+    if t is None:
+        return HttpResponseNotFound("No such torrent")
+    
+    url = '/scrape/?info_hash='+_urlesc(hash)
     dict = {}
     try:
         c = httplib.HTTPConnection(TRACKER_ADDR)
