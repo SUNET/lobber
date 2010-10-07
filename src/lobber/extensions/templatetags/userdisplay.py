@@ -12,6 +12,8 @@ register = template.Library()
 def userdisplay(u):
     display = user_profile(u).display_name
     if not display:
+        display = u.username
+    if not display:
         display = "unknown user"
     return display
 
