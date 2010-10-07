@@ -10,7 +10,10 @@ from lobber.share.models import user_profile
 register = template.Library()
 
 def userdisplay(u):
-    return user_profile(u).display_name
+    display = user_profile(u).display_name
+    if not display:
+        display = "unknown user"
+    return display
 
 userdisplay.is_safe = True
 register.filter(userdisplay)
