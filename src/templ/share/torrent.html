@@ -2,6 +2,7 @@
 {% load explainace %}
 {% load datehumanize %}
 {% load metainfo %}
+{% load userdisplay %}
 {% block title %}Lobber: Modify Torrent{% endblock %}
 {% block js %}
 <script type="text/javascript">
@@ -73,25 +74,23 @@ $(function() {
 {{torrent.description}}
 </p>
 <div id="settings">
-   {% if write %}
-   <div id="general" class="ui-widget-content ui-corner-all altitem">
-      <h3 class="altheader">General</h3>
-      <div class="altcontent">
-      	
-      </div>
-   </div>
-   {% endif %}
    <div id="info" class="ui-widget-content ui-corner-all altitem">
    	  <h3 class="altheader">Information</h3>
    	  <div class="altcontent">
    	    <h4>Download status</h4>
    	  	<p id="scrape"></p>
+   	  	<h4>Name</h4>
+   	  	<p>{{torrent.meta_info.name}}</p>
+   	  	{% if torrent.meta_info.files %}
    	  	<h4>Files</h4>
    	  	<ul class="links">
    	  	{% for f in torrent.meta_info.files %}
    	  	   <li>{{f|metainfofile}}</li>
    	  	{% endfor %}
    	  	</ul>
+   	  	{% endif %}
+   	  	<h4>Creator</h4>
+   	  	<p>{{torrent.creator|userdisplay}}</p>
    	  </div>
    </div>
    {% if write %}
@@ -125,7 +124,34 @@ $(function() {
 			{% endfor %}
 			</table>
 		</div>
-		<form id="aclform" enctype="multipart/form-data" method="POST" action="/torrent/{{torrent.id}}/ace">
+
+		<br/>
+		<form id="aclform" class="cmxform" enctype="multipart/form-data" method="post" action="/torrent/{{torrent.id}}/ace">
+		  <fieldset class="ui-widget-content ui-corner-all infopanel">
+		      <legend>Add Permission</legend>
+		      <ol>
+		      {% for field in forms.permissions %}
+		      		{% if field.is_hidden %}
+		      		{{ field }}
+		      		{% else %}
+		        	<li><label for="id_{{ field.html_name }}">{{ field.label }}
+		        		{% if field.field.required %}<em>*</em>{% endif %}</label>
+		        		{{ field }}
+		        		{% if field.errors %}<em>{{field.errors}}</em>{% endif %}
+		        	</li>
+		        	{% endif %}
+		      {% endfor %}
+		      </ol>
+		  </fieldset>
+
+		  <br/>
+		  <div class="button">
+		    <input type="submit" value="Add Permission" />
+		    <input type="button" onClick="document.location='/torrent'" value="Cancel"/>
+		  </div>
+		</form>
+		
+		<!-- form id="aclform" enctype="multipart/form-data" method="POST" action="/torrent/{{torrent.id}}/ace">
 		  <div style="margin-top: 20px;">
 		    <table>
 		      {% for field in forms.permissions %}
@@ -148,7 +174,7 @@ $(function() {
 		    <input type="submit" value="Save Changes" />
 			<input type="button" onClick="document.location='/torrent'" value="Cancel"/>
 		  </div>
-		</form>
+		</form -->
 	</div>
    </div>
    {% endif %}
