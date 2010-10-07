@@ -204,7 +204,6 @@ def _locations(hash,entitlement,scheme):
         
     return locations.all()
     
-@login_required
 def hazcount(request,hash,entitlement=None,scheme="torrent"):
     count = 0
     for dl in _locations(hash,entitlement,scheme):
@@ -216,7 +215,6 @@ def hazcount(request,hash,entitlement=None,scheme="torrent"):
             count = count+1
     return json_response({'count': count})
     
-@login_required
 def canhaz(request,hash,entitlement=None,scheme="http"):
     urls = []
     for dl in _locations(hash,entitlement,scheme):
@@ -266,7 +264,7 @@ def upload_jnlp(req):
     d = {'sessionid': req.session.session_key,
          'announce_url': ANNOUNCE_URL,
          'baseurl': BASE_UI_URL,
-         'apiurl': '%s/torrent/add/' % NORDUSHARE_URL} # ==> upload_form() via urls.py.
+         'apiurl': NORDUSHARE_URL} # ==> upload_form() via urls.py.
     return render_to_response('share/launch.jnlp', d,
                               mimetype='application/x-java-jnlp-file')
 
