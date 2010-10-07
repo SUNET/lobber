@@ -261,9 +261,10 @@ def scrape(request,inst):
     return json_response(dict)
 
 def scrape_hash(request,hash):
-    t = Torrent.objects.filter(hashval=hash).first();
-    if t is None:
+    qst = Torrent.objects.filter(hashval=hash);
+    if not qst:
         return HttpResponseNotFound("No such torrent")
+    t = qst[0]
     
     url = '/scrape/?info_hash='+_urlesc(hash)
     dict = {}
