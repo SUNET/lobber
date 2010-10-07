@@ -18,7 +18,7 @@ urlpatterns = patterns('',
     (r'^torrent/(?P<inst>[0-9]+)(?:\.([^\.]+))?$', "lobber.share.torrent.TorrentView"),
     (r'^torrent/(?P<inst>.+)\.torrent$', "lobber.share.torrent.torrent_by_hashval"),
     (r'^torrent/exists/(?P<inst>.+)$', "lobber.share.torrent.exists"),
-    (r'^torrent/scrape/(?P<inst>[0-9]+)\.([^\.]+)$', "lobber.share.torrent.scrape"),
+    (r'^torrent/scrape/(?P<hashorinst>[^\.]+)\.([^\.]+)$', "lobber.share.torrent.scrape"),
     # lolcat voldb
     (r'^torrent/ihaz/(?P<hash>[^\/]+)$', "lobber.share.torrent.ihaz"),
     (r'^torrent/ihaz/(?P<hash>[^\/]+)/(?P<url>)$', "lobber.share.torrent.ihaz"),

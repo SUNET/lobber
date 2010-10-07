@@ -3,7 +3,7 @@ import httplib
 from datetime import datetime as dt
 
 from django.http import HttpResponse, HttpResponseRedirect,\
-    HttpResponseForbidden, HttpResponseServerError
+    HttpResponseForbidden, HttpResponseServerError, HttpResponseNotFound
 from django.shortcuts import render_to_response, get_object_or_404
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
@@ -239,13 +239,16 @@ def remove_torrent(request, tid):
                       {'application/json': json_response(tid),
                        'text/html': HttpResponseRedirect("/torrent")})
 
-@login_required
-def scrape(request,inst):
+#@login_required
+def scrape(request,hashorinst):
     t = None
     try:
-        t = Torrent.objects.get(id=inst)
+        t = Torrent.objects.get(id=hashorinst)
     except ObjectDoesNotExist:
-        return None
+        try:
+            t = Torrent.objects.get(hashval=hashorinst)
+        except ObjectDoesNotExist:
+            return HttpResponseNotFound("No such torrent")
     
     url = '/scrape/?info_hash='+t.eschash()
     dict = {}
