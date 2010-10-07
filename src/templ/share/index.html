@@ -120,7 +120,7 @@ $(function() {
 			buttons: {
 				'Remove torrent': function() {
 					$.getJSON($("#remove-torrent-dialog form").attr('action'),function(data) {
-					   $("#"+data).detach(); // works better than remove which breaks the accordion
+					   $("#"+data).empty(); // works better than remove which breaks the accordion
 					});
 					$(this).dialog('close');
 				},
@@ -159,7 +159,7 @@ function removeit(id) {
 {% block main %}
 <div class="button">
   <a id="launch-dlmanager" href="javascript:void(0);">Upload using Java Web Start</a>
-  <a href="/torrent/add/">Upload using your Browser</a>
+  <a href="/torrent/add">Upload using your Browser</a>
 </div>
 
 <div id="share-link-dialog" class="modal-dialog" title="Share this data">
