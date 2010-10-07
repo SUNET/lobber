@@ -234,6 +234,10 @@ def welcome(req):
 @login_required
 def remove_torrent(request, tid):
     t = get_object_or_404(Torrent,pk=tid)
+    
+    if not t.authz(request.user,'d'):
+        return HttpResponseForbidden("Your are not allowed to remove this torrent")
+    
     t.remove()
     return respond_to(request,
                       {'application/json': json_response(tid),
