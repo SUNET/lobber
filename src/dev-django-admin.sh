@@ -7,4 +7,6 @@ else
     dir=`pwd`
 fi
 
-django-admin shell --settings=lobber.settings --pythonpath=${dir} $*
+DJANGO_SETTINGS_MODULE=lobber.settings; export DJANGO_SETTINGS_MODULE
+
+env PYTHONPATH=${dir}:$PYTHONPATH django-admin $*
