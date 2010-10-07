@@ -176,7 +176,7 @@ class DataLocation(models.Model):
     lastupdated = models.DateTimeField(auto_now=True)
     
     def __unicode__(self):
-        return '%s @ %s' % (self.torrent.name,self.url)
+        return '%s @ %s' % (self.hashval,self.url)
 
 class UserProfile(models.Model):
     """This is how we represent a key, as well as an ordinary user."""
