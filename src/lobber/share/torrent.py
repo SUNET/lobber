@@ -23,6 +23,7 @@ from lobber.share.forms import formdict
 from tempfile import NamedTemporaryFile
 from lobber.share.models import DataLocation
 import tempfile
+from pprint import pprint
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
@@ -199,8 +200,8 @@ def inohaz(request,hash,url=None):
     
 def _locations(hash,entitlement,scheme):
     locations = DataLocation.objects.filter(url__startswith=scheme,hashval=hash)
-    if entitlement != None:
-        locations = locations.filter(owner__profile__entitlements__contains=entitlement)
+    #if entitlement != None:
+    #    locations = locations.filter(owner__profile__entitlements__contains=entitlement)
         
     return locations.all()
     
