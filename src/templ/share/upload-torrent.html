@@ -4,44 +4,40 @@
 <script type="text/javascript">
 $(function() {
 	$("#id_expires").datepicker({'dateFormat': 'yy-mm-dd', minDate: "+1D"});
-	/*
-	$.getJSON("/ace/suggest",function (data) {
-	    var acl = $("#id_acl");
-		$.each(data,function (pos,elt) {
-			acl.append($("<option></option>").attr("value",elt[0]).text(elt[1])); 
-		});
-		acl.multiselect2side({selectedPosition: 'right', moveOptions: false});
-	});
-	*/
+    var max = 0;
+    $("label").each(function(){
+        if ($(this).width() > max)
+            max = $(this).width();   
+    });
+    $("label").width(max);
 });
 </script>
 {% endblock %}
 {% block main %}
 <h1>Please upload some data</h1>
-
-<form enctype="multipart/form-data" method="post" action="/torrent/add/">
-  <div class="ui-widget infopanel">
+<div class="ui-widget infopanel">
     <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;"></span>
       <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
         When using this form to upload a torrent file (.torrent), the tracker announce URL must be: <br/> <code>{{ announce_url }}</p>
     </div>
   </div>
-
-  <div class="ui-widget-content ui-corner-all infopanel" style="margin-top: 20px;">
-    <table>
+<form class="cmxform" enctype="multipart/form-data" method="post" action="/torrent/add/">
+  <fieldset class="ui-widget-content ui-corner-all infopanel">
+      <legend>Describe your upload</legend>
+      <ol>
       {% for field in form %}
-        <tr>
-          {% if field.errors %}
-            <td colspan="2">{{ field.errors }}</td>
-          {% endif %}
-        </tr>
-        <tr>
-          <td>{{ field.label_tag }}</td>
-	  <td><div class="ui-widget">{{ field }}</div></td>
-        </tr>
+      		{% if field.is_hidden %}
+      		{{ field }}
+      		{% else %}
+        	<li><label for="id_{{ field.html_name }}">{{ field.label }}
+        		{% if field.field.required %}<em>*</em>{% endif %}</label>
+        		{{ field }}
+        		{% if field.errors %}<em>{{field.errors}}</em>{% endif %}
+        	</li>
+        	{% endif %}
       {% endfor %}
-    </table>
-  </div>
+      </ol>
+  </fieldset>
 
   <br/>
   <div class="button">

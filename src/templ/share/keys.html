@@ -29,25 +29,27 @@ $(function() {
 
 {% block main %}
 <h1>Application Keys</h1>
-<form enctype="multipart/form-data" method="post">
-  <div class="ui-widget-content ui-corner-all infopanel" style="margin-top: 20px;">
-    <table>
+<form class="cmxform" enctype="multipart/form-data" method="post">
+  <fieldset class="ui-widget-content ui-corner-all infopanel">
+      <legend>Create a new key</legend>
+      <ol>
       {% for field in form %}
-        <tr>
-          {% if field.errors %}
-            <td colspan="2">{{ field.errors }}</td>
-          {% endif %}
-        </tr>
-        <tr>
-          <td>{{ field.label_tag }}</td>
-	  <td><div class="ui-widget">{{ field }}</div></td>
-        </tr>
+      		{% if field.is_hidden %}
+      		{{ field }}
+      		{% else %}
+        	<li><label for="id_{{ field.html_name }}">{{ field.label }}
+        		{% if field.field.required %}<em>*</em>{% endif %}</label>
+        		{{ field }}
+        		{% if field.errors %}<em>{{field.errors}}</em>{% endif %}
+        	</li>
+        	{% endif %}
       {% endfor %}
-    </table>
-  </div>
+      </ol>
+  </fieldset>
+
   <br/>
   <div class="button">
-    <input type="submit" value="Create key" />
+    <input type="submit" value="Create Key" />
     <input type="button" onClick="document.location='/torrent'" value="Cancel"/>
   </div>
 </form>

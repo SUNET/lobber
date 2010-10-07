@@ -3,7 +3,7 @@ from django.forms.widgets import CheckboxInput, CheckboxSelectMultiple,\
     HiddenInput, TextInput, SelectMultiple, Textarea
 
 class UploadForm(forms.Form):
-    description = forms.CharField(label="Description", widget=forms.Textarea)
+    description = forms.CharField(label="Description", widget=forms.Textarea,required=False)
     expires = forms.DateTimeField(label="Expiration")
     file = forms.FileField(label="Data")
     publicAccess = forms.BooleanField(required=False,label="Allow public access?")
@@ -18,7 +18,7 @@ class AddACEForm(forms.Form):
     permissions = forms.MultipleChoiceField(widget=CheckboxSelectMultiple,choices=[('r','read'),('w','write'),('d','delete')])
         
 class CreateKeyForm(forms.Form):
-    entitlements = forms.MultipleChoiceField(label="Delegated entitlements",widget=SelectMultiple,required=False)
+    entitlements = forms.MultipleChoiceField(label="Entitlements",widget=SelectMultiple,required=False)
     urlfilter = forms.CharField(label="URL filter", required=False,widget=Textarea(attrs={'rows':'4'}))
     expires = forms.DateTimeField(label="Expiration date",required=False)
 
