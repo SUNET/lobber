@@ -1,1 +1,3 @@
-env PYTHONPATH=`pwd`:$PHTHONPATH DJANGO_SETTINGS_MODULE=lobber.settings django-admin $*
+#! /bin/sh
+
+django-admin shell --settings=lobber.settings --pythonpath=`pwd` $*
