@@ -235,7 +235,7 @@ def welcome(req):
 def remove_torrent(request, tid):
     t = get_object_or_404(Torrent,pk=tid)
     
-    if not t.authz(request.user,'d'):
+    if not t.authz(request.user,'d') and not t.authz(request.user,'w'):
         return HttpResponseForbidden("Your are not allowed to remove this torrent")
     
     t.remove()
