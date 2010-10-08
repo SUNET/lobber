@@ -2,14 +2,16 @@ from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 # http://docs.djangoproject.com/en/dev/topics/auth/#module-django.contrib.auth
 from django.contrib.auth.models import User
-from lobber.settings import TORRENTS,BASE_URL
+from lobber.settings import TORRENTS,BASE_URL, LOBBER_LOG_FILE
 import tagging
 from tagging.models import Tag
 from deluge.bencode import bdecode
 import os
 from lobber.notify import notifyJSON
 import shutil
-from pprint import pprint
+import lobber.log
+
+logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 def _urlesc(s):
     r = ''
@@ -68,13 +70,13 @@ class Torrent(models.Model):
                 #print 'DEBUG: tag constraints not ok for %s with tag constraints %s, seeking #%c for torrrent %s' % (user, profile.tagconstraints, perm, self)
                 return False
 
-        pprint("authz %s %s" % (user.username,perm))
+        logger.info("authz %s %s" % (user.username,perm))
         for ace in self.acl.split():
             ace_user, ace_perm = ace.split('#')
-            pprint("%s %s" % (ace_user,ace_perm))
+            logger.info("%s %s" % (ace_user,ace_perm))
             #print 'DEBUG: ace_user: %s, ace_perm: %s, usernames: %s' % (ace_user, ace_perm, usernames)
             for username in usernames:
-                pprint("%s" % username)
+                logger.info("%s" % username)
                 if ace_user == username and ace_perm == perm:
                     return True
                 if username.startswith('user:%s:' % user.username) and ace_perm == perm:
