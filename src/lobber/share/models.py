@@ -79,7 +79,7 @@ class Torrent(models.Model):
                 return False
 
         for ace in self.acl.split():
-            ace_user, ace_perm = ace.split('#')
+            (ace_user,hash,ace_perm) = ace.rpartition('#')
             if ace_perm == perm:
                 for entitlement in entitlements:
                     if not ace_user or ace_user == entitlement or ace_user.startswith('user:%s:' % user.username):
