@@ -65,11 +65,40 @@ $(function() {
 	      namePrefix: 'tags'
 	   });
 	}); 
+	$("#remove-torrent-dialog").dialog({
+			autoOpen: false,
+			resizable: false,
+			height: 160,
+			modal: true,
+			buttons: {
+				'Remove torrent': function() {
+					$.getJSON($("#remove-torrent-dialog form").attr('action'));
+					$(this).dialog('close');
+				},
+				'Cancel': function() {
+					$(this).dialog('close');
+				}
+			}
+	});
 });
+function removeit(id) {
+   $('#remove-torrent-dialog form').attr('action','/torrent/remove/'+id);
+   $('#remove-torrent-dialog').dialog('open');
+}
 </script>
 {% endblock %}
 {% block main %}
-<h1>{{torrent.name}} - created {{torrent.creation_date|datehumanize}}</h1>
+<div id="remove-torrent-dialog" class="modal-dialog" title="Really remove this torrent?">
+    <form action="">
+		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
+			This torrent will be permanently deleted and cannot be recovered. Are you sure?</p>
+	</form>
+</div>
+<h1>{{torrent.name}} - created {{torrent.creation_date|datehumanize}}
+	<a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{torrent.id}}')">
+       <span class="ui-icon ui-icon-trash"></span>
+    </a>
+</h1>
 <p>
 {{torrent.description}}
 </p>
@@ -93,7 +122,7 @@ $(function() {
    	  	<p>{{torrent.creator|userdisplay}}</p>
    	  </div>
    </div>
-   {% if write %}
+   {% if torrent.effective_rights.w %}
    <div id="tags" class="ui-widget-content ui-corner-all altitem">
       <h3 class="altheader">Tags</h3>
       <div class="altcontent">
@@ -110,7 +139,7 @@ $(function() {
       </div>
    </div>
    {% endif %}
-   {% if write and forms.permissions %}
+   {% if torrent.effective_rights.w and forms.permissions %}
    <div id="permissions" class="ui-widget-content ui-corner-all altitem">
 	<h3 class="altheader">Permissions</h3>
 	<div class="altcontent">
