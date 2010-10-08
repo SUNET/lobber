@@ -58,6 +58,7 @@ class Torrent(models.Model):
             pass
         if profile:
             usernames += profile.entitlements.split()
+            
             tagconstraintsok_flag = True
             if profile.tagconstraints:
                 tagconstraintsok_flag = False
@@ -74,11 +75,17 @@ class Torrent(models.Model):
             ace_user, ace_perm = ace.split('#')
             #print 'DEBUG: ace_user: %s, ace_perm: %s, usernames: %s' % (ace_user, ace_perm, usernames)
             for username in usernames:
-                if not ace_user or ace_user.startswith(username):
-                    if ace_perm == 'w': # Write permission == all.
-                        return True
-                    if ace_perm == '%c' % perm:
-                        return True
+                if ace_user == username and ace_perm == perm:
+                    return True
+                if username.startswith('user:%s:' % user.username) and ace_perm == perm:
+                    return True
+                if not ace_user and ace_perm == perm:
+                    return True
+                #if not ace_user or ace_user.startswith(username):
+                #    if ace_perm == 'w': # Write permission == all.
+                #        return True
+                #    if ace_perm == '%c' % perm:
+                #        return True
         #print 'DEBUG: perm %s denied for %s on %s' % (perm, user, self)
         return False
     
