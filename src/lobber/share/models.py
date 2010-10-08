@@ -9,6 +9,7 @@ from deluge.bencode import bdecode
 import os
 from lobber.notify import notifyJSON
 import shutil
+from pprint import pprint
 
 def _urlesc(s):
     r = ''
@@ -51,13 +52,9 @@ class Torrent(models.Model):
     def authz(self, user, perm):
         """Does USER have PERM on torrent?"""
         usernames = ['user:%s' % user.username]
-        profile = None
-        try:
-            profile = user.profile.get()
-        except ObjectDoesNotExist:
-            pass
+        profile = user_profile(user)
         if profile:
-            usernames += profile.entitlements.split()
+            usernames += profile.get_entitlements()
             
             tagconstraintsok_flag = True
             if profile.tagconstraints:
@@ -71,10 +68,13 @@ class Torrent(models.Model):
                 #print 'DEBUG: tag constraints not ok for %s with tag constraints %s, seeking #%c for torrrent %s' % (user, profile.tagconstraints, perm, self)
                 return False
 
+        pprint("authz %s %s" % (user.username,perm))
         for ace in self.acl.split():
             ace_user, ace_perm = ace.split('#')
+            pprint("%s %s" % (ace_user,ace_perm))
             #print 'DEBUG: ace_user: %s, ace_perm: %s, usernames: %s' % (ace_user, ace_perm, usernames)
             for username in usernames:
+                pprint("%s" % username)
                 if ace_user == username and ace_perm == perm:
                     return True
                 if username.startswith('user:%s:' % user.username) and ace_perm == perm:

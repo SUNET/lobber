@@ -122,7 +122,7 @@ function removeit(id) {
    	  	<p>{{torrent.creator|userdisplay}}</p>
    	  </div>
    </div>
-   {% if torrent.effective_rights.w %}
+   {% if torrent.effective_rights.user.w %}
    <div id="tags" class="ui-widget-content ui-corner-all altitem">
       <h3 class="altheader">Tags</h3>
       <div class="altcontent">
@@ -179,31 +179,6 @@ function removeit(id) {
 		    <input type="button" onClick="document.location='/torrent'" value="Cancel"/>
 		  </div>
 		</form>
-		
-		<!-- form id="aclform" enctype="multipart/form-data" method="POST" action="/torrent/{{torrent.id}}/ace">
-		  <div style="margin-top: 20px;">
-		    <table>
-		      {% for field in forms.permissions %}
-		        <tr>
-			      <td>
-			          {% if not field.is_hidden %}
-			          <div class="ui-widget fieldlabel">{{ field.label_tag }}</div>
-			          {% endif %}
-			          {% if field.errors %}
-			          <div class="ui-widget ui-state-error">{{ field.errors }}</div>
-			          {% endif %}
-			          <div class="ui-widget">{{ field }}</div>
-			      </td>
-				</tr>
-		      {% endfor %}
-		    </table>
-		  </div>
-		  <br/>
-		  <div class="button">
-		    <input type="submit" value="Save Changes" />
-			<input type="button" onClick="document.location='/torrent'" value="Cancel"/>
-		  </div>
-		</form -->
 	</div>
    </div>
    {% endif %}
