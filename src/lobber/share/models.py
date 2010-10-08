@@ -46,12 +46,9 @@ class Torrent(models.Model):
         return "%s%s" % (BASE_URL,self.url())
 
     def compute_effective_rights(self,user):
-        logger.info("commpute effective rights %s for %s" % (user,self))
         for perm in ['r','w','d']:
             if self.authz(user, perm):
                 self.effective_rights[perm] = True
-        
-        logger.info(";".join(self.effective_rights.keys()))
         return self
 
     def authz(self, user, perm):
@@ -77,19 +74,12 @@ class Torrent(models.Model):
             ace_user, ace_perm = ace.split('#')
             if ace_perm == perm:
                 for entitlement in entitlements:
-                    logger.info("can %s do %s on %s by asserting %s =? %s " % (user,perm,self,entitlement,ace_user))
                     if not ace_user:
                         return True
                     if ace_user == entitlement:
                         return True
                     if entitlement.startswith('user:%s:' % user.username):
                         return True
-                #if not ace_user or ace_user.startswith(username):
-                #    if ace_perm == 'w': # Write permission == all.
-                #        return True
-                #    if ace_perm == '%c' % perm:
-                #        return True
-        #print 'DEBUG: perm %s denied for %s on %s' % (perm, user, self)
         return False
     
     def authz_tag(self, user, perm, tag):
