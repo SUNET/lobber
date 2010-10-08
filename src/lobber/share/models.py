@@ -73,10 +73,10 @@ class Torrent(models.Model):
         logger.info("authz %s %s" % (user.username,perm))
         for ace in self.acl.split():
             ace_user, ace_perm = ace.split('#')
-            logger.info("%s %s" % (ace_user,ace_perm))
+            logger.info("\t -> %s %s" % (ace_user,ace_perm))
             #print 'DEBUG: ace_user: %s, ace_perm: %s, usernames: %s' % (ace_user, ace_perm, usernames)
             for username in usernames:
-                logger.info("%s" % username)
+                logger.info("\t\tentitlement: %s" % username)
                 if ace_user == username and ace_perm == perm:
                     return True
                 if username.startswith('user:%s:' % user.username) and ace_perm == perm:
