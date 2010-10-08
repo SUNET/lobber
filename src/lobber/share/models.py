@@ -51,7 +51,7 @@ class Torrent(models.Model):
             if self.authz(user, perm):
                 self.effective_rights[perm] = True
         
-        logger.info(";".join(self.effective_rights[perm].keys()))
+        logger.info(";".join(self.effective_rights.keys()))
         return self
 
     def authz(self, user, perm):
