@@ -70,7 +70,7 @@ class Torrent(models.Model):
                 #print 'DEBUG: tag constraints not ok for %s with tag constraints %s, seeking #%c for torrrent %s' % (user, profile.tagconstraints, perm, self)
                 return False
 
-        logger.info("authz %s %s" % (user.username,perm))
+        logger.info("authz %s %s %s" % (self,user.username,perm))
         for ace in self.acl.split():
             ace_user, ace_perm = ace.split('#')
             logger.info("\t -> %s %s" % (ace_user,ace_perm))
