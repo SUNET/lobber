@@ -74,7 +74,7 @@ class Torrent(models.Model):
             ace_user, ace_perm = ace.split('#')
             #print 'DEBUG: ace_user: %s, ace_perm: %s, usernames: %s' % (ace_user, ace_perm, usernames)
             for username in usernames:
-                logger.info("can %s do %s on %s by asserting =? %s " % (user,ace_perm,self,username,ace_user))
+                logger.info("can %s do %s on %s by asserting %s =? %s " % (user,ace_perm,self,username,ace_user))
                 if ace_user == username and ace_perm == perm:
                     return True
                 if username.startswith('user:%s:' % user.username) and ace_perm == perm:
