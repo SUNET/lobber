@@ -53,10 +53,10 @@ class Torrent(models.Model):
 
     def authz(self, user, perm):
         """Does USER have PERM on torrent?"""
-        usernames = ['user:%s' % user.username]
+        entitlements = ['user:%s' % user.username]
         profile = user_profile(user)
         if profile:
-            usernames += profile.get_entitlements()
+            entitlements += profile.get_entitlements()
             
             tagconstraintsok_flag = True
             if profile.tagconstraints:
@@ -72,15 +72,15 @@ class Torrent(models.Model):
 
         for ace in self.acl.split():
             ace_user, ace_perm = ace.split('#')
-            #print 'DEBUG: ace_user: %s, ace_perm: %s, usernames: %s' % (ace_user, ace_perm, usernames)
-            for username in usernames:
-                logger.info("can %s do %s on %s by asserting %s =? %s " % (user,ace_perm,self,username,ace_user))
-                if ace_user == username and ace_perm == perm:
-                    return True
-                if username.startswith('user:%s:' % user.username) and ace_perm == perm:
-                    return True
-                if not ace_user and ace_perm == perm:
-                    return True
+            if ace_perm == perm:
+                for entitlement in entitlements:
+                    logger.info("can %s do %s on %s by asserting %s =? %s " % (user,perm,self,entitlement,ace_user))
+                    if ace_user == entitlement:
+                        return True
+                    if entitlement.startswith('user:%s:' % user.username):
+                        return True
+                    if not ace_user:
+                        return True
                 #if not ace_user or ace_user.startswith(username):
                 #    if ace_perm == 'w': # Write permission == all.
                 #        return True
