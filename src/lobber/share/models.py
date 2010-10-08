@@ -29,7 +29,7 @@ class Torrent(models.Model):
     hashval = models.CharField(max_length=40)
     acl = models.TextField()
     
-    effective_rights = {}
+    effective_rights = None
 
     def __unicode__(self):
         return '%s (%d / %s) (acl=%s) (expire=%s)' % \
@@ -46,6 +46,7 @@ class Torrent(models.Model):
         return "%s%s" % (BASE_URL,self.url())
 
     def compute_effective_rights(self,user):
+        self.effective_rights = {}
         for perm in ['r','w','d']:
             if self.authz_i(user, perm):
                 self.effective_rights[perm] = True
