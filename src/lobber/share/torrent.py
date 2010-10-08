@@ -145,7 +145,7 @@ def find_torrents(user, args, max=40):
                     break
                 q = TaggedItem.objects.get_by_model(q, tag)
         
-    return [ t.compute_effective_rights(user) for t in filter(lambda t: t.authz(user, 'r'), q)[:max]]
+    return [ x.compute_effective_rights(user) for x in filter(lambda t: t.authz(user, 'r'), q)[:max]]
     
 
 def _torrent_file_response(dict):
