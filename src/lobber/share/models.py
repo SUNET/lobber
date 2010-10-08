@@ -82,11 +82,7 @@ class Torrent(models.Model):
             ace_user, ace_perm = ace.split('#')
             if ace_perm == perm:
                 for entitlement in entitlements:
-                    if not ace_user:
-                        return True
-                    if ace_user == entitlement:
-                        return True
-                    if entitlement.startswith('user:%s:' % user.username):
+                    if not ace_user or ace_user == entitlement or ace_user.startswith('user:%s:' % user.username):
                         return True
         return False
     
