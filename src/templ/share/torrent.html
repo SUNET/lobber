@@ -95,7 +95,7 @@ function removeit(id) {
 	</form>
 </div>
 <h1>{{torrent.name}} - created {{torrent.creation_date|datehumanize}}
-	{% if torrent.effective_rights.user.w or torrent.effective_rights.user.d %}
+	{% if torrent.effective_rights.w or torrent.effective_rights.d %}
 	<a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{torrent.id}}')">
        <span class="ui-icon ui-icon-trash"></span>
     </a>
@@ -124,7 +124,7 @@ function removeit(id) {
    	  	<p>{{torrent.creator|userdisplay}}</p>
    	  </div>
    </div>
-   {% if torrent.effective_rights.user.w %}
+   {% if torrent.effective_rights.w %}
    <div id="tags" class="ui-widget-content ui-corner-all altitem">
       <h3 class="altheader">Tags</h3>
       <div class="altcontent">
