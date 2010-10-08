@@ -177,7 +177,11 @@ class Torrent(models.Model):
     
     def remove(self):
         Tag.objects.update_tags(self,None)
-        os.unlink(self.file().name)
+        try:
+            os.unlink(self.file().name)
+        except IOError, e:
+            if e[0] == 2:               # ENOENT
+                pass            
         id = self.id
         hashval = self.hashval
         self.delete()
