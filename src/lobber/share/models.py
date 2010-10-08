@@ -49,10 +49,9 @@ class Torrent(models.Model):
         logger.info("commpute effective rights %s for %s" % (user,self))
         for perm in ['r','w','d']:
             if self.authz(user, perm):
-                logger.info("-------------------------------------- YES")
                 self.effective_rights[perm] = True
         
-        logger.info(";".join(self.effective_rights[perm].values()))
+        logger.info(";".join(self.effective_rights[perm].keys()))
         return self
 
     def authz(self, user, perm):
