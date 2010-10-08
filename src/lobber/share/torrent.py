@@ -369,7 +369,7 @@ class TorrentView(TorrentViewBase):
         if not inst:
             return _torrentlist(request, find_torrents(request.user, request.GET.lists()))
         
-        t = get_object_or_404(Torrent,pk=inst)
+        t = get_object_or_404(Torrent,pk=inst).compute_effective_rights(request.user)
         d = torrentdict(request, t)
         return respond_to(request,
                           {'text/html': 'share/torrent.html',
@@ -385,6 +385,8 @@ def torrent_by_hashval(request, inst):
     except MultipleObjectsReturned:
         return _torrentlist(request,
                             Torrent.objects.filter(hashval=inst).order_by('-creation_date'))
+        
+    t = t.compute_effective_rights(request.user)
     return respond_to(request,
                       {'text/html': 'share/torrent.html',
                        'application/x-bittorrent': _torrent_file_response},
