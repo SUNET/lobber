@@ -63,7 +63,10 @@ def _store_torrent(req, form):
         ff.close()
     else:
         tmptf = NamedTemporaryFile(delete=False)
-        datafile = file("%s%s%s" % (tempfile.gettempdir(),os.sep,ff.name),"w")
+        datafile = file("%s%s%s" % (tempfile.gettempdir(),
+                                    os.sep,
+                                    ff.name.decode('latin1')),
+                        "w")
         datafile.write(ff.read())
         datafile.close()
         make_meta_file(datafile.name,ANNOUNCE_URL, 2**18, comment=form.cleaned_data['description'], target=tmptf.name)
