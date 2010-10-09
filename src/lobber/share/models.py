@@ -2,13 +2,16 @@ from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 # http://docs.djangoproject.com/en/dev/topics/auth/#module-django.contrib.auth
 from django.contrib.auth.models import User
-from lobber.settings import TORRENTS,BASE_URL
+from lobber.settings import TORRENTS,BASE_URL, LOBBER_LOG_FILE
 import tagging
 from tagging.models import Tag
 from deluge.bencode import bdecode
 import os
 from lobber.notify import notifyJSON
 import shutil
+import lobber.log
+
+logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 def _urlesc(s):
     r = ''
@@ -26,7 +29,7 @@ class Torrent(models.Model):
     hashval = models.CharField(max_length=40)
     acl = models.TextField()
     
-    effective_rights = {}
+    effective_rights = None
 
     def __unicode__(self):
         return '%s (%d / %s) (acl=%s) (expire=%s)' % \
@@ -43,21 +46,26 @@ class Torrent(models.Model):
         return "%s%s" % (BASE_URL,self.url())
 
     def compute_effective_rights(self,user):
+        self.effective_rights = {}
         for perm in ['r','w','d']:
-            if self.authz(user, perm):
+            if self.authz_i(user, perm):
                 self.effective_rights[perm] = True
+            else:
+                self.effective_rights[perm] = False
         return self
 
-    def authz(self, user, perm):
+    def authz(self,user,perm):
+        if not self.effective_rights:
+            self.compute_effective_rights(user)
+        
+        return self.effective_rights[perm]
+
+    def authz_i(self, user, perm):
         """Does USER have PERM on torrent?"""
-        usernames = ['user:%s' % user.username]
-        profile = None
-        try:
-            profile = user.profile.get()
-        except ObjectDoesNotExist:
-            pass
+        entitlements = ['user:%s' % user.username]
+        profile = user_profile(user)
         if profile:
-            usernames += profile.entitlements.split()
+            entitlements += profile.get_entitlements()
             
             tagconstraintsok_flag = True
             if profile.tagconstraints:
@@ -72,21 +80,11 @@ class Torrent(models.Model):
                 return False
 
         for ace in self.acl.split():
-            ace_user, ace_perm = ace.split('#')
-            #print 'DEBUG: ace_user: %s, ace_perm: %s, usernames: %s' % (ace_user, ace_perm, usernames)
-            for username in usernames:
-                if ace_user == username and ace_perm == perm:
-                    return True
-                if username.startswith('user:%s:' % user.username) and ace_perm == perm:
-                    return True
-                if not ace_user and ace_perm == perm:
-                    return True
-                #if not ace_user or ace_user.startswith(username):
-                #    if ace_perm == 'w': # Write permission == all.
-                #        return True
-                #    if ace_perm == '%c' % perm:
-                #        return True
-        #print 'DEBUG: perm %s denied for %s on %s' % (perm, user, self)
+            (ace_user,hash,ace_perm) = ace.rpartition('#')
+            if ace_perm == perm:
+                for entitlement in entitlements:
+                    if not ace_user or ace_user == entitlement or ace_user.startswith('user:%s:' % user.username):
+                        return True
         return False
     
     def authz_tag(self, user, perm, tag):

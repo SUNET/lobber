@@ -1,4 +1,4 @@
-import mimeparse
+from lobber import mimeparse
 import re
 from django.conf import settings
 from django.shortcuts import render_to_response
@@ -6,7 +6,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from lobber.settings import STOMP_HOST, STOMP_PORT, ORBITED_PREFIX, ANNOUNCE_URL, DEBUG
 from lobber.share.models import UserProfile
 from datetime import datetime
-from pprint import pprint
 from django.http import HttpResponse
 from orbited import json
 from lobber.share.models import Torrent

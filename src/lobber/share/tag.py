@@ -18,17 +18,18 @@ logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 def tag_usage(request):
         r = None
         try:
-		tags = []
-		if request.GET.has_key('search'): 
-			tags = filter(lambda x: x.name.startswith(request.GET['search']),Tag.objects.usage_for_model(Torrent,counts=False))
-		else:
-			tags = Tag.objects.usage_for_model(Torrent,counts=True)
-		tagnames = [tag.name for tag in tags]
-		profile = user_profile(request.user)
-		tagnames.extend(profile.get_entitlements())
-		r = json_response(tagnames)
+            tags = []
+            if request.GET.has_key('search'): 
+                tags = filter(lambda x: x.name.startswith(request.GET['search']),Tag.objects.usage_for_model(Torrent,counts=False))
+            else:
+                tags = Tag.objects.usage_for_model(Torrent,counts=True)
+
+            tagnames = [tag.name for tag in tags]
+            profile = user_profile(request.user)
+            tagnames.extend(profile.get_entitlements())
+            r = json_response(tagnames)
         except MultiValueDictKeyError,e:
-		logger.error(e)
+            logger.error(e)
         return r
     
 @login_required

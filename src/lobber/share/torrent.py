@@ -147,8 +147,8 @@ def find_torrents(user, args, max=40):
                     q = empty_set
                     break
                 q = TaggedItem.objects.get_by_model(q, tag)
-        
-    return [ t.compute_effective_rights(user) for t in filter(lambda t: t.authz(user, 'r'), q)[:max]]
+            
+    return filter(lambda t: t.authz(user, 'r'), q)[:max]
     
 
 def _torrent_file_response(dict):
@@ -373,6 +373,9 @@ class TorrentView(TorrentViewBase):
             return _torrentlist(request, find_torrents(request.user, request.GET.lists()))
         
         t = get_object_or_404(Torrent,pk=inst)
+        if not t.authz(request.user,'r'):
+            return HttpResponseForbidden("You don't have read access on %d" % inst)
+        
         d = torrentdict(request, t)
         return respond_to(request,
                           {'text/html': 'share/torrent.html',
@@ -387,7 +390,11 @@ def torrent_by_hashval(request, inst):
                                   make_response_dict(request, {'error': "No such torrent: %s" % inst}))
     except MultipleObjectsReturned:
         return _torrentlist(request,
-                            Torrent.objects.filter(hashval=inst).order_by('-creation_date'))
+                            filter(lambda t: t.authz(request.user,'r'),Torrent.objects.filter(hashval=inst).order_by('-creation_date')))
+        
+    if not t.authz(request.user,'r'):
+        return HttpResponseForbidden("You don't have read access on %s" % inst)
+    
     return respond_to(request,
                       {'text/html': 'share/torrent.html',
                        'application/x-bittorrent': _torrent_file_response},
