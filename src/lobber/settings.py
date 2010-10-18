@@ -119,6 +119,7 @@ INSTALLED_APPS = (
     'lobber.extensions',
     'tagging',
     'lobber.share',
+    'lobber.tracker',
     'lobber.auth'
 )
 
