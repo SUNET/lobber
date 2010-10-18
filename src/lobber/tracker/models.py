@@ -5,6 +5,9 @@ Created on Oct 17, 2010
 '''
 from django.db import models
 from django.contrib.auth.models import User
+import socket
+import struct
+import ctypes
 
 def _urlesc(s):
     r = ''
@@ -21,8 +24,7 @@ class PeerInfo(models.Model):
     user = models.ForeignKey(User,blank=True,null=True)
     info_hash = models.CharField(max_length=128)
     peer_id = models.CharField(max_length=128)
-    ipv4 = models.IPAddressField(null=True,blank=True)
-    ipv6 = models.IPAddressField(null=True,blank=True)
+    address = models.IPAddressField(null=True,blank=True)
     port = models.IntegerField(null=True,blank=True)
     uploaded = models.IntegerField(blank=True,null=True)
     downloaded = models.IntegerField(blank=True,null=True)
@@ -32,13 +34,27 @@ class PeerInfo(models.Model):
     last_seen = models.DateTimeField(auto_now=True)
     
     def __unicode__(self):
-        return "%s %d for %s" % (self.ip(),self.port,self.info_hash)
+        return "%s@%s:%d" % (self.eschash(),self.address,self.port)
     
-    def ip(self):
-        if self.ipv6:
-            return self.ipv6
-        else:
-            return self.ipv4
+    def dict(self):
+        return {'ip': self.address.encode('ascii'),'port': self.port}
     
-    def pidict(self):
-        return {'peer id': self.peer_id,'ip': self.ip(),'port': self.port}
+    def eschash(self):
+        return _urlesc(self.info_hash)
+    
+    def escpeerid(self):
+        return _urlesc(self.peer_id)
+    
+    def pack_peer(self,buf4,buf6,offset):
+        family = socket.AF_INET
+        fmt="!4sH"
+        len=6
+        buf = buf4
+        if ':' in self.address:
+            family = socket.AF_INET6
+            fmt="!16sH"
+            len=18
+            buf = buf6
+        
+        struct.pack_into(fmt,buf,offset,socket.inet_pton(family,self.address),self.port)
+        return len

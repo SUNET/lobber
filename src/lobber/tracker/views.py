@@ -3,14 +3,39 @@ Created on Oct 17, 2010
 
 @author: leifj
 '''
-
+ 
 from lobber.tracker.models import PeerInfo
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseBadRequest, HttpResponse,\
-    HttpResponseForbidden
+from django.http import HttpResponse
 from deluge.bencode import bencode
 from socket import gethostname
 from lobber.share.models import Torrent
+from urllib import unquote
+from pprint import pprint
+import struct
+from ctypes import create_string_buffer
+
+def _err(msg):
+    return HttpResponse(bencode({'failure reason': msg}),mimetype='text/plain')
+
+def peer_address(request):
+    port = None
+    ip = None
+    if request.GET.has_key('port'):
+        port = request.GET['port']
+        
+    if request.GET.has_key('ipv6'):
+        ipv6 = request.GET['ipv6']
+        if ':' in ipv6:
+            ip = ipv6
+            
+    if not ip and request.GET.has_key('ip'):
+        ip = request.GET['ip']
+    
+    if not ip:
+        ip = request.META['REMOTE_ADDR']
+        
+    return ip,port
 
 def announce(request,info_hash=None):
     
@@ -18,45 +43,50 @@ def announce(request,info_hash=None):
         info_hash = request.GET['info_hash']
     
     if not info_hash:
-        return HttpResponseBadRequest("Missing info_hash")
+        return _err('Missing info_hash parameter')
 
-    t = Torrent.objects.filter(info_hash=info_hash)[:1]
-    if not t:
-        return HttpResponseForbidden("Not authorized")
+    info_hash = unquote(info_hash)
 
-    peer_id = None
-    if not request.GET.has_key('peer_id'):
-        return HttpResponseBadRequest("Missing peer_id")
-    peer_id = request.GET['peer_id']
+    pprint("info_hash=%s" % info_hash)
+    #t = Torrent.objects.filter(hashval=info_hash)[:1]
+    #if not t:
+    #    return _err("Not authorized")
     
-    pi,created = PeerInfo.objects.get_or_create(info_hash=info_hash,peer_id=peer_id)
+    pi = None
+    #if request.GET.has_key('trackerid'):
+    #    try:
+    #        pi = PeerInfo.objects.get(pk=request.GET['trackerid'])
+    #    except Exception,ex:
+    #        pass
+        
+    ip,port = peer_address(request)
+    
+    if pi == None:
+        pi,created = PeerInfo.objects.get_or_create(info_hash=info_hash,port=port,address=ip)
     
     if request.user and not request.user.is_anonymous:
         pi.user = request.user
         
-    addr = request.META['REMOTE_ADDR']
-    if '.' in addr:
-        pi.ipv4 = addr
-    if ':' in addr:
-        pi.ipv6 = addr
-        
     numwant = 50
     if request.GET.has_key('numwant'):
-        numwant = request.GET['numwant']
+        numwant = int(request.GET['numwant'])
 
     for key in ('port','uploaded','downloaded','left','corrupt'):
         if request.GET.has_key(key):
             value = request.GET[key]
-            setattr(pi,key,value)
-    
-    if request.GET.has_key('ipv6'):
-        ipv6 = request.GET['ipv6']
-        if ':' in ipv6:
-            pi.ipv6 = ipv6
+            key = key.replace(' ','_')
+            setattr(pi,key,int(value))
 
     event = None
     if request.GET.has_key('event'):
-        event = request.GET['event'] 
+        event = request.GET['event']
+        
+    if request.GET.has_key('peer_id'):
+        pi.peer_id = request.GET['peer_id']
+        
+    compact = False
+    if request.GET.has_key('compact') and request.GET['compact']:
+        compact = True 
     
     if event == 'stopped':
         pi.state = PeerInfo.STOPPED
@@ -68,16 +98,40 @@ def announce(request,info_hash=None):
         pi.state = PeerInfo.STARTED
     
     pi.save()
-    
-    dict = {'torrentid': 'lobber-%s' % gethostname(),'peers': []}
-    complete = 0
-    incomplete = 0
+    p4str = create_string_buffer(numwant*6+1)
+    p6str = create_string_buffer(numwant*18+1)
+    offset = 0
+    #dict = {'tracker id': "%d" % pi.id}
+    dict = {}
+    seeding = 0
+    downloaded = 0
+    count = 0
     for pi in PeerInfo.objects.filter(info_hash=info_hash)[:numwant]:
-        if pi.state == PeerInfo.COMPLETED:
-            complete = complete+1
-            incomplete = incomplete+1
-            dict['peers'].append(pi.info_dict())
-        
+        if pi.state == PeerInfo.STARTED or pi.state == PeerInfo.COMPLETED:
+            count = count + 1
+            if pi.left == 0:
+                seeding = seeding + 1
+            
+            if pi.state == PeerInfo.COMPLETED:
+                downloaded = downloaded + 1
+                      
+            if compact:
+                offset = offset + pi.pack_peer(p4str,p6str,offset)
+            else:
+                dict['peers'].append(pi.dict())
+    
+    dict['complete'] = seeding
+    dict['downloaded'] = downloaded
+    dict['incomplete'] = count - seeding
+    
+    pprint(dict)
+    
+    if compact:
+        if p4str.value:
+            dict['peers'] = p4str.value
+        if p6str.value:
+            dict['peers6'] = p6str.value
+            
     return HttpResponse(bencode(dict),mimetype="text/plain")
     
 @login_required
