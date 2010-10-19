@@ -2,8 +2,8 @@
 <jnlp spec="1.0+" codebase="{{baseurl}}/../site-media/jars">
   <information>
     <title>Lobber Client</title>
-    <vendor>NORDUnet<vendor/>
-    <homepage>http://www.nordu.net<homepage/>
+    <vendor>NORDUnet</vendor>
+    <homepage>http://www.nordu.net</homepage>
     <description kind="one-line">An applet for talking to a lobber service</description>
   </information>
   <security>
