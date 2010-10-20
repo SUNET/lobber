@@ -132,7 +132,36 @@ def announce(request,info_hash=None):
         if p6str.value:
             dict['peers6'] = p6str.value
             
+    return tracker_response(dict)
+    
+def tracker_response(dict):
     return HttpResponse(bencode(dict),mimetype="text/plain")
+
+def summarize(qs):
+    count = 0
+    downloaded = 0
+    seeding = 0
+    for pi in qs:
+        if pi.state == PeerInfo.STARTED or pi.state == PeerInfo.COMPLETED:
+            count = count + 1
+            if pi.left == 0:
+                seeding = seeding + 1
+            
+            if pi.state == PeerInfo.COMPLETED:
+                downloaded = downloaded + 1
+    return count,downloaded,seeding
+    
+def scrape(request):
+    files = {}
+    if request.GET.has_key('info_hash'):
+        for info_hash in request.GET.getlist('info_hash'):
+            count,downloaded,seeding = summarize(PeerInfo.objects.filter(info_hash=info_hash))
+            files[info_hash]= {'complete': seeding, 'downloaded': downloaded, 'incomplete': count - seeding}
+    else:
+        return _err("I'm not going to tell you about all torrents n00b!")
+    
+    pprint(files)
+    return tracker_response({'files': files})
     
 @login_required
 def user_announce(request):
