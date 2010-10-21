@@ -58,7 +58,12 @@ class Torrent(models.Model):
         if not self.effective_rights:
             self.compute_effective_rights(user)
         
-        return self.effective_rights[perm]
+        if perm == 'd':
+            return self.effective_rights['d'] or self.effective_rights['w']
+        elif perm == 'r':
+            return self.effective_rights['r'] or self.effective_rights['w']
+        else:   
+            return self.effective_rights['w']
 
     def authz_i(self, user, perm):
         """Does USER have PERM on torrent?"""
