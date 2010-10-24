@@ -94,7 +94,7 @@ function removeit(id) {
 			This torrent will be permanently deleted and cannot be recovered. Are you sure?</p>
 	</form>
 </div>
-{% if torrent.effective_rights.r or torrent.effective_rights.w %}
+{% if torrent.effective_rights.r or torrent.effective_rights.w or torrent.effective_rights.d %}
 <h1>{{torrent.name}} - created {{torrent.creation_date|datehumanize}}
 	{% if torrent.effective_rights.w or torrent.effective_rights.d %}
 	<a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{torrent.id}}')">
@@ -112,7 +112,7 @@ function removeit(id) {
 </p>
 {% endif %}
 <div id="settings">
-   {% if torrent.effective_rights.r or torrent.effective_rights.w %}
+   {% if torrent.effective_rights.r or torrent.effective_rights.w or torrent.effective_rights.d %}
    <div id="info" class="ui-widget-content ui-corner-all altitem">
    	  <h3 class="altheader">Information</h3>
    	  <div class="altcontent">
