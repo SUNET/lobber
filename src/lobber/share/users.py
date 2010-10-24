@@ -12,9 +12,9 @@ from lobber.share.models import Torrent, UserProfile, user_profile
 import lobber.log
 from lobber.multiresponse import json_response
 
-def create_key_user(creator, urlfilter, tagconstraints, entitlements, expires=None):
+def create_key_user_profile(creator, urlfilter, tagconstraints, entitlements, expires=None):
     """
-    Create a user profile named key:<random text>.  
+    Create a user profile named key:<random text>.
 
     Each space separated entitlement in ENTITLEMENTS is checked.
     Invalid entitlements are stripped.  Valid entitlements are
@@ -54,7 +54,11 @@ def create_key_user(creator, urlfilter, tagconstraints, entitlements, expires=No
                           entitlements=entitlements,
                           expiration_date=expires)
     profile.save()
-    return secret
+    return profile
+
+def create_key_user(creator, urlfilter, tagconstraints, entitlements, expires=None):
+    profile = create_key_user_profile(creator, urlfilter, tagconstraints, entitlements, expires)
+    return profile.get_username()
 
 @login_required
 def user_self(req):

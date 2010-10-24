@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Lobber{% endblock %}
+{% block js %}
+<script type="text/javascript">
+$(function() {
+   $("#id_expires").datepicker({'dateFormat': 'yy-mm-dd', minDate: "+1D", maxDate: "{{torrent.expiration_date}}"});
+});
+</script>
+{% endblock %}
+{% block main %}
+<h1>Share a link to {% if tag %}<a href="/torrent/tag/{{tag}}">torrents tagged with {{tag}}</a>{% endif %}{% if torrent %}<a href="/torrent/{{torrent.id}}">{{torrent.name}}</a>{% endif %}</h1>
+<form class="cmxform" enctype="multipart/form-data" method="post">
+  <fieldset class="ui-widget-content ui-corner-all infopanel">
+      <legend>For how long should the link be valid?</legend>
+      <ol>
+      {% for field in form %}
+      		{% if field.is_hidden %}
+      		{{ field }}
+      		{% else %}
+        	<li><label for="id_{{ field.html_name }}">{{ field.label }}
+        		{% if field.field.required %}<em>*</em>{% endif %}</label>
+        		{{ field }}
+        		{% if field.errors %}<em>{{field.errors}}</em>{% endif %}
+        	</li>
+        	{% endif %}
+      {% endfor %}
+      </ol>
+  </fieldset>
+
+  <br/>
+  <div class="button">
+    <input type="submit" value="Create Link" />
+    <input type="button" onClick="document.location='/torrent/{{torrent.id}}'" value="Cancel"/>
+  </div>
+</form>
+{% endblock %}

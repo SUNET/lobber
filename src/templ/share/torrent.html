@@ -99,6 +99,9 @@ function removeit(id) {
 	<a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{torrent.id}}')">
        <span class="ui-icon ui-icon-trash"></span>
     </a>
+    <a class="tip" title="Share a link to this data" href="/link/torrent/{{torrent.id}}">
+       <span class="ui-icon ui-icon-extlink"></span>
+    </a>
     {% endif %}
 </h1>
 <p>

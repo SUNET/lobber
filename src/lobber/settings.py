@@ -29,7 +29,7 @@ DATABASE_PASSWORD = ''
 DATABASE_HOST = ''
 DATABASE_PORT = ''
 
-DROPBOX_DIR = '/tmp/dropbox'
+DROPBOX_DIR = '/var/lib/transmission-daemon/dropbox'
 TRANSMISSION_RPC = 'http://transmission:transmission@localhost:9091'
 
 # Local time zone for this installation. Choices can be found here:
@@ -119,6 +119,7 @@ INSTALLED_APPS = (
     'lobber.extensions',
     'tagging',
     'lobber.share',
+    'lobber.links',
     'lobber.tracker',
     'lobber.auth'
 )

@@ -13,5 +13,6 @@ urlpatterns = patterns('',
     (r'^site-media/(?P<path>.*)$', 'django.views.static.serve',
     	{'document_root': MEDIA_ROOT}),
     (r'^tracker/',include('lobber.tracker.urls')),
+    (r'^link/',include('lobber.links.urls')),
     (r'',include('lobber.share.urls')),
 )
