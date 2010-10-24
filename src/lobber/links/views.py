@@ -29,7 +29,7 @@ def send_link_mail(request,pid,tid):
             msg += "To: "+form.cleaned_data['to']+"\n"
             msg += "Subject: "+request.user.get_full_name()+" has shared some data with you\n"
             msg += "\n"
-            msg += "Follow this link to download the data using a torrent client: "+link+"\n"
+            msg += "Follow this link to download the data using a torrent client: "+link+"\n\n"
             msg += form.cleaned_data['message']
             msg += "\n"
             notifyJSON("/agents/sendmail",{'notify_to': "/session/%s" % request.session.session_key,
