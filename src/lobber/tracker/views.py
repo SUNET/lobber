@@ -84,9 +84,9 @@ def announce(request,info_hash=None):
     if request.GET.has_key('peer_id'):
         pi.peer_id = request.GET['peer_id']
         
-    compact = False
-    if request.GET.has_key('compact') and request.GET['compact']:
-        compact = True 
+    compact = True
+    if request.GET.has_key('compact') and not request.GET['compact']:
+        compact = False
     
     if event == 'stopped':
         pi.state = PeerInfo.STOPPED
@@ -106,6 +106,10 @@ def announce(request,info_hash=None):
     seeding = 0
     downloaded = 0
     count = 0
+    
+    if not compact:
+        dict['peers'] = []
+    
     for pi in PeerInfo.objects.filter(info_hash=info_hash)[:numwant]:
         if pi.state == PeerInfo.STARTED or pi.state == PeerInfo.COMPLETED:
             count = count + 1
@@ -123,6 +127,7 @@ def announce(request,info_hash=None):
     dict['complete'] = seeding
     dict['downloaded'] = downloaded
     dict['incomplete'] = count - seeding
+    dict['interval'] = 10
     
     pprint(dict)
     
@@ -160,7 +165,6 @@ def scrape(request):
     else:
         return _err("I'm not going to tell you about all torrents n00b!")
     
-    pprint(files)
     return tracker_response({'files': files})
     
 @login_required
