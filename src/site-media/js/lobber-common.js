@@ -42,6 +42,7 @@ $(function() {
       'z-index': '9999'
    });
    $('.tip').tooltip({showURL: false});
+   /**
    stomp = new STOMPClient();
    stomp.onopen = function() {
        if (debug) {
@@ -66,4 +67,5 @@ $(function() {
        _i(frame.body);
    };
    stomp.connect(stomp_host,stomp_port);
+   **/
 });
