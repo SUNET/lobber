@@ -30,7 +30,8 @@ $(function() {
    			header: "h3", 
    			event: "click", 
    			collapsible: true,
-   			active: false,
+   			navigation: true,
+   			animated: true,
    			changestart: function(event,ui) {
    			    var content = ui.newContent;
    			    var torrent = $(content).closest('.torrent');
@@ -44,7 +45,6 @@ $(function() {
 		   		}
    			}
    });
-   
    $("#mail-expiration").datepicker({'dateFormat': 'yy-mm-dd', minDate: "+1D"});
    $('#share-mail-dialog').dialog({
        position: ['center','center'],
