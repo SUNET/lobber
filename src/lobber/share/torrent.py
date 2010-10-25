@@ -188,10 +188,12 @@ def torrentdict(request,t,forms=None):
 def ihaz(request,hash,url=None):
     if url == None:
         url = "torrent:%s" % hash
-    
-    DataLocation.objects.get_or_create(owner=request.user,url=url,hashval=hash)
-    
-    return json_response(url)
+        
+    if Torrent.objects.filter(hashval=hash).count() > 0:
+        DataLocation.objects.get_or_create(owner=request.user,url=url,hashval=hash)
+        return json_response(url)
+    else:
+        return json_response("")
         
 @login_required
 def inohaz(request,hash,url=None):
