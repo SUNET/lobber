@@ -13,7 +13,7 @@ from django.contrib.auth.models import User
 from tagging.models import Tag, TaggedItem
 
 from lobber.multiresponse import respond_to, make_response_dict, json_response
-from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE, TRACKER_ADDR, DROPBOX_DIR
+from lobber.settings import SCRAPE_URL, TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE, TRACKER_ADDR, DROPBOX_DIR
 from lobber.resource import Resource
 import lobber.log
 from lobber.share.forms import UploadForm
@@ -256,7 +256,7 @@ def scrape(request,inst):
     except ObjectDoesNotExist:
         return HttpResponseNotFound("No such torrent")
     
-    url = '/scrape/?info_hash='+t.eschash()
+    url = '%s?info_hash=%s' % (SCRAPE_URL,t.eschash())
     dict = {}
     try:
         c = httplib.HTTPConnection(TRACKER_ADDR)
@@ -275,7 +275,7 @@ def scrape_hash(request,hash):
         return HttpResponseNotFound("No such torrent")
     t = qst[0]
     
-    url = '/scrape/?info_hash='+_urlesc(hash)
+    url = '%s?info_hash=%s' % (SCRAPE_URL,_urlesc(hash))
     dict = {}
     try:
         c = httplib.HTTPConnection(TRACKER_ADDR)

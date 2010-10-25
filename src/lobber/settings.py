@@ -11,9 +11,11 @@ APPLICATION_CTX = ''
 NORDUSHARE_URL = BASE_UI_URL 
 TRACKER_EXIST_URL = '%s/torrent/exists' % BASE_URL
 
-TRACKER_ADDR = 'tracker-dev.lobber.se:4711'
+#TRACKER_ADDR = 'tracker-dev.lobber.se:4711'
+TRACKER_ADDR = 'localhost:8000'
 ANNOUNCE_BASE_URL = 'http://' + TRACKER_ADDR
-ANNOUNCE_URL = ANNOUNCE_BASE_URL + '/announce'
+ANNOUNCE_URL = ANNOUNCE_BASE_URL + '/tracker/announce'
+SCRAPE_URL = '/tracker/scrape'
 
 ADMINS = (
     ('Linus Nordberg', 'linus@nordu.net'),
