@@ -178,8 +178,15 @@ class Torrent(models.Model):
         data = self.file().read()
         return bdecode(data)['info']
     
+    def cleanup_datalocations(self):
+        ntorrents = Torrent.objects.filter(hashval=self.hashval).count()
+        if ntorrents <= 1:
+            for loc in DataLocation.objects.filter(hashval=self.hashval).all():
+                loc.delete()
+    
     def remove(self):
         Tag.objects.update_tags(self,None)
+        self.cleanup_datalocations()
         try:
             os.unlink(self.file().name)
         except IOError, e:
