@@ -43,7 +43,7 @@ def announce(request,info_hash=None):
         info_hash = request.GET['info_hash']
     
     if not info_hash:
-        return _err('Missing info_hash parameter')
+        return _err('Missing info_hash')
 
     info_hash = unquote(info_hash)
 
