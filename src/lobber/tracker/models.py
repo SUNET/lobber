@@ -24,8 +24,8 @@ class PeerInfo(models.Model):
     user = models.ForeignKey(User,blank=True,null=True)
     info_hash = models.CharField(max_length=128)
     peer_id = models.CharField(max_length=128)
-    address = models.IPAddressField(null=True,blank=True)
-    port = models.IntegerField(null=True,blank=True)
+    address = models.IPAddressField()
+    port = models.IntegerField()
     uploaded = models.IntegerField(blank=True,null=True)
     downloaded = models.IntegerField(blank=True,null=True)
     left = models.IntegerField(blank=True,null=True)
@@ -34,7 +34,7 @@ class PeerInfo(models.Model):
     last_seen = models.DateTimeField(auto_now=True)
     
     def __unicode__(self):
-        return "%s@%s:%d" % (self.eschash(),self.address,self.port)
+        return "%s@%s:%s" % (self.eschash(),self.address,self.port)
     
     def dict(self):
         return {'ip': self.address.encode('ascii'),'port': self.port}

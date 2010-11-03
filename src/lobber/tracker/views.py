@@ -70,6 +70,10 @@ def announce(request,info_hash=None):
     numwant = 50
     if request.GET.has_key('numwant'):
         numwant = int(request.GET['numwant'])
+        if numwant > 200:
+            numwant = 200
+        if numwant < 0:
+            numwant = 50
 
     for key in ('port','uploaded','downloaded','left','corrupt'):
         if request.GET.has_key(key):
@@ -129,8 +133,6 @@ def announce(request,info_hash=None):
     dict['incomplete'] = count - seeding
     dict['interval'] = 10
     
-    pprint(dict)
-    
     if compact:
         if p4str.value:
             dict['peers'] = p4str.value
@@ -156,16 +158,18 @@ def summarize(qs):
                 downloaded = downloaded + 1
     return count,downloaded,seeding
     
-def scrape(request):
+def peer_status(hashvals):
     files = {}
+    for info_hash in hashvals:
+        count,downloaded,seeding = summarize(PeerInfo.objects.filter(info_hash=info_hash))
+        files[info_hash]= {'complete': seeding, 'downloaded': downloaded, 'incomplete': count - seeding}
+    return files;
+    
+def scrape(request):
     if request.GET.has_key('info_hash'):
-        for info_hash in request.GET.getlist('info_hash'):
-            count,downloaded,seeding = summarize(PeerInfo.objects.filter(info_hash=info_hash))
-            files[info_hash]= {'complete': seeding, 'downloaded': downloaded, 'incomplete': count - seeding}
+        return tracker_response({'files': peer_status(request.GET.getlist('info_hash'))})
     else:
         return _err("I'm not going to tell you about all torrents n00b!")
-    
-    return tracker_response({'files': files})
     
 @login_required
 def user_announce(request):

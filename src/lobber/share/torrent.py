@@ -1,5 +1,4 @@
 import os
-import httplib
 from datetime import datetime as dt
 
 from django.http import HttpResponse, HttpResponseRedirect,\
@@ -13,7 +12,7 @@ from django.contrib.auth.models import User
 from tagging.models import Tag, TaggedItem
 
 from lobber.multiresponse import respond_to, make_response_dict, json_response
-from lobber.settings import SCRAPE_URL, TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE, TRACKER_ADDR, DROPBOX_DIR
+from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE, DROPBOX_DIR
 from lobber.resource import Resource
 import lobber.log
 from lobber.share.forms import UploadForm
@@ -23,7 +22,7 @@ from lobber.share.forms import formdict
 from tempfile import NamedTemporaryFile
 from lobber.share.models import DataLocation
 import tempfile
-from pprint import pprint
+from lobber.tracker.views import peer_status
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
@@ -110,14 +109,6 @@ def _urlesc(s):
     for n in range(0, len(s), 2):
         r += '%%%s' % s[n:n+2].upper()
     return r
-
-def _prefetch_existlink(hash):
-    url = '/announce?info_hash='+_urlesc(hash)
-    #print 'DEBUG: prefetching %s from %s' % (url, TRACKER_ADDR)
-    try:
-        httplib.HTTPConnection(TRACKER_ADDR).request('GET', url)
-    except:
-        pass
 
 def find_torrents(user, args, max=40):
     """Search for torrents for which USER has read access.
@@ -256,35 +247,20 @@ def scrape(request,inst):
     except ObjectDoesNotExist:
         return HttpResponseNotFound("No such torrent")
     
-    url = '%s?info_hash=%s' % (SCRAPE_URL,t.eschash())
-    dict = {}
-    try:
-        c = httplib.HTTPConnection(TRACKER_ADDR)
-        c.request('GET', url)
-        txt = c.getresponse().read()
-        response = bdecode(txt)
-        dict = response['files'][t.hashval.decode('hex')]
-    except Exception,e:
-        pass
+    response = peer_status([t.eschash])
+    dict = response['files'][t.hashval.decode('hex')]
     
     return json_response(dict)
 
+@login_required
 def scrape_hash(request,hash):
     qst = Torrent.objects.filter(hashval=hash);
     if not qst:
         return HttpResponseNotFound("No such torrent")
     t = qst[0]
     
-    url = '%s?info_hash=%s' % (SCRAPE_URL,_urlesc(hash))
-    dict = {}
-    try:
-        c = httplib.HTTPConnection(TRACKER_ADDR)
-        c.request('GET', url)
-        txt = c.getresponse().read()
-        response = bdecode(txt)
-        dict = response['files'][t.hashval.decode('hex')]
-    except Exception,e:
-        pass
+    response = peer_status([t.eschash])
+    dict = response['files'][t.hashval.decode('hex')]
     
     return json_response(dict)
 
@@ -317,7 +293,6 @@ def add_torrent(request):
             t = _store_torrent(request, form)
             if not t:
                 return HttpResponseServerError('error creating torrent')
-            _prefetch_existlink(t.hashval)
             return respond_to(request,
                               {'application/json': json_response(t.id),
                                'text/html': HttpResponseRedirect("/torrent#%d" % t.id)})
@@ -327,6 +302,21 @@ def add_torrent(request):
     return respond_to(request,
                       {'application/json': HttpResponseServerError("Invalid request"),
                        'text/html': 'share/upload-torrent.html'},{'form': form})
+
+
+@login_required
+def show(request, inst=None):
+    if not inst:
+        return _torrentlist(request, find_torrents(request.user, request.GET.lists()))
+    
+    t = get_object_or_404(Torrent,pk=inst)
+    if not t.authz(request.user,'r'):
+        return HttpResponseForbidden("You don't have read access on %d" % inst)
+    
+    d = torrentdict(request, t)
+    return respond_to(request,
+                      {'text/html': 'share/torrent.html',
+                       'application/x-bittorrent': _torrent_file_response},d)
 
 ## TODO: This class stuff wasn't so neat after all - refactor to regular methods checking for the method instead
 
@@ -342,7 +332,6 @@ class TorrentViewBase(Resource):
             t = _store_torrent(req, form)
             if not t:
                 return HttpResponse('error creating torrent')
-            _prefetch_existlink(t.hashval)
             return HttpResponseRedirect('/torrent/#%d' % t.id)
         else:
             return render_to_response('share/upload-torrent.html',
@@ -355,7 +344,6 @@ class TorrentViewBase(Resource):
             t = _store_torrent(req, form)
             if not t:
                 return HttpResponse('error creating torrent')
-            _prefetch_existlink(t.hashval)
             return HttpResponseRedirect('/torrent/#%d' % t.id)
         else:
             logger.info("upload_form: received invalid form")
