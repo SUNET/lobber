@@ -21,11 +21,11 @@ class PeerInfo(models.Model):
     STOPPED = 3
     PAUSED = 4
     
-    user = models.ForeignKey(User,blank=True,null=True)
-    info_hash = models.CharField(max_length=128)
+    user = models.ForeignKey(User,blank=True,null=True,db_index=True)
+    info_hash = models.CharField(max_length=128,db_index=True)
     peer_id = models.CharField(max_length=128)
-    address = models.IPAddressField()
-    port = models.IntegerField()
+    address = models.IPAddressField(db_index=True)
+    port = models.IntegerField(db_index=True)
     uploaded = models.IntegerField(blank=True,null=True)
     downloaded = models.IntegerField(blank=True,null=True)
     left = models.IntegerField(blank=True,null=True)

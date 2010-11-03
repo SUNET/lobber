@@ -26,7 +26,7 @@ class Torrent(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     expiration_date = models.DateTimeField() # FIXME: Default to something reasonable.
     data = models.FileField(upload_to='.') # upload_to: directory in TORRENTS.
-    hashval = models.CharField(max_length=40)
+    hashval = models.CharField(max_length=40,db_index=True)
     acl = models.TextField()
     
     effective_rights = None
