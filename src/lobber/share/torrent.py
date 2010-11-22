@@ -246,11 +246,8 @@ def scrape(request,inst):
         t = Torrent.objects.get(id=inst)
     except ObjectDoesNotExist:
         return HttpResponseNotFound("No such torrent")
-    
-    response = peer_status([t.eschash])
-    dict = response['files'][t.hashval.decode('hex')]
-    
-    return json_response(dict)
+
+    return json_response(peer_status[t.eschash()])
 
 @login_required
 def scrape_hash(request,hash):
@@ -258,11 +255,8 @@ def scrape_hash(request,hash):
     if not qst:
         return HttpResponseNotFound("No such torrent")
     t = qst[0]
-    
-    response = peer_status([t.eschash])
-    dict = response['files'][t.hashval.decode('hex')]
-    
-    return json_response(dict)
+
+    return json_response(peer_status[t.eschash()])
 
 @login_required
 def upload_jnlp(req):
