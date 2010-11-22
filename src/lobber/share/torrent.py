@@ -239,7 +239,7 @@ def remove_torrent(request, tid):
                       {'application/json': json_response(tid),
                        'text/html': HttpResponseRedirect("/torrent")})
 
-#@login_required
+@login_required
 def scrape(request,inst):
     t = None
     try:
