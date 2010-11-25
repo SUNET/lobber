@@ -14,6 +14,8 @@ from urllib import unquote
 import struct
 from ctypes import create_string_buffer
 
+logger = lobber.log.Logger("tracker", LOBBER_LOG_FILE)
+
 def _err(msg):
     return HttpResponse(bencode({'failure reason': msg}),mimetype='text/plain')
 
@@ -46,7 +48,7 @@ def announce(request,info_hash=None):
 
     info_hash = unquote(info_hash)
 
-    #pprint("info_hash=%s" % info_hash)
+    logger.debug("announce: info_hash=%s" % info_hash)
     #t = Torrent.objects.filter(hashval=info_hash)[:1]
     #if not t:
     #    return _err("Not authorized")
@@ -132,7 +134,7 @@ def announce(request,info_hash=None):
     dict['incomplete'] = count - seeding
     dict['interval'] = 10
     
-    #pprint(dict)
+    logger.debug("announce: dict: " % dict)
     if compact:
         if p4str.value:
             dict['peers'] = p4str.value
