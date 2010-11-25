@@ -11,7 +11,6 @@ from deluge.bencode import bencode
 from socket import gethostname
 from lobber.share.models import Torrent
 from urllib import unquote
-from pprint import pprint
 import struct
 from ctypes import create_string_buffer
 
@@ -47,7 +46,7 @@ def announce(request,info_hash=None):
 
     info_hash = unquote(info_hash)
 
-    pprint("info_hash=%s" % info_hash)
+    #pprint("info_hash=%s" % info_hash)
     #t = Torrent.objects.filter(hashval=info_hash)[:1]
     #if not t:
     #    return _err("Not authorized")
@@ -133,6 +132,7 @@ def announce(request,info_hash=None):
     dict['incomplete'] = count - seeding
     dict['interval'] = 10
     
+    #pprint(dict)
     if compact:
         if p4str.value:
             dict['peers'] = p4str.value
