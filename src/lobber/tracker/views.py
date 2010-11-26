@@ -87,13 +87,16 @@ def announce(request,info_hash=None):
     if request.user and not request.user.is_anonymous:
         pi.user = request.user
         
-    numwant = 50
+    DEFNUMWANT = 10
+    MAXNUMWANT = 20
+
+    numwant = DEFNUMWANT
     if request.GET.has_key('numwant'):
         numwant = int(request.GET['numwant'])
-        if numwant > 200:
-            numwant = 200
+        if numwant > MAXNUMWANT:
+            numwant = MAXNUMWANT
         if numwant < 0:
-            numwant = 50
+            numwant = DEFNUMWANT
 
     for key in ('port','uploaded','downloaded','left','corrupt'):
         if request.GET.has_key(key):
