@@ -14,7 +14,15 @@ from urllib import unquote
 import struct
 from ctypes import create_string_buffer
 
+import lobber.log
+from lobber.settings import LOBBER_LOG_FILE
 logger = lobber.log.Logger("tracker", LOBBER_LOG_FILE)
+
+def _hexify(s):
+    r = ''
+    for n in range(0, len(s)):
+        r += '%02x' % ord(s[n])
+    return r
 
 def _err(msg):
     return HttpResponse(bencode({'failure reason': msg}),mimetype='text/plain')
@@ -38,17 +46,28 @@ def peer_address(request):
         
     return ip,port
 
+def get_from_qs(qs, key):
+    res = None
+    i = qs.find(key)
+    if i >= 0:
+        i2 = qs[i:].find('&')
+        if i2 >= 0:
+            res = qs[i+len(key):i2]
+    return res
+
 def announce(request,info_hash=None):
     
     if not info_hash and request.GET.has_key('info_hash'):
-        info_hash = request.GET['info_hash']
+        info_hash = get_from_qs(request.META['QUERY_STRING'], 'info_hash=')
+        #logger.debug("announce: getting hash from request: %s" % request.META['QUERY_STRING'])
     
     if not info_hash:
         return _err('Missing info_hash')
 
-    info_hash = unquote(info_hash)
+    info_hash = _hexify(unquote(info_hash))
+    #logger.debug("announce: info_hash=%s" % info_hash)
 
-    logger.debug("announce: info_hash=%s" % info_hash)
+
     #t = Torrent.objects.filter(hashval=info_hash)[:1]
     #if not t:
     #    return _err("Not authorized")
@@ -134,13 +153,13 @@ def announce(request,info_hash=None):
     dict['incomplete'] = count - seeding
     dict['interval'] = 10
     
-    logger.debug("announce: dict: " % dict)
     if compact:
         if p4str.value:
-            dict['peers'] = p4str.value
+            dict['peers'] = p4str.raw
         if p6str.value:
-            dict['peers6'] = p6str.value
+            dict['peers6'] = p6str.raw
             
+    #logger.debug("announce: %s:%s (%s): compact=%s, offset=%d, dict=%s" % (ip, port, repr(info_hash), compact, offset, repr(dict)))
     return tracker_response(dict)
     
 def tracker_response(dict):
