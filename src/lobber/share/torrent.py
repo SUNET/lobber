@@ -42,6 +42,13 @@ def _torrent_info(data):
 def _create_torrent(filename, announce_url, target_file, comment=None):
     make_meta_file(filename, announce_url, 2 ** 18, comment=comment, target=target_file)
 
+def _sanitize_fn(name):
+    import unicodedata, re
+    name = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore')
+    name = unicode(re.sub('[^\w\s-]', '', name).strip().lower())
+    name = unicode(re.sub('[-\s]+', '-', name))
+    return name
+
 def _store_torrent(req, form):
     """
     Check if req.user already has the torrent file (req.FILES) in the
@@ -64,7 +71,7 @@ def _store_torrent(req, form):
         tmptf = NamedTemporaryFile(delete=False)
         datafile = file("%s%s%s" % (tempfile.gettempdir(),
                                     os.sep,
-                                    ff.name.decode('latin1')),
+                                    _sanitize_fn(ff.name)),
                         "w")
         datafile.write(ff.read())
         datafile.close()
