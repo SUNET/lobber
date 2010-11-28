@@ -88,7 +88,7 @@ def announce(request,info_hash=None):
         pi.user = request.user
         
     DEFNUMWANT = 50
-    MAXNUMWANT = 200
+    MAXNUMWANT = 20
 
     numwant = DEFNUMWANT
     if request.GET.has_key('numwant'):
@@ -151,23 +151,7 @@ def announce(request,info_hash=None):
             else:
                 dict['peers'].append(pi.dict())
     
-    dict['complete'] = seedingdiff --git a/src/lobber/tracker/views.py b/src/lobber/tracker/views.py
-index e9b2566..32a6d97 100644
---- a/src/lobber/tracker/views.py
-+++ b/src/lobber/tracker/views.py
-@@ -158,9 +158,9 @@ def announce(request,info_hash=None):
-     
-     if compact:
-         if p4str.value:
--            dict['peers'] = p4str.raw
-+            dict['peers'] = p4str.raw[:offset]
-         if p6str.value:
--            dict['peers6'] = p6str.raw
-+            dict['peers6'] = p6str.raw[:offset]
-             
-     #logger.debug("announce: %s:%s (%s): compact=%s, offset=%d, dict=%s" % (ip, port, repr(info_hash), compact, offset, repr(dict)))
-     return tracker_response(dict)
-
+    dict['complete'] = seeding
     dict['downloaded'] = downloaded
     dict['incomplete'] = count - seeding
     dict['interval'] = 10
