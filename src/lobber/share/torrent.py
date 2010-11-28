@@ -42,6 +42,18 @@ def _torrent_info(data):
 def _create_torrent(filename, announce_url, target_file, comment=None):
     make_meta_file(filename, announce_url, 2 ** 18, comment=comment, target=target_file)
 
+def _sanitize_fn(name):
+    import unicodedata, re
+    # Normalize.
+    name = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore')
+    # Remove everything but alphanumerics, underscore, space, period and dash.
+    name = unicode(re.sub('[^\w\s.-]', '', name).strip())
+    # Replace dashes and spaces with a single dash.
+    name = unicode(re.sub('[-\s]+', '-', name))
+    # Remove double periods.
+    name = unicode(re.sub('\.\.', '', name))
+    return name
+
 def _store_torrent(req, form):
     """
     Check if req.user already has the torrent file (req.FILES) in the
@@ -64,7 +76,7 @@ def _store_torrent(req, form):
         tmptf = NamedTemporaryFile(delete=False)
         datafile = file("%s%s%s" % (tempfile.gettempdir(),
                                     os.sep,
-                                    ff.name.decode('latin1')),
+                                    _sanitize_fn(ff.name)),
                         "w")
         datafile.write(ff.read())
         datafile.close()
@@ -239,18 +251,15 @@ def remove_torrent(request, tid):
                       {'application/json': json_response(tid),
                        'text/html': HttpResponseRedirect("/torrent")})
 
-#@login_required
+@login_required
 def scrape(request,inst):
     t = None
     try:
         t = Torrent.objects.get(id=inst)
     except ObjectDoesNotExist:
         return HttpResponseNotFound("No such torrent")
-    
-    response = peer_status([t.eschash])
-    dict = response['files'][t.hashval.decode('hex')]
-    
-    return json_response(dict)
+
+    return json_response(peer_status([t.eschash()]))
 
 @login_required
 def scrape_hash(request,hash):
@@ -258,11 +267,8 @@ def scrape_hash(request,hash):
     if not qst:
         return HttpResponseNotFound("No such torrent")
     t = qst[0]
-    
-    response = peer_status([t.eschash])
-    dict = response['files'][t.hashval.decode('hex')]
-    
-    return json_response(dict)
+
+    return json_response(peer_status([t.eschash()]))
 
 @login_required
 def upload_jnlp(req):
