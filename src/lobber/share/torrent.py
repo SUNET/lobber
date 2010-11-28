@@ -286,7 +286,7 @@ def exists_new(req,inst):
         r = HttpResponse(inst)
         r['Cache-Control'] = 'max-age=604800'
     else:
-        r = HttpResponseNotFound(inst)
+        r = HttpResponseNotFound()
         r['Cache-Control'] = 'max-age=2'
     return r
 
