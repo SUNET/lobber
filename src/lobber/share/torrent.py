@@ -44,9 +44,14 @@ def _create_torrent(filename, announce_url, target_file, comment=None):
 
 def _sanitize_fn(name):
     import unicodedata, re
+    # Normalize.
     name = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore')
-    name = unicode(re.sub('[^\w\s-]', '', name).strip().lower())
+    # Remove everything but alphanumerics, underscore, space, period and dash.
+    name = unicode(re.sub('[^\w\s.-]', '', name).strip())
+    # Replace dashes and spaces with a single dash.
     name = unicode(re.sub('[-\s]+', '-', name))
+    # Remove double periods.
+    name = unicode(re.sub('\.\.', '', name))
     return name
 
 def _store_torrent(req, form):
