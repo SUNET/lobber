@@ -279,6 +279,17 @@ def upload_jnlp(req):
     return render_to_response('share/launch.jnlp', d,
                               mimetype='application/x-java-jnlp-file')
 
+def exists_new(req,inst):
+    count = Torrent.objects.filter(hashval=inst).count()
+    r = None
+    if count > 0:
+        r = HttpResponse(inst)
+        r['Cache-Control'] = 'max-age=604800'
+    else:
+        r = HttpResponseNotFound(inst)
+        r['Cache-Control'] = 'max-age=2'
+    return r
+
 def exists(req, inst):
     r = HttpResponse(status=200);
     r['Cache-Control'] = 'max-age=604800' # 1 week in seconds
