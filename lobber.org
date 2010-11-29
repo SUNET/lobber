@@ -559,7 +559,7 @@ diff -c /etc/init.d/shibd\~ /etc/init.d/shibd
 Diff finished.  Tue Aug 10 13:02:21 2010
 
 ** cleaning up torrents
-lobber (in a python dev-shell):
+lobber (sudo ./dev-django-admin.sh shell):
 map(lambda t: t.remove(), Torrent.objects.filter())
 
 tracker (in a db shell):
@@ -732,3 +732,9 @@ maatuska:~% curl -O -v https://beta.lobber.se/torrent/198.torrent?lkey=baa536d2d
 - SSLv3, TLS alert, Client hello (1):
 } [data not shown]
 maatuska:~%
+* TODO Fix today
+- [X] clean up db
+- [X] rewrite torrents in lobber-storagenode
+- [ ] remove canhaz in lobber-storagenode and lobber
+- [ ] add 150 torrents to the system
+- [ ] have 3 SN's and 20 BT clients running

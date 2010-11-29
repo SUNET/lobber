@@ -84,7 +84,7 @@ def announce(request,info_hash=None):
     if pi == None:
         pi,created = PeerInfo.objects.get_or_create(info_hash=info_hash,port=port,address=ip)
     
-    if request.user and not request.user.is_anonymous:
+    if request.user and not request.user.is_anonymous():
         pi.user = request.user
         
     DEFNUMWANT = 50
