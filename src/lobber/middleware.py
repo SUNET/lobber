@@ -62,22 +62,16 @@ class KeyMiddleware(object):
                         % (username, cmd, urlfilter))
             return                      # Fail.
 
-        if request.user.is_authenticated():
-            if request.user.username == self.clean_username(username, request):
-                # FIXME: What is this case and do we need to login the
-                # user here?
-                logger.info("user %s already authenticated" % username)
+        # Authenticate and login user.
+        auth_user = auth.authenticate(username=username, password=username)
+        if auth_user:
+            profile.displayname = username
+            request.user = auth_user
+            auth.login(request, auth_user)
+            request.session.flush()
         else:
-            # Authenticate and login user.
-            auth_user = auth.authenticate(username=username, password=username)
-            if auth_user:
-                profile.displayname = username
-                request.user = auth_user
-                auth.login(request, auth_user)
-                request.session.flush()
-            else:
-                logger.debug("%s: failed authentication" % username)
-                return                  # Fail.
+            logger.debug("%s: failed authentication" % username)
+            return                  # Fail.
 
         # EPIC SUCCESS!!!  This is where we do anything needed for an
         # authenticated and logged in user.
