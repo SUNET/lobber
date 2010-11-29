@@ -72,6 +72,7 @@ class KeyMiddleware(object):
             profile.displayname = username
             request.user = auth_user
             auth.login(request, auth_user)
+	    request.session.flush()
         else:
             logger.debug("%s: failed authentication" % username)
         
