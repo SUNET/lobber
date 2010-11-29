@@ -558,6 +558,17 @@ diff -c /etc/init.d/shibd\~ /etc/init.d/shibd
 
 Diff finished.  Tue Aug 10 13:02:21 2010
 
+** cleaning up torrents
+lobber (in a python dev-shell):
+map(lambda t: t.remove(), Torrent.objects.filter())
+
+tracker (in a db shell):
+delete from tracker_peerinfo;
+
+storage nodes:
+rm /var/lib/transmission-daemon/info/torrents/*.torrent
+rm /var/lib/transmission-daemon/info/resume/*.resume
+/etc/init.d/transmission-daemon restart
 * Tracker
 ** Correspondance
 - talked to nrkbeta <knut-olav.hoven@nrk.no> 2009-09-22 about opentracker
@@ -661,3 +672,63 @@ verify return:0
 9048:error:04067072:rsa routines:RSA_EAY_PUBLIC_DECRYPT:padding check failed:rsa_eay.c:697:
 9048:error:1408D07B:SSL routines:SSL3_GET_KEY_EXCHANGE:bad signature:s3_clnt.c:1448:
 
+** key-user login
+*** getting session
+maatuska:~% curl -O -v https://beta.lobber.se/torrent/198.torrent?lkey=baa536d2d4e89cd7b28066aef6
+- About to connect() to beta.lobber.se port 443 (#0)
+-   Trying 192.36.171.184... connected
+- Connected to beta.lobber.se (192.36.171.184) port 443 (#0)
+- successfully set certificate verify locations:
+-   CAfile: none
+  CApath: /etc/ssl/certs
+- SSLv3, TLS handshake, Client hello (1):
+} [data not shown]
+- SSLv3, TLS handshake, Server hello (2):
+{ [data not shown]
+- SSLv3, TLS handshake, CERT (11):
+{ [data not shown]
+- SSLv3, TLS handshake, Server key exchange (12):
+{ [data not shown]
+- SSLv3, TLS handshake, Server finished (14):
+{ [data not shown]
+- SSLv3, TLS handshake, Client key exchange (16):
+} [data not shown]
+- SSLv3, TLS change cipher, Client hello (1):
+} [data not shown]
+- SSLv3, TLS handshake, Finished (20):
+} [data not shown]
+- SSLv3, TLS change cipher, Client hello (1):
+{ [data not shown]
+- SSLv3, TLS handshake, Finished (20):
+{ [data not shown]
+- SSL connection using DHE-RSA-AES256-SHA
+- Server certificate:
+-        subject: C=SE; O=SUNET; CN=beta.lobber.se
+-        start date: 2010-04-16 00:00:00 GMT
+-        expire date: 2013-04-15 23:59:59 GMT
+-        subjectAltName: beta.lobber.se matched
+-        issuer: C=NL; O=TERENA; CN=TERENA SSL CA
+-        SSL certificate verify ok.
+> GET /torrent/198.torrent?lkey=baa536d2d4e89cd7b28066aef6 HTTP/1.1
+> User-Agent: curl/7.19.7 (i486-pc-linux-gnu) libcurl/7.19.7 OpenSSL/0.9.8k zlib/1.2.3.3 libidn/1.15
+> Host: beta.lobber.se
+> Accept: */*
+>
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0< HTTP/1.1 200 OK
+< Date: Sun, 28 Nov 2010 12:35:46 GMT
+< Server: Apache/2.2.14 (Ubuntu)
+< Vary: Cookie
+< Content-Length: 176
+< Content-Disposition: filename=a.torrent
+< Set-Cookie:  sessionid=41acec86643cc38721e827dd75b97b03; expires=Sun, 12-Dec-2010 12:35:46 GMT; Max-Age=1209600; Path=/
+< Content-Type: application/x-bittorrent
+<
+{ [data not shown]
+176   176  176   176    0     0    725      0 --:--:-- --:--:-- --:--:--  1557* Connection #0 to host beta.lobber.se left intact
+
+- Closing connection #0
+- SSLv3, TLS alert, Client hello (1):
+} [data not shown]
+maatuska:~%
