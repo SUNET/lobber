@@ -67,10 +67,8 @@ def announce(request,info_hash=None):
     info_hash = _hexify(unquote(info_hash))
     #logger.debug("announce: info_hash=%s" % info_hash)
 
-
-    #t = Torrent.objects.filter(hashval=info_hash)[:1]
-    #if not t:
-    #    return _err("Not authorized")
+    if Torrent.objects.filter(hashval=info_hash).count() < 1:
+        return _err("Not authorized")
     
     pi = None
     #if request.GET.has_key('trackerid'):
