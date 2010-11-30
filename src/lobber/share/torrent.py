@@ -168,7 +168,9 @@ def _torrentlist(request, torrents):
                        'application/rss+xml': 'share/rss2.xml',
                        'text/rss': 'share/rss2.xml',
                        'application/json': json_response([{'label': t.name,'link': "/torrent/%d" % (t.id), 'id': t.id, 'info_hash': t.hashval} for t in torrents])},
-                      {'torrents': torrents, 'title': 'Search result',
+                      {'torrents': torrents,
+                       'refresh': 20, 
+                       'title': 'Search result',
                        'description': 'Search result'})
 
 def torrentdict(request,t,forms=None):
@@ -394,7 +396,7 @@ def torrent_by_hashval(request, inst):
         t = Torrent.objects.get(hashval=inst)
     except ObjectDoesNotExist:
         return render_to_response('share/index.html',
-                                  make_response_dict(request, {'error': "No such torrent: %s" % inst}))
+                                  make_response_dict(request, {'refresh': 20,'error': "No such torrent: %s" % inst}))
     except MultipleObjectsReturned:
         return _torrentlist(request,
                             filter(lambda t: t.authz(request.user,'r'),Torrent.objects.filter(hashval=inst).order_by('-creation_date')))
