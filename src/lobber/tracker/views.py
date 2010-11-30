@@ -148,7 +148,7 @@ def announce(request,info_hash=None):
     dict['complete'] = seeding
     dict['downloaded'] = downloaded
     dict['incomplete'] = count - seeding
-    dict['interval'] = 10
+    dict['interval'] = 60
     
     if compact:
         if p4str.value:
