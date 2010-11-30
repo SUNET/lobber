@@ -5,6 +5,7 @@ urlpatterns = patterns('',
     (r'^$', "lobber.share.torrent.welcome"),
     ## RESTful API.
     # Torrents.
+    (r'^index.html$',"lobber.share.torrent.welcome"),
     (r'^torrent/$',"lobber.share.torrent.show"),
     (r'^torrent/all.rss$',"lobber.share.torrent.show"),
     (r'^torrent/all.json$',"lobber.share.torrent.show"),
