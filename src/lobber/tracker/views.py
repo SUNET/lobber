@@ -47,14 +47,10 @@ def peer_address(request):
     return ip,port
 
 def get_from_qs(qs, key):
-    res = None
-    i = qs.find(key)
-    if i >= 0:
-        i2 = qs[i:].find('&')
-        if i2 >= 0:
-            res = qs[i+len(key):i2]
-    return res
-
+    for q in qs.split('&'):
+        if q.startswith(key):
+            return q[len(key):]
+    
 def announce(request,info_hash=None):
     
     if not info_hash and request.GET.has_key('info_hash'):
