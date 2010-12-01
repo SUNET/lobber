@@ -330,7 +330,7 @@ def show(request, inst=None):
     
     t = get_object_or_404(Torrent,pk=inst)
     if not t.authz(request.user,'r'):
-        return HttpResponseForbidden("You don't have read access on %d" % inst)
+        return HttpResponseForbidden("You don't have read access on %s" % inst)
     
     d = torrentdict(request, t)
     return respond_to(request,
@@ -383,7 +383,7 @@ class TorrentView(TorrentViewBase):
         
         t = get_object_or_404(Torrent,pk=inst)
         if not t.authz(request.user,'r'):
-            return HttpResponseForbidden("You don't have read access on %d" % inst)
+            return HttpResponseForbidden("You don't have read access on %s" % inst)
         
         d = torrentdict(request, t)
         return respond_to(request,
