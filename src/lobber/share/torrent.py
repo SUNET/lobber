@@ -337,6 +337,19 @@ def show(request, inst=None):
         return HttpResponseForbidden("You don't have read access on %s" % inst)
     
     d = torrentdict(request, t)
+    d['edit'] = True
+    return respond_to(request,
+                      {'text/html': 'share/torrent.html',
+                       'application/x-bittorrent': _torrent_file_response},d)
+
+@login_required
+def land(request, inst):
+    t = get_object_or_404(Torrent,pk=inst)
+    if not t.authz(request.user,'r'):
+        return HttpResponseForbidden("You don't have read access on %s" % inst)
+    
+    d = torrentdict(request, t)
+    d['edit'] = False
     return respond_to(request,
                       {'text/html': 'share/torrent.html',
                        'application/x-bittorrent': _torrent_file_response},d)
