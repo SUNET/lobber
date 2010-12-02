@@ -5,7 +5,7 @@ label { display:block; }
 #modal-dialog { font-size: 110%; }
 #modal-dialog input.text textarea { margin-bottom:12px; width:95%; padding: .4em; }
 #modal-dialog fieldset { padding:0; border:0; margin-top:25px; }
-div#thisislobber { font: 150% "Trebuchet MS", sans-serif; margin-left: 300px; margin-top: 150px; }
+div#thisislobber { font: 150% "Trebuchet MS", sans-serif; margin-top: 150px; }
 div#footer { font: 100% "Trebuchet MS", sans-serif; border-top: 1px solid #CECECE; position: absolute; bottom: 0; padding-bottom: 10px; width: 100%; }
 div#footer ul { margin-right: 50px; list-style: none; padding: 0; margin: 0; }
 div#footer li { float: left; margin: 0 0.15em}
