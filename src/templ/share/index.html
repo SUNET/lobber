@@ -39,9 +39,9 @@ $(function() {
 	   				var id = torrent.attr('id');
 	   				_update_tags(id);
 	   				
-	   				//$.getJSON('/torrent/scrape/'+id+'.json',function(data) {
-	   				//	torrent.find('.scrape').text('seeders: '+data['downloaded']+' leechers: '+data['incomplete']);
-	   				//});
+	   				$.getJSON('/torrent/scrape/'+id+'.json',function(data) {
+	   					torrent.find('.scrape').text('seeders: '+data['downloaded']+' leechers: '+data['incomplete']);
+	   				});
 		   		}
    			}
    });
