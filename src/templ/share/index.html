@@ -44,12 +44,7 @@ $(function() {
    			    if (torrent.size() > 0) {
 	   				var id = torrent.attr('id');
 	   				_update_tags(id);
-	   				
-	   				$.getJSON('/torrent/scrape/'+id+'.json',function(data) {
-	   					scrape = torrent.find('.scrape');
-	   					scrape.text('seeders: '+data['complete']+' leechers: '+data['incomplete']);
-	   					scrape.addClass("ui-state-active");
-	   				});
+	   				_update_status(id,torrent);
 		   		}
    			}
    });   
@@ -72,6 +67,18 @@ $(function() {
 		});
    $("#launch-dlmanager").webstart({jnlp: 'add.jnlp',minVersion: '1.6.0'});
 });
+
+function _update_status(id,torrent) {
+ 		if (!torrent) {
+ 		   torrent = $("#"+id);
+ 		}
+	   	$.getJSON('/torrent/scrape/'+id+'.json',function(data) {
+	   		scrape = torrent.find('.scrape');
+	   		scrape.text('seeders: '+data['complete']+' leechers: '+data['incomplete']);
+	   		scrape.addClass("ui-state-active");
+	   	});
+}
+
 function removeit(id) {
    $('#remove-torrent-dialog form').attr('action','/torrent/remove/'+id+'.json');
    $('#remove-torrent-dialog').dialog('open');
@@ -121,6 +128,7 @@ function removeit(id) {
 	               <a class="tip" title="Share a link to this data" href="/link/torrent/{{t.id}}">Share</a>
 	           </div>
             </li>
+            <li><div class="minipanel"><a href="javascript:void(0);" onClick="_update_status('{{t.id}}')"><span class="ui-icon ui-icon-refresh"></span></a></div></li>
             <li>
                <div class="scrape minipanel ui-corner-all"></div>
             </li>
