@@ -38,7 +38,7 @@ li.links { padding: 0; margin: 0; }
 .altcontent { padding-left: 20px; padding-bottom: 10px; width: 80%; }
 .altitem { margin-top: 20px; }
 .ui-icon { display: inline-block !important; }
-.minipanel { padding-top: 4px; padding-bottom: 4px; padding-left: 6px; padding-right: 6px; }
+.minipanel { padding-top: 5px; padding-bottom: 5px; padding-left: 6px; padding-right: 6px; }
 
 form.cmxform fieldset {
   margin-bottom: 10px;
