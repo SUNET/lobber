@@ -136,9 +136,27 @@ class Torrent(models.Model):
         permission is denied.
         """
         acl = self.get_acl(user)
-        if not ace in acl:
-            acl = self.set_acl(user, acl+[ace])
-        return acl
+        if ace in acl:           # Optimization: ACE already in place.
+            return True
+
+        u, perms1 = ace.split('#')      # New ACE.
+        perms2 = None
+        for a in acl:                   # Look for U in existing ACL.
+            if a.split('#')[0] == u:
+                perms2 = a.split('#')[1] # Save old permissions.
+                if not self.remove_ace(user, a): # Remove ACE.
+                    return False
+                break       # Optimization: There's at most one match.
+
+        if perms2:                    # Merging ACL's.
+            acl = self.get_acl(user)  # We removed ACE -- refresh ACL.
+            for p in perms1:          # Add new permissions not in place.
+                if p not in perms2:
+                    perms2 = perms2 + p
+        else:                           # Use permissions in new ACE.
+            perms2 = perms1
+
+        return self.set_acl(user, acl+['%s#%s' % (u, perms2)])
     
     def remove_ace(self, user, ace):
         """
