@@ -14,11 +14,12 @@ var link = $('#link'),
 function _update_tags(id) {
 	if (id) {
    		$.getJSON('/torrent/'+id+'/tags.json',function(data) {
+   			nlinks = data.size();
    			links = $.map(data,function(elt) {
    				return "<a href=\"/torrent/tag/"+elt+".html\">"+elt+"</a>";
    			});
    			tags = $("#"+id).find('div.tags');
-   			if (links.size() > 0) {
+   			if (nlinks > 0) {
 	   			tags.html(links.join("&nbsp;"));
 	   			tags.addClass("ui-state-active");
 	   		}
