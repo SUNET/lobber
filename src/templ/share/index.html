@@ -18,7 +18,7 @@ function _update_tags(id) {
    				return "<a href=\"/torrent/tag/"+elt+".html\">"+elt+"</a>";
    			});
    			tags = $("#"+id).find('div.tags');
-   			if (tags) {
+   			if (tags.size() > 0) {
 	   			tags.html(links.join("&nbsp;"));
 	   			tags.addClass("ui-state-active");
 	   		}
@@ -45,7 +45,9 @@ $(function() {
 	   				_update_tags(id);
 	   				
 	   				$.getJSON('/torrent/scrape/'+id+'.json',function(data) {
-	   					torrent.find('.scrape').text('seeders: '+data['complete']+' leechers: '+data['incomplete']);
+	   					scrape = torrent.find('.scrape');
+	   					scrape.text('seeders: '+data['complete']+' leechers: '+data['incomplete']);
+	   					scrape.addClass("ui-state-active");
 	   				});
 		   		}
    			}
@@ -119,7 +121,7 @@ function removeit(id) {
 	           </div>
             </li>
             <li>
-               <div class="scrape minipanel ui-corner-all ui-state-active"></div>
+               <div class="scrape minipanel ui-corner-all"></div>
             </li>
             {% if t.effective_rights.w or t.effective_rights.d %}
             <li style="float: right;">
