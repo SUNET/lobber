@@ -18,7 +18,7 @@ function _update_tags(id) {
    				return "<a href=\"/torrent/tag/"+elt+".html\">"+elt+"</a>";
    			});
    			tags = $("#"+id).find('div.tags');
-   			if (tags.size() > 0) {
+   			if (links.size() > 0) {
 	   			tags.html(links.join("&nbsp;"));
 	   			tags.addClass("ui-state-active");
 	   		}
