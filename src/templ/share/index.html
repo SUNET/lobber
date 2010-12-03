@@ -18,8 +18,10 @@ function _update_tags(id) {
    				return "<a href=\"/torrent/tag/"+elt+".html\">"+elt+"</a>";
    			});
    			tags = $("#"+id).find('div.tags');
-   			tags.html(links.join("&nbsp;"));
-   			tags.addClass("ui-state-active");
+   			if (tags) {
+	   			tags.html(links.join("&nbsp;"));
+	   			tags.addClass("ui-state-active");
+	   		}
 		});
 	}
 }
@@ -138,7 +140,6 @@ function removeit(id) {
        </div>
        {% if t.description %}
        <div class="description">
-          <h4>Description:</h4>
           <p>{{t.description}}</p>
        </div>
        {% endif %} 
