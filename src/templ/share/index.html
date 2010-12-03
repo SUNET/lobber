@@ -14,7 +14,7 @@ var link = $('#link'),
 function _update_tags(id) {
 	if (id) {
    		$.getJSON('/torrent/'+id+'/tags.json',function(data) {
-   			nlinks = data.lengths;
+   			nlinks = data.length;
    			links = $.map(data,function(elt) {
    				return "<a href=\"/torrent/tag/"+elt+".html\">"+elt+"</a>";
    			});
