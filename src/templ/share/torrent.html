@@ -97,25 +97,25 @@ function removeit(id) {
 </div>
 {% endif %}
 
-<h1>{{torrent.name}} - created {{torrent.creation_date|datehumanize}}
-    {% if edit %}
-	{% if torrent.effective_rights.w or torrent.effective_rights.d %}
-	<a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{torrent.id}}')">
-       <span class="ui-icon ui-icon-trash"></span>
-    </a>
-    {% endif %}
-    {% if torrent.effective_rights.r or torrent.effective_rights.w %}
-    <a class="tip" title="Share a link to this data" href="/link/torrent/{{torrent.id}}">
-       <span class="ui-icon ui-icon-extlink"></span>
-    </a>
-    {% endif %}
-    {% endif %}
-</h1>
+<h1>{{torrent.name}} - created {{torrent.creation_date|datehumanize}}</h1>
+<div class="navlist" style="margin-top: 50px;">
+   <ul>
+	   <li><div class="button"><a href="/torrent/{{torrent.id}}.torrent">Download</a></div></li>
+	   {% if edit %}
+	   {% if torrent.effective_rights.w or torrent.effective_rights.d %}
+	   <li><div class="button"><a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{torrent.id}}')">Delete</a></div></li>
+	   {% endif %}
+	   {% if torrent.effective_rights.r or torrent.effective_rights.w %}
+	   <li><div class="button"><a class="tip" title="Share a link to this data" href="/link/torrent/{{torrent.id}}">Share a link</a></div></li>
+   	   {% endif %}
+   </ul>
+</div>
+{% endif %}
+<div class="clear"></div>
+
 <p>
 {{torrent.description}}
 </p>
-
-<div class="button"><a href="/torrent/{{torrent.id}}.torrent">Download {{torrent.name}}</a></div>
 
 <div id="settings">
    {% if torrent.effective_rights.r or torrent.effective_rights.w or torrent.effective_rights.d %}
