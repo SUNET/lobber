@@ -106,10 +106,15 @@ def _store_torrent(req, form):
     
     name_on_disk = '%s/%d.torrent' % (TORRENTS,t.id)
     f = file(name_on_disk, 'w')
-    f.write(torrent_file_content)
-    f.close()
-    t.data = '%d.torrent' % t.id
-    t.save()
+    try:
+        f.write(torrent_file_content)
+        f.close()
+        t.data = '%d.torrent' % t.id
+        t.save()
+    except Exception,ex:
+        t.delete()
+        logger.error(repr(ex))
+        return None
     
     notifyJSON('/torrents/notify', {'add': [t.id,torrent_hash]})
     if datafile:
