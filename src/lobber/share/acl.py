@@ -40,7 +40,7 @@ def add_ace(req, tid, ace):
         return HttpResponse("Permission denied.", status=403)
 
     t.save()
-    return respond_to(req,{'text/html': HttpResponseRedirect("/torrent/%d/ace" % (t.id)),
+    return respond_to(req,{'text/html': HttpResponseRedirect("/torrent/%d" % (t.id)),
                            'application/json': json_response(ace)})
 
 @login_required
@@ -52,7 +52,7 @@ def remove_ace(req, tid, ace):
         return HttpResponse("Permission denied.", status=403)
         
     t.save()
-    return respond_to(req,{'text/html': HttpResponseRedirect("/torrent/%d/ace" % (t.id)),
+    return respond_to(req,{'text/html': HttpResponseRedirect("/torrent/%d" % (t.id)),
                            'application/json': json_response(ace)})
 
 @login_required
