@@ -261,7 +261,9 @@ def scrape(request,inst):
     except ObjectDoesNotExist:
         return HttpResponseNotFound("No such torrent")
 
-    return json_response(peer_status([t.eschash()]))
+    hash = t.hashval
+    status = peer_status([hash])
+    return json_response(status[hash])
 
 @login_required
 def scrape_hash(request,hash):
@@ -270,7 +272,9 @@ def scrape_hash(request,hash):
         return HttpResponseNotFound("No such torrent")
     t = qst[0]
 
-    return json_response(peer_status([t.eschash()]))
+    hash = t.hashval
+    status = peer_status([hash])
+    return json_response(status[hash])
 
 @login_required
 def upload_jnlp(req):
@@ -333,6 +337,19 @@ def show(request, inst=None):
         return HttpResponseForbidden("You don't have read access on %s" % inst)
     
     d = torrentdict(request, t)
+    d['edit'] = True
+    return respond_to(request,
+                      {'text/html': 'share/torrent.html',
+                       'application/x-bittorrent': _torrent_file_response},d)
+
+@login_required
+def land(request, inst):
+    t = get_object_or_404(Torrent,pk=inst)
+    if not t.authz(request.user,'r'):
+        return HttpResponseForbidden("You don't have read access on %s" % inst)
+    
+    d = torrentdict(request, t)
+    d['edit'] = False
     return respond_to(request,
                       {'text/html': 'share/torrent.html',
                        'application/x-bittorrent': _torrent_file_response},d)

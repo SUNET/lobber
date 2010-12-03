@@ -40,78 +40,11 @@ $(function() {
 	   				_update_tags(id);
 	   				
 	   				//$.getJSON('/torrent/scrape/'+id+'.json',function(data) {
-	   				//	torrent.find('.scrape').text('seeders: '+data['downloaded']+' leechers: '+data['incomplete']);
+	   				//	torrent.find('.scrape').text('seeders: '+data['complete']+' leechers: '+data['incomplete']);
 	   				//});
 		   		}
    			}
-   });
-   $("#mail-expiration").datepicker({'dateFormat': 'yy-mm-dd', minDate: "+1D"});
-   $('#share-mail-dialog').dialog({
-       position: ['center','center'],
-       autoOpen: false,
-       height: 300,
-       width: 450,
-       modal: true,
-       buttons: {
-          'Send email': function() {
-             var form = $('#share-mail-dialog form');
-             if (form.valid()) {
-                form.submit();
-                $(this).dialog('close');
-             }
-          },
-          'Cancel': function() {
-             $(this).dialog('close');
-          }
-       },
-       close: function() {
-          allFields.val('').removeClass('ui-state-error');
-       }
-   });
-   
-   $('#share-mail-dialog form').validate({});
-   $('#share-mail-dialog form').submit(function() {
-      $.get($(this).attr('action'),$(this).serialize(),function(data) {
-         if (data) { _i(data); }
-      });
-      return false;
-   });
-   
-   $("#link-expiration").datepicker({'dateFormat': 'yy-mm-dd', minDate: "+1D"});
-   $('#share-link-dialog form').validate({});
-   $('#share-link-dialog').dialog({
-       dialogClass: 'link-dialog',
-       autoOpen: false,
-       height: 200,
-       width: 500,
-       modal: true,
-       buttons: {
-          'Create Link': function() {
-             if ($('#share-link-dialog form').valid()) {
-                $('#share-link-dialog form').submit();
-             }
-          },
-          'Done': function() {
-             $(this).dialog('close');
-          }
-       },
-       close: function() {
-          $('#link').html('');
-          allFields.val('').removeClass('ui-state-error');
-       }
-   });
-   $('#share-link-dialog form').submit(function() {
-      $.get($(this).attr('action'),$(this).serialize(),function(data) {
-         $('#link-explain').show();
-         $('#link').html(data);
-         var button = getDialogButton( '.link-dialog', 'Create Link' );
-		 if ( button ) {
-	        button.attr('disabled', 'disabled' ).addClass( 'ui-state-disabled' );
-	     }
-      });
-      return false;
-   });
-   
+   });   
    $("#remove-torrent-dialog").dialog({
 			autoOpen: false,
 			resizable: false,
@@ -131,23 +64,6 @@ $(function() {
 		});
    $("#launch-dlmanager").webstart({jnlp: 'add.jnlp',minVersion: '1.6.0'});
 });
-
-function gufrt(id) {
-   $('#share-link-dialog form').attr('action',"/torrent/gufrt/"+id);
-   $('#share-link-dialog').dialog('open');
-}
-
-function gufrtag(tag) {
-   $('#share-link-dialog form').attr('action',"/torrent/tag/gufrt/"+tag);
-   $('#share-link-dialog').dialog('open');
-}
-
-function mailit(id) {
-   allFields.val('');
-   $('#share-mail-dialog form').attr('action','/torrent/sendlink/'+id);
-   $('#share-mail-dialog').dialog('open');
-}
-
 function removeit(id) {
    $('#remove-torrent-dialog form').attr('action','/torrent/remove/'+id+'.json');
    $('#remove-torrent-dialog').dialog('open');
@@ -162,17 +78,6 @@ function removeit(id) {
   <a href="/torrent/add">Upload using your Browser</a>
 </div>
 
-<div id="share-link-dialog" class="modal-dialog" title="Share this data">
-   <form action="">
-      <fieldset>
-         <label for="expiration">Expiration date
-         <input type="text" name="expiration" id="link-expiration" value="" size="20" class="text required ui-widget-content ui-corner-all" /></label>
-      </fieldset>
-      <p id="link-explain" style="display: none;">Give this link to someone who should have access to this data:</p>
-      <div id="link" class="text"></div>
-   </form>
-</div>
-
 <div id="remove-torrent-dialog" class="modal-dialog" title="Really remove this torrent?">
     <form action="">
 		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
@@ -180,21 +85,10 @@ function removeit(id) {
 	</form>
 </div>
 
-<div id="share-mail-dialog" class="modal-dialog" title="Send a link to this data">
-   <form action="">
-      <fieldset>
-         <label for="to">Email <input type="text" name="to" id="to" value="" size="30" class="text required ui-widget-content ui-corner-all" /></label>
-         <label for="expiration">Expiration date<input type="text" name="expiration" id="mail-expiration" value="" size="20" class="text required ui-widget-content ui-corner-all" /></label>
-         <label for="message">Message</label>
-         <textarea name="message" id="message" rows="4" cols="40" class="text ui-widget-content ui-corner-all">Here is some data for you...</textarea>
-      </fieldset>
-   </form>
-</div>
-
 {% if torrents %}
 <h1 style="display: inline; float: left;">{{title}}
 {% if tag %}
-<a class="tip" title="Share a link to torrents tagged with '{{tag}}'" href="javascript:void(0);" onClick="gufrtag('{{tag}}')">
+<a class="tip" title="Share a link to torrents tagged with '{{tag}}'" href="/link/tag/{{tag}}">
    <span style="float: right; margin-top: 2px;" class="ui-icon ui-icon-extlink"></span>
 </a>
 {% endif %}
@@ -213,35 +107,18 @@ function removeit(id) {
                <div class="ui-corner-all ui-state-highlight" style="padding-right: 4px;">
 	               <a class="tip" title="Download this data using a torrent client" href="{{t.url}}">
 	                  <span class="ui-icon ui-icon-arrowthickstop-1-s"></span>
-			  <span>Download</span>
-	                  <!-- <div style="float: right; padding-top: 2px;">Download</div> -->
+			  		  <span>Download</span>
 	               </a>
 	           </div>
             </li>
-            <!-- li>
-               <a class="tip" title="Download this data using the download manager" href="/torrent/{{t.id}}.jnlp">
-                  <span class="ui-icon ui-icon-folder-open"></span>
-               </a>
-            </li -->
-            <!-- li>
-               <a class="tip" title="Share a link to this data" href="javascript:void(0);" onClick="gufrt('{{t.id}}')">
-                  <span class="ui-icon ui-icon-extlink"></span>
-               </a>
-            </li -->
             <li>
                <div class="ui-corner-all ui-state-highlight" style="padding-right: 4px;">
 	               <a class="tip" title="Share a link to this data" href="/link/torrent/{{t.id}}">
 	                  <span class="ui-icon ui-icon-extlink"></span>
-			  <span>Share</span>
-	                  <!-- <div style="float: right; padding-top: 2px;">Share</div> -->
+			  		  <span>Share</span>
 	               </a>
 	           </div>
             </li>
-            <!-- li>
-               <a class="tip" title="Send a link to this data" href="javascript:void(0);" onClick="mailit('{{t.id}}')">
-                  <span class="ui-icon ui-icon-mail-closed"></span>
-               </a>
-            </li -->
             <li>
                <div class="scrape"></div>
             </li>
@@ -250,8 +127,7 @@ function removeit(id) {
                <div class="ui-corner-all ui-state-highlight" style="padding-right: 4px;">
 	               <a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{t.id}}')">
 	                  <span class="ui-icon ui-icon-trash"></span>
-			  <span>Delete</span>
-	                  <!-- <div style="float: right; padding-top: 2px;">Delete</div> -->
+			  		  <span>Delete</span>
 	               </a>
 	           </div>
             </li>
@@ -260,8 +136,7 @@ function removeit(id) {
                <div class="ui-corner-all ui-state-highlight" style="padding-right: 4px;">
 	               <a class="tip" title="Modify torrent" href="/torrent/{{t.id}}">
 	                  <span class="ui-icon ui-icon-wrench"></span>
-			  <span>Modify</span>
-	                  <!-- <div style="float: right; padding-top: 2px;">Modify</div> -->
+			          <span>Modify</span>
 	               </a>
 	           </div>
             </li>

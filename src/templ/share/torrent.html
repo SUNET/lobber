@@ -88,14 +88,17 @@ function removeit(id) {
 </script>
 {% endblock %}
 {% block main %}
+{% if edit %}
 <div id="remove-torrent-dialog" class="modal-dialog" title="Really remove this torrent?">
     <form action="">
 		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
 			This torrent will be permanently deleted and cannot be recovered. Are you sure?</p>
 	</form>
 </div>
-{% if torrent.effective_rights.r or torrent.effective_rights.w or torrent.effective_rights.d %}
+{% endif %}
+
 <h1>{{torrent.name}} - created {{torrent.creation_date|datehumanize}}
+    {% if edit %}
 	{% if torrent.effective_rights.w or torrent.effective_rights.d %}
 	<a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{torrent.id}}')">
        <span class="ui-icon ui-icon-trash"></span>
@@ -106,11 +109,14 @@ function removeit(id) {
        <span class="ui-icon ui-icon-extlink"></span>
     </a>
     {% endif %}
+    {% endif %}
 </h1>
 <p>
 {{torrent.description}}
 </p>
-{% endif %}
+
+<div class="button"><a href="/torrent/{{torrent.id}}.torrent">Download {{torrent.name}}</a></div>
+
 <div id="settings">
    {% if torrent.effective_rights.r or torrent.effective_rights.w or torrent.effective_rights.d %}
    <div id="info" class="ui-widget-content ui-corner-all altitem">
@@ -133,7 +139,7 @@ function removeit(id) {
    	  </div>
    </div>
    {% endif %}
-   {% if torrent.effective_rights.w %}
+   {% if edit and torrent.effective_rights.w %}
    <div id="tags" class="ui-widget-content ui-corner-all altitem">
       <h3 class="altheader">Tags</h3>
       <div class="altcontent">
@@ -150,7 +156,7 @@ function removeit(id) {
       </div>
    </div>
    {% endif %}
-   {% if torrent.effective_rights.w and forms.permissions %}
+   {% if edit and torrent.effective_rights.w and forms.permissions %}
    <div id="permissions" class="ui-widget-content ui-corner-all altitem">
 	<h3 class="altheader">Permissions</h3>
 	<div class="altcontent">
