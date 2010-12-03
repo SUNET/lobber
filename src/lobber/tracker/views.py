@@ -16,13 +16,8 @@ from ctypes import create_string_buffer
 
 import lobber.log
 from lobber.settings import LOBBER_LOG_FILE
+from lobber.common import hexify
 logger = lobber.log.Logger("tracker", LOBBER_LOG_FILE)
-
-def _hexify(s):
-    r = ''
-    for n in range(0, len(s)):
-        r += '%02x' % ord(s[n])
-    return r
 
 def _err(msg):
     return HttpResponse(bencode({'failure reason': msg}),mimetype='text/plain')
@@ -60,7 +55,7 @@ def announce(request,info_hash=None):
     if not info_hash:
         return _err('Missing info_hash')
 
-    info_hash = _hexify(unquote(info_hash))
+    info_hash = hexify(unquote(info_hash))
     #logger.debug("announce: info_hash=%s" % info_hash)
 
     if Torrent.objects.filter(hashval=info_hash).count() < 1:

@@ -261,7 +261,7 @@ def scrape(request,inst):
     except ObjectDoesNotExist:
         return HttpResponseNotFound("No such torrent")
 
-    hash = t.eschash()
+    hash = t.hashval
     status = peer_status([hash])
     return json_response(status[hash])
 
@@ -272,7 +272,7 @@ def scrape_hash(request,hash):
         return HttpResponseNotFound("No such torrent")
     t = qst[0]
 
-    hash = t.eschash()
+    hash = t.hashval
     status = peer_status([hash])
     return json_response(status[hash])
 
