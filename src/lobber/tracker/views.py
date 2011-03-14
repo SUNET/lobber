@@ -8,10 +8,8 @@ from lobber.tracker.models import PeerInfo
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from deluge.bencode import bencode
-from socket import gethostname
 from lobber.share.models import Torrent
 from urllib import unquote
-import struct
 from ctypes import create_string_buffer
 
 import lobber.log

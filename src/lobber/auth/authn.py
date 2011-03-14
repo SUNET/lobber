@@ -62,8 +62,6 @@ def login_federated(request):
     for attrib_name, meta_name in (("first_name", "HTTP_GIVENNAME"),
                                    ("last_name", "HTTP_SN"),
                                    ("email", "HTTP_MAIL")):
-
-        attrib_value = getattr(request.user, attrib_name)
         meta_value = request.META.get(meta_name)
         if meta_value != "(null)":
             setattr(request.user, attrib_name, meta_value)

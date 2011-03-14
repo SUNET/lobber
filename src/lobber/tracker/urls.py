@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns
 
 urlpatterns = patterns('',
     (r'^announce\??(?P<info_hash>.+)$',"lobber.tracker.views.announce"),

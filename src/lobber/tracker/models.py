@@ -7,7 +7,6 @@ from django.db import models
 from django.contrib.auth.models import User
 import socket
 import struct
-import ctypes
 
 def _urlesc(s):
     r = ''
