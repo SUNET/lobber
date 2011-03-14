@@ -6,11 +6,8 @@ import re
 from django.contrib import auth
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-
-from lobber.share.models import UserProfile
-from lobber.settings import LOBBER_LOG_FILE, APPLICATION_CTX
+from lobber.settings import LOBBER_LOG_FILE
 import lobber.log
-from pprint import pprint
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 class KeyMiddleware(object):
