@@ -10,3 +10,5 @@ torrents
 .settings
 src/TAGS
 /torrents
+src/env
+src/admin-media
