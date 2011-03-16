@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404
 from lobber.links.forms import LinkForm, LinkMessageForm
 from lobber.multiresponse import respond_to
 from lobber.share.users import create_key_user_profile
+from django.core.mail import send_mail
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
@@ -24,18 +25,13 @@ def send_link_mail(request,pid,tid):
         form = LinkMessageForm(request.POST)
         if form.is_valid():        
             link = '%s/torrent/%d?lkey=%s' % (NORDUSHARE_URL, t.id, keyp.get_username())
-            msg = "Data: "+strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())+"\n"
-            msg += "From: "+request.user.email+"\n"
-            msg += "To: "+form.cleaned_data['to']+"\n"
-            msg += "Subject: "+request.user.get_full_name()+" has shared some data with you\n"
+            msg = form.cleaned_data['message']
             msg += "\n"
-            msg += "Follow this link to download the data: "+link+"\n\n"
-            msg += form.cleaned_data['message']
-            msg += "\n"
-            notifyJSON("/agents/sendmail",{'notify_to': "/session/%s" % request.session.session_key,
-                                           'to': [form.cleaned_data['to']], 
-                                           'sender': request.user.email,
-                                           'message': msg})
+            msg = "Follow this link to download the data: "+link+"\n\n"
+            send_mail(request.user.get_full_name()+" has shared some data with you", 
+                      msg, 
+                      request.user.email, 
+                      [form.cleaned_data['to']])
             return HttpResponseRedirect("/torrent/%d" % (t.id))
     else:
         form = LinkMessageForm()
