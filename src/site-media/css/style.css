@@ -1,5 +1,5 @@
-html { height: 100%; margin: 0; padding: 0;}
-body { font: 61.8% "Trebuchet MS", sans-serif; width: 80%; height: 99%; margin:0; padding:0;}
+html,body { font-size: 80%; font-family: arial, sans-serif; height: 100%; margin:0; padding:0;}
+body { width: 80%; }
 div#container { position: relative; height:auto !important; height: 99%; min-height: 80%; margin-left: 50px; margin-top: 0; padding-bottom: 50px;}
 label { display:block; }
 #modal-dialog { font-size: 110%; }
@@ -12,8 +12,9 @@ div#footer li { float: left; margin: 0 0.15em}
 div#header { margin-top: 5px; margin-bottom: 10px; background-image: url('../images/lobber-banner.jpg'); background-repeat:no-repeat; height: 100px; }
 .navlist ul { list-style: none; padding: 0; margin: 0; }
 .navlist li { float: right; display: inline;}
-.ilist ul { list-style: none inside; padding: 0px; margin: 0px; }
-.ilist li { display: inline-block; padding: 0px; margin: 0px; }
+.ilist { padding: 0px; margin: 0px; }
+.ilist ul { list-style: none; }
+.ilist li { display: inline-block; }
 .leftright ul { display: inline; list-style: none inside; padding: 0px; }
 .leftright li { display: inline-block; padding: 0px; vertical-align: top; }
 .rlist ul { list-style: none inside; padding: inherit; }
