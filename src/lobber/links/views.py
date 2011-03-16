@@ -64,7 +64,7 @@ def link_to_torrent(request,tid):
         form = LinkForm(request.POST)
         if form.is_valid():
             keyp = create_key_user_profile(creator=request.user,
-                                          urlfilter='/torrent/%d.torrent[^/]*$' % t.id,
+                                          urlfilter='/torrent/%d.torrent[^/]*$ /torrent/%d' % (t.id,t.id),
                                           tagconstraints='',
                                           entitlements='user:%s:$self' % request.user.username,
                                           expires=form.cleaned_data['expires'])
