@@ -105,7 +105,7 @@ function removeit(id) {
 	   {% if torrent.effective_rights.w or torrent.effective_rights.d %}
 	   <li><div class="button"><a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{torrent.id}}')">Delete</a></div></li>
 	   {% endif %}
-	   {% if torrent.effective_rights.r or torrent.effective_rights.w %}
+	   {% if torrent.effective_rights.w %}
 	   <li><div class="button"><a class="tip" title="Share a link to this data" href="/link/torrent/{{torrent.id}}">Share a link</a></div></li>
    	   {% endif %}
    </ul>
