@@ -183,9 +183,13 @@ def torrentdict(request,t,forms=None):
         forms = formdict()
     tags = map(lambda t: t.name,t.readable_tags(request.user))
     acl = t.get_acl(request.user)
-    return {'torrent': t, 
-            'forms': forms, 
-            'tags': tags, 
+    lkey = ""
+    if request.GET.has_key('lkey'):
+        lkey = "?lkey=%s" % request.GET['lkey']
+    return {'torrent': t,
+            'lkey': lkey,
+            'forms': forms,
+            'tags': tags,
             'acl': acl,
             'read': t.authz(request.user,'r'), 
             'write': t.authz(request.user,'w'), 

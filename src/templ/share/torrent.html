@@ -100,7 +100,7 @@ function removeit(id) {
 <h1>{{torrent.name}} - created {{torrent.creation_date|datehumanize}}</h1>
 <div class="navlist" style="margin-top: 50px;">
    <ul>
-	   <li><div class="button"><a href="/torrent/{{torrent.id}}.torrent">Download</a></div></li>
+	   <li><div class="button"><a href="/torrent/{{torrent.id}}.torrent{{lkey}}">Download</a></div></li>
 	   {% if edit %}
 	   {% if torrent.effective_rights.w or torrent.effective_rights.d %}
 	   <li><div class="button"><a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{torrent.id}}')">Delete</a></div></li>
