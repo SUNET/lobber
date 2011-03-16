@@ -7,7 +7,6 @@ from django.db import models
 from django.contrib.auth.models import User
 import socket
 import struct
-import ctypes
 
 def _urlesc(s):
     r = ''
@@ -21,11 +20,11 @@ class PeerInfo(models.Model):
     STOPPED = 3
     PAUSED = 4
     
-    user = models.ForeignKey(User,blank=True,null=True)
-    info_hash = models.CharField(max_length=128)
+    user = models.ForeignKey(User,blank=True,null=True,db_index=True)
+    info_hash = models.CharField(max_length=128,db_index=True)
     peer_id = models.CharField(max_length=128)
-    address = models.IPAddressField(null=True,blank=True)
-    port = models.IntegerField(null=True,blank=True)
+    address = models.IPAddressField(default='127.0.0.1',db_index=True)
+    port = models.IntegerField(default=0,db_index=True)
     uploaded = models.IntegerField(blank=True,null=True)
     downloaded = models.IntegerField(blank=True,null=True)
     left = models.IntegerField(blank=True,null=True)
@@ -34,7 +33,7 @@ class PeerInfo(models.Model):
     last_seen = models.DateTimeField(auto_now=True)
     
     def __unicode__(self):
-        return "%s@%s:%d" % (self.eschash(),self.address,self.port)
+        return "%s@%s:%s" % (self.eschash(),self.address,self.port)
     
     def dict(self):
         return {'ip': self.address.encode('ascii'),'port': self.port}

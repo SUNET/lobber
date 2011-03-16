@@ -14,10 +14,17 @@ var link = $('#link'),
 function _update_tags(id) {
 	if (id) {
    		$.getJSON('/torrent/'+id+'/tags.json',function(data) {
+   			nlinks = data.length;
    			links = $.map(data,function(elt) {
    				return "<a href=\"/torrent/tag/"+elt+".html\">"+elt+"</a>";
    			});
-			$("#"+id).find('div.tags').html(links.join("&nbsp;"));
+   			tags = $("#"+id).find('div.tags');
+   			if (nlinks > 0) {
+	   			tags.html(links.join("&nbsp;"));
+	   			tags.addClass("ui-state-active");
+	   		} else {
+	   			tags.html("<em>No tags</em>");
+	   		}
 		});
 	}
 }
@@ -31,87 +38,19 @@ $(function() {
    			event: "click", 
    			collapsible: true,
    			navigation: true,
+   			active: false,
    			animated: true,
+   			autoHeight: false,
    			changestart: function(event,ui) {
    			    var content = ui.newContent;
    			    var torrent = $(content).closest('.torrent');
    			    if (torrent.size() > 0) {
 	   				var id = torrent.attr('id');
 	   				_update_tags(id);
-	   				
-	   				$.getJSON('/torrent/scrape/'+id+'.json',function(data) {
-	   					torrent.find('.scrape').text('seeders: '+data['downloaded']+' leechers: '+data['incomplete']);
-	   				});
+	   				_update_status(id,torrent);
 		   		}
    			}
-   });
-   $("#mail-expiration").datepicker({'dateFormat': 'yy-mm-dd', minDate: "+1D"});
-   $('#share-mail-dialog').dialog({
-       position: ['center','center'],
-       autoOpen: false,
-       height: 300,
-       width: 450,
-       modal: true,
-       buttons: {
-          'Send email': function() {
-             var form = $('#share-mail-dialog form');
-             if (form.valid()) {
-                form.submit();
-                $(this).dialog('close');
-             }
-          },
-          'Cancel': function() {
-             $(this).dialog('close');
-          }
-       },
-       close: function() {
-          allFields.val('').removeClass('ui-state-error');
-       }
-   });
-   
-   $('#share-mail-dialog form').validate({});
-   $('#share-mail-dialog form').submit(function() {
-      $.get($(this).attr('action'),$(this).serialize(),function(data) {
-         if (data) { _i(data); }
-      });
-      return false;
-   });
-   
-   $("#link-expiration").datepicker({'dateFormat': 'yy-mm-dd', minDate: "+1D"});
-   $('#share-link-dialog form').validate({});
-   $('#share-link-dialog').dialog({
-       dialogClass: 'link-dialog',
-       autoOpen: false,
-       height: 200,
-       width: 500,
-       modal: true,
-       buttons: {
-          'Create Link': function() {
-             if ($('#share-link-dialog form').valid()) {
-                $('#share-link-dialog form').submit();
-             }
-          },
-          'Done': function() {
-             $(this).dialog('close');
-          }
-       },
-       close: function() {
-          $('#link').html('');
-          allFields.val('').removeClass('ui-state-error');
-       }
-   });
-   $('#share-link-dialog form').submit(function() {
-      $.get($(this).attr('action'),$(this).serialize(),function(data) {
-         $('#link-explain').show();
-         $('#link').html(data);
-         var button = getDialogButton( '.link-dialog', 'Create Link' );
-		 if ( button ) {
-	        button.attr('disabled', 'disabled' ).addClass( 'ui-state-disabled' );
-	     }
-      });
-      return false;
-   });
-   
+   });   
    $("#remove-torrent-dialog").dialog({
 			autoOpen: false,
 			resizable: false,
@@ -132,20 +71,15 @@ $(function() {
    $("#launch-dlmanager").webstart({jnlp: 'add.jnlp',minVersion: '1.6.0'});
 });
 
-function gufrt(id) {
-   $('#share-link-dialog form').attr('action',"/torrent/gufrt/"+id);
-   $('#share-link-dialog').dialog('open');
-}
-
-function gufrtag(tag) {
-   $('#share-link-dialog form').attr('action',"/torrent/tag/gufrt/"+tag);
-   $('#share-link-dialog').dialog('open');
-}
-
-function mailit(id) {
-   allFields.val('');
-   $('#share-mail-dialog form').attr('action','/torrent/sendlink/'+id);
-   $('#share-mail-dialog').dialog('open');
+function _update_status(id,torrent) {
+ 		if (!torrent) {
+ 		   torrent = $("#"+id);
+ 		}
+	   	$.getJSON('/torrent/scrape/'+id+'.json',function(data) {
+	   		scrape = torrent.find('.scrape');
+	   		scrape.text('seeders: '+data['complete']+' leechers: '+data['incomplete']);
+	   		scrape.addClass("ui-state-active");
+	   	});
 }
 
 function removeit(id) {
@@ -162,17 +96,6 @@ function removeit(id) {
   <a href="/torrent/add">Upload using your Browser</a>
 </div>
 
-<div id="share-link-dialog" class="modal-dialog" title="Share this data">
-   <form action="">
-      <fieldset>
-         <label for="expiration">Expiration date
-         <input type="text" name="expiration" id="link-expiration" value="" size="20" class="text required ui-widget-content ui-corner-all" /></label>
-      </fieldset>
-      <p id="link-explain" style="display: none;">Give this link to someone who should have access to this data:</p>
-      <div id="link" class="text"></div>
-   </form>
-</div>
-
 <div id="remove-torrent-dialog" class="modal-dialog" title="Really remove this torrent?">
     <form action="">
 		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
@@ -180,25 +103,15 @@ function removeit(id) {
 	</form>
 </div>
 
-<div id="share-mail-dialog" class="modal-dialog" title="Send a link to this data">
-   <form action="">
-      <fieldset>
-         <label for="to">Email <input type="text" name="to" id="to" value="" size="30" class="text required ui-widget-content ui-corner-all" /></label>
-         <label for="expiration">Expiration date<input type="text" name="expiration" id="mail-expiration" value="" size="20" class="text required ui-widget-content ui-corner-all" /></label>
-         <label for="message">Message</label>
-         <textarea name="message" id="message" rows="4" cols="40" class="text ui-widget-content ui-corner-all">Here is some data for you...</textarea>
-      </fieldset>
-   </form>
-</div>
-
 {% if torrents %}
-<h1 style="display: inline; float: left;">{{title}}
+<ul class="ilist">
+   <li><h1>{{title}}</h1></li>
 {% if tag %}
-<a class="tip" title="Share a link to torrents tagged with '{{tag}}'" href="javascript:void(0);" onClick="gufrtag('{{tag}}')">
-   <span style="float: right; margin-top: 2px;" class="ui-icon ui-icon-extlink"></span>
-</a>
+	<li><a class="tip" title="Share a link to torrents tagged with '{{tag}}'" href="/link/tag/{{tag}}">
+	   <span style="float: right; margin-top: 2px;" class="ui-icon ui-icon-extlink"></span>
+	</a></li>
 {% endif %}
-</h1>
+</ul>
 <div style="clear: both;"></div>
 
 <div id="torrents">
@@ -210,53 +123,38 @@ function removeit(id) {
        <div class="navlist">
          <ul>
             <li>
-               <a class="tip" title="Download this data using a torrent client" href="{{t.url}}">
-                  <span class="ui-icon ui-icon-arrowthickstop-1-s"></span>
-               </a>
+               <div class="button">
+	               <a class="tip" title="Download this data using a torrent client" href="{{t.url}}">Download</a>
+	           </div>
             </li>
-            <!-- li>
-               <a class="tip" title="Download this data using the download manager" href="/torrent/{{t.id}}.jnlp">
-                  <span class="ui-icon ui-icon-folder-open"></span>
-               </a>
-            </li -->
-            <!-- li>
-               <a class="tip" title="Share a link to this data" href="javascript:void(0);" onClick="gufrt('{{t.id}}')">
-                  <span class="ui-icon ui-icon-extlink"></span>
-               </a>
-            </li -->
             <li>
-               <a class="tip" title="Share a link to this data" href="/link/torrent/{{t.id}}">
-                  <span class="ui-icon ui-icon-extlink"></span>
-               </a>
+               <div class="button">
+	               <a class="tip" title="Share a link to this data" href="/link/torrent/{{t.id}}">Share</a>
+	           </div>
             </li>
-            <!-- li>
-               <a class="tip" title="Send a link to this data" href="javascript:void(0);" onClick="mailit('{{t.id}}')">
-                  <span class="ui-icon ui-icon-mail-closed"></span>
-               </a>
-            </li -->
+            <li><div class="minipanel"><a href="javascript:void(0);" onClick="_update_status('{{t.id}}')"><span class="ui-icon ui-icon-refresh"></span></a></div></li>
             <li>
-               <div class="scrape"></div>
+               <div class="scrape minipanel ui-corner-all"></div>
             </li>
             {% if t.effective_rights.w or t.effective_rights.d %}
             <li style="float: right;">
-               <a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{t.id}}')">
-                  <span class="ui-icon ui-icon-trash"></span>
-               </a>
+               <div class="button">
+	               <a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{t.id}}')">Delete</a>
+	           </div>
             </li>
             {% endif %}
             <li style="float: right;">
-               <a class="tip" title="Modify torrent" href="/torrent/{{t.id}}">
-                  <span class="ui-icon ui-icon-wrench"></span>
-               </a>
+               <div class="button">
+	               <a class="tip" title="Modify torrent" href="/torrent/{{t.id}}">Modify</a>
+	           </div>
             </li>
-            <li style="float: right;">
-               <div class="tags"></div>
+            <li style="float: left;">
+               <div class="tags minipanel ui-corner-all"></div>
             </li>
          </ul> 
        </div>
        {% if t.description %}
        <div class="description">
-          <h4>Description:</h4>
           <p>{{t.description}}</p>
        </div>
        {% endif %} 
@@ -267,13 +165,4 @@ function removeit(id) {
 {% else %}
   <p>Nothing matched your search or we're simply out of shared material...</p>
 {% endif %}
-{% endblock %}
-
-{% block rhs %}
-<div style="padding: 5px;">
-<h4>Tag cloud</h4>
-{% for tag in tagcloud %}
-<font class="tag" size="{{tag.font_size}}"><a href="/torrent/tag/{{tag.name}}.html">{{tag.name}}</a></font>  
-{% endfor %}
-</div>
 {% endblock %}

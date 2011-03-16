@@ -1,22 +1,25 @@
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns
 
 urlpatterns = patterns('',
     # (regexp as a string, function without prefix as a string)
     (r'^$', "lobber.share.torrent.welcome"),
     ## RESTful API.
     # Torrents.
-    (r'^torrent/$',"lobber.share.torrent.TorrentView"),
-    (r'^torrent/all.rss$',"lobber.share.torrent.TorrentView"),
-    (r'^torrent/all.json$',"lobber.share.torrent.TorrentView"),
+    (r'^index.html$',"lobber.share.torrent.welcome"),
+    (r'^torrent/$',"lobber.share.torrent.show"),
+    (r'^torrent/all.rss$',"lobber.share.torrent.show"),
+    (r'^torrent/all.json$',"lobber.share.torrent.show"),
     (r'^torrent/search(?:\.(?:[^\.]+))?$',"lobber.share.torrent.search"),
     (r'^torrent/remove/(?P<tid>[0-9]+)(?:\.([^\.]+))?$', "lobber.share.torrent.remove_torrent"),
     (r'^torrent/sendlink/(?P<tid>[0-9]+)$',"lobber.share.links.send_link_mail"),
     (r'^torrent/gufrt/(?P<tid>[0-9]+)$', "lobber.share.links.gimme_url_for_reading_torrent"),
     (r'add.jnlp$',"lobber.share.torrent.upload_jnlp"),
     (r'^torrent/add(?:\.(?:[^\.]+))?$',"lobber.share.torrent.add_torrent"),
-    (r'^torrent/(?P<inst>[0-9]+)(?:\.([^\.]+))?$', "lobber.share.torrent.TorrentView"),
+    (r'^torrent/(?P<inst>[0-9]+)(?:\.([^\.]+))?$', "lobber.share.torrent.show"),
+    (r'^torrent/info/(?P<inst>[0-9]+)(?:\.([^\.]+))?$', "lobber.share.torrent.land"),
     (r'^torrent/(?P<inst>.+)\.torrent$', "lobber.share.torrent.torrent_by_hashval"),
     (r'^torrent/exists/(?P<inst>.+)$', "lobber.share.torrent.exists"),
+    (r'^torrent/exists_new/(?P<inst>.+)$', "lobber.share.torrent.exists_new"),
     (r'^torrent/scrape/(?P<inst>[^\.]+)\.([^\.]+)$', "lobber.share.torrent.scrape"),
     (r'^torrent/scrapehash/(?P<hash>[^\.]+)(?:\.(?:[^\.]+))?$', "lobber.share.torrent.scrape_hash"),
     # lolcat voldb

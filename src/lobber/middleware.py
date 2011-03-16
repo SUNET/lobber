@@ -6,11 +6,8 @@ import re
 from django.contrib import auth
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-
-from lobber.share.models import UserProfile
-from lobber.settings import LOBBER_LOG_FILE, APPLICATION_CTX
+from lobber.settings import LOBBER_LOG_FILE
 import lobber.log
-from pprint import pprint
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 class KeyMiddleware(object):
@@ -29,7 +26,7 @@ class KeyMiddleware(object):
         if secret is None:
             secret = request.META.get('HTTP_X_LOBBER_KEY', None)
         if secret is None:
-            return
+            return                      # Fail
 
         # TODO: Sanitize secret (a.k.a. un-bobby-tablify it).
         username = 'key:' + secret
@@ -37,18 +34,18 @@ class KeyMiddleware(object):
             user = User.objects.get(username=username)
         except ObjectDoesNotExist:
             logger.info("%s: user not found" % username)
-            return
+            return                      # Fail
 
         try:
             profile = user.profile.get()
         except ObjectDoesNotExist:
             logger.error("%s: user profile not found" % username)
-            return
+            return                      # Fail.
 
         if profile.expiration_date is not None and \
                profile.expiration_date <= dt.now():
             logger.info("%s: key expired" % secret)
-            return
+            return                      # Fail.
 
         filtermatch_flag = False
         cmd = request.path
@@ -60,23 +57,22 @@ class KeyMiddleware(object):
         if not filtermatch_flag:
             logger.info("%s: no match for url in filter (url=%s, filter=%s)"
                         % (username, cmd, urlfilter))
-            return
+            return                      # Fail.
 
-        if request.user.is_authenticated():
-            if request.user.username == self.clean_username(username, request):
-                logger.info("user %s already authenticated" % username)
-                return                  # All ok.
-
+        # Authenticate and login user.
         auth_user = auth.authenticate(username=username, password=username)
         if auth_user:
             profile.displayname = username
             request.user = auth_user
             auth.login(request, auth_user)
+            request.session.flush()
         else:
             logger.debug("%s: failed authentication" % username)
+            return                  # Fail.
+
+        # EPIC SUCCESS!!!  This is where we do anything needed for an
+        # authenticated and logged in user.
         
-    # TODO: Add a configure_user(user) method?
-    
     def clean_username(self, username, request):
         """
         Allows the backend to clean the username, if the backend defines a
@@ -89,3 +85,5 @@ class KeyMiddleware(object):
         except AttributeError: # Backend has no clean_username method.
             pass
         return username
+
+    # TODO: Add a configure_user(user) method?

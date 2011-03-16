@@ -8,12 +8,14 @@ from lobber.tracker.models import PeerInfo
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from deluge.bencode import bencode
-from socket import gethostname
 from lobber.share.models import Torrent
 from urllib import unquote
-from pprint import pprint
-import struct
 from ctypes import create_string_buffer
+
+import lobber.log
+from lobber.settings import LOBBER_LOG_FILE
+from lobber.common import hexify
+logger = lobber.log.Logger("tracker", LOBBER_LOG_FILE)
 
 def _err(msg):
     return HttpResponse(bencode({'failure reason': msg}),mimetype='text/plain')
@@ -37,20 +39,25 @@ def peer_address(request):
         
     return ip,port
 
+def get_from_qs(qs, key):
+    for q in qs.split('&'):
+        if q.startswith(key):
+            return q[len(key):]
+    
 def announce(request,info_hash=None):
     
     if not info_hash and request.GET.has_key('info_hash'):
-        info_hash = request.GET['info_hash']
+        info_hash = get_from_qs(request.META['QUERY_STRING'], 'info_hash=')
+        #logger.debug("announce: getting hash from request: %s" % request.META['QUERY_STRING'])
     
     if not info_hash:
         return _err('Missing info_hash')
 
-    info_hash = unquote(info_hash)
+    info_hash = hexify(unquote(info_hash))
+    #logger.debug("announce: info_hash=%s" % info_hash)
 
-    pprint("info_hash=%s" % info_hash)
-    #t = Torrent.objects.filter(hashval=info_hash)[:1]
-    #if not t:
-    #    return _err("Not authorized")
+    if Torrent.objects.filter(hashval=info_hash).count() < 1:
+        return _err("Not authorized")
     
     pi = None
     #if request.GET.has_key('trackerid'):
@@ -64,12 +71,19 @@ def announce(request,info_hash=None):
     if pi == None:
         pi,created = PeerInfo.objects.get_or_create(info_hash=info_hash,port=port,address=ip)
     
-    if request.user and not request.user.is_anonymous:
+    if request.user and not request.user.is_anonymous():
         pi.user = request.user
         
-    numwant = 50
+    DEFNUMWANT = 50
+    MAXNUMWANT = 20
+
+    numwant = DEFNUMWANT
     if request.GET.has_key('numwant'):
         numwant = int(request.GET['numwant'])
+        if numwant > MAXNUMWANT:
+            numwant = MAXNUMWANT
+        if numwant < 0:
+            numwant = DEFNUMWANT
 
     for key in ('port','uploaded','downloaded','left','corrupt'):
         if request.GET.has_key(key):
@@ -127,16 +141,15 @@ def announce(request,info_hash=None):
     dict['complete'] = seeding
     dict['downloaded'] = downloaded
     dict['incomplete'] = count - seeding
-    dict['interval'] = 10
-    
-    pprint(dict)
+    dict['interval'] = 60
     
     if compact:
         if p4str.value:
-            dict['peers'] = p4str.value
+            dict['peers'] = p4str.raw[:offset]
         if p6str.value:
-            dict['peers6'] = p6str.value
+            dict['peers6'] = p6str.raw[:offset]
             
+    #logger.debug("announce: %s:%s (%s): compact=%s, offset=%d, dict=%s" % (ip, port, repr(info_hash), compact, offset, repr(dict)))
     return tracker_response(dict)
     
 def tracker_response(dict):
@@ -156,16 +169,18 @@ def summarize(qs):
                 downloaded = downloaded + 1
     return count,downloaded,seeding
     
-def scrape(request):
+def peer_status(hashvals):
     files = {}
+    for info_hash in hashvals:
+        count,downloaded,seeding = summarize(PeerInfo.objects.filter(info_hash=info_hash))
+        files[info_hash]= {'complete': seeding, 'downloaded': downloaded, 'incomplete': count - seeding}
+    return files;
+    
+def scrape(request):
     if request.GET.has_key('info_hash'):
-        for info_hash in request.GET.getlist('info_hash'):
-            count,downloaded,seeding = summarize(PeerInfo.objects.filter(info_hash=info_hash))
-            files[info_hash]= {'complete': seeding, 'downloaded': downloaded, 'incomplete': count - seeding}
+        return tracker_response({'files': peer_status(request.GET.getlist('info_hash'))})
     else:
         return _err("I'm not going to tell you about all torrents n00b!")
-    
-    return tracker_response({'files': files})
     
 @login_required
 def user_announce(request):

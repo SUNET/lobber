@@ -1,13 +1,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US">
 	<head>
+	    {% if refresh %}
+	    <!-- META HTTP-EQUIV="Refresh" CONTENT="{{refresh}}"/ -->
+	    {% endif %}
 	    <link type="text/css" href="/site-media/css/style.css" rel="stylesheet" />
 	    <link type="text/css" href="/site-media/css/jquery.ui.autocomplete.custom.css" rel="stylesheet" />
-        <link type="text/css" href="/site-media/css/redmond/jquery-ui-1.8.1.custom.css" rel="stylesheet" />
+        <link type="text/css" href="/site-media/css/lobberui/jquery-ui-1.8.6.custom.css" rel="stylesheet" />
         <link type="text/css" href="/site-media/css/jquery.jnotify.css" rel="stylesheet" />
         <link type="text/css" href="/site-media/css/jquery.tooltip.css" rel="stylesheet" />
         <script type="text/javascript" src="/site-media/js/jquery-1.4.2.min.js"></script>
-        <script type="text/javascript" src="/site-media/js/jquery-ui-1.8.1.custom.min.js"></script>
+        <script type="text/javascript" src="/site-media/js/jquery-ui-1.8.6.custom.min.js"></script>
         <script type="text/javascript" src="/site-media/js/jquery.tooltip.pack.js"></script>
         <script type="text/javascript" src="/site-media/js/jquery.gravatar.js"></script>
         <script type="text/javascript" src="/site-media/js/md5.js"></script>
@@ -87,17 +90,17 @@
 		<div id="container">
 			<div id="header">
 			   {% if user.is_authenticated %}
-			   <div class="ui-widget ui-state-default ui-corner-all navlist toolbar">
-			      <ul>
-			         <li style="padding-right: 10px; margin-right: 20px; border-right: 1px solid #CECECE">
+			   <div class="ui-widget ui-corner-all navlist toolbar">
+			      <ul class="rlist">
+			         <li class="button" style="margin-right: 50px"><a class="tip" title="Logout" id="logout" href="/auth/logout/">Logout</a></li>
+			         <li class="button"><a class="tip" title="{{ user.get_full_name }}" href="/user">Profile</a></li>
+			         <li style="margin-right: 50px">
 			            <form method="POST" action="/torrent/search">
 			               <input type="text" id="searchbox" name="q" style="margin-right: 5px;"></input><input type="submit" value="search"/>
 			            </form>
 			         </li>
-					 <li style="margin-top: 4px;"><a class="tip" title="Application keys" href="/key"><span class="ui-icon ui-icon-key"></span></a></li>
-					 <li style="margin-top: 4px;"><a class="tip" title="Torrents" href="/torrent"><span class="ui-icon ui-icon-transferthick-e-w"></span></a></li>
-					 <li style="margin-top: 4px;"><a class="tip" title="{{ user.get_full_name }}" href="/user"><span class="ui-icon ui-icon-home"></span></a></li>
-			         <li style="margin-top: 4px;"><a class="tip" title="Logout" id="logout" href="/auth/logout/"><span class="ui-icon ui-icon-power"></span></a></li>
+			         <li class="button"><a class="tip" title="Data" href="/torrent">Downloads</a></li>
+					 <li class="button"><a class="tip" title="Keys" href="/key">Keys</a></li>
 			      </ul>
 			   </div>
 			   {% endif %}
@@ -108,7 +111,11 @@
 				   	{% block main %}{% endblock %}
 				</div>
 				<div id="rhs">
-				    {% block rhs %}{% endblock %}
+				    <div style="padding: 5px;">
+						{% for tag in tagcloud %}
+						<font class="tag" size="{{tag.font_size}}"><a href="/torrent/tag/{{tag.name}}.html">{{tag.name}}</a></font>  
+						{% endfor %}
+					</div>
 				</div>
 			</div>
 			<div class="clear"></div>

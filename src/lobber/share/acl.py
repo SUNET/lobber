@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.utils.html import escape
 
 from lobber.share.models import Torrent
-from django.core.exceptions import ObjectDoesNotExist
 from lobber.multiresponse import respond_to, json_response
 from lobber.share.forms import AddACEForm
 from django.shortcuts import get_object_or_404
@@ -40,7 +39,7 @@ def add_ace(req, tid, ace):
         return HttpResponse("Permission denied.", status=403)
 
     t.save()
-    return respond_to(req,{'text/html': HttpResponseRedirect("/torrent/%d/ace" % (t.id)),
+    return respond_to(req,{'text/html': HttpResponseRedirect("/torrent/%d" % (t.id)),
                            'application/json': json_response(ace)})
 
 @login_required
@@ -52,7 +51,7 @@ def remove_ace(req, tid, ace):
         return HttpResponse("Permission denied.", status=403)
         
     t.save()
-    return respond_to(req,{'text/html': HttpResponseRedirect("/torrent/%d/ace" % (t.id)),
+    return respond_to(req,{'text/html': HttpResponseRedirect("/torrent/%d" % (t.id)),
                            'application/json': json_response(ace)})
 
 @login_required

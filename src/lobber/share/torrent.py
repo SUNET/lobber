@@ -1,5 +1,4 @@
 import os
-import httplib
 from datetime import datetime as dt
 
 from django.http import HttpResponse, HttpResponseRedirect,\
@@ -13,7 +12,7 @@ from django.contrib.auth.models import User
 from tagging.models import Tag, TaggedItem
 
 from lobber.multiresponse import respond_to, make_response_dict, json_response
-from lobber.settings import SCRAPE_URL, TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE, TRACKER_ADDR, DROPBOX_DIR
+from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE, DROPBOX_DIR
 from lobber.resource import Resource
 import lobber.log
 from lobber.share.forms import UploadForm
@@ -23,7 +22,7 @@ from lobber.share.forms import formdict
 from tempfile import NamedTemporaryFile
 from lobber.share.models import DataLocation
 import tempfile
-from pprint import pprint
+from lobber.tracker.views import peer_status
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
@@ -42,6 +41,18 @@ def _torrent_info(data):
 
 def _create_torrent(filename, announce_url, target_file, comment=None):
     make_meta_file(filename, announce_url, 2 ** 18, comment=comment, target=target_file)
+
+def _sanitize_fn(name):
+    import unicodedata, re
+    # Normalize.
+    name = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore')
+    # Remove everything but alphanumerics, underscore, space, period and dash.
+    name = unicode(re.sub('[^\w\s.-]', '', name).strip())
+    # Replace dashes and spaces with a single dash.
+    name = unicode(re.sub('[-\s]+', '-', name))
+    # Remove double periods.
+    name = unicode(re.sub('\.\.', '', name))
+    return name
 
 def _store_torrent(req, form):
     """
@@ -65,7 +76,7 @@ def _store_torrent(req, form):
         tmptf = NamedTemporaryFile(delete=False)
         datafile = file("%s%s%s" % (tempfile.gettempdir(),
                                     os.sep,
-                                    ff.name.decode('latin1')),
+                                    _sanitize_fn(ff.name)),
                         "w")
         datafile.write(ff.read())
         datafile.close()
@@ -95,10 +106,15 @@ def _store_torrent(req, form):
     
     name_on_disk = '%s/%d.torrent' % (TORRENTS,t.id)
     f = file(name_on_disk, 'w')
-    f.write(torrent_file_content)
-    f.close()
-    t.data = '%d.torrent' % t.id
-    t.save()
+    try:
+        f.write(torrent_file_content)
+        f.close()
+        t.data = '%d.torrent' % t.id
+        t.save()
+    except Exception,ex:
+        t.delete()
+        logger.error(repr(ex))
+        return None
     
     notifyJSON('/torrents/notify', {'add': [t.id,torrent_hash]})
     if datafile:
@@ -110,14 +126,6 @@ def _urlesc(s):
     for n in range(0, len(s), 2):
         r += '%%%s' % s[n:n+2].upper()
     return r
-
-def _prefetch_existlink(hash):
-    url = '/announce?info_hash='+_urlesc(hash)
-    #print 'DEBUG: prefetching %s from %s' % (url, TRACKER_ADDR)
-    try:
-        httplib.HTTPConnection(TRACKER_ADDR).request('GET', url)
-    except:
-        pass
 
 def find_torrents(user, args, max=40):
     """Search for torrents for which USER has read access.
@@ -165,7 +173,9 @@ def _torrentlist(request, torrents):
                        'application/rss+xml': 'share/rss2.xml',
                        'text/rss': 'share/rss2.xml',
                        'application/json': json_response([{'label': t.name,'link': "/torrent/%d" % (t.id), 'id': t.id, 'info_hash': t.hashval} for t in torrents])},
-                      {'torrents': torrents, 'title': 'Search result',
+                      {'torrents': torrents,
+                       'refresh': 20, 
+                       'title': 'Search result',
                        'description': 'Search result'})
 
 def torrentdict(request,t,forms=None):
@@ -248,45 +258,28 @@ def remove_torrent(request, tid):
                       {'application/json': json_response(tid),
                        'text/html': HttpResponseRedirect("/torrent")})
 
-#@login_required
+@login_required
 def scrape(request,inst):
     t = None
     try:
         t = Torrent.objects.get(id=inst)
     except ObjectDoesNotExist:
         return HttpResponseNotFound("No such torrent")
-    
-    url = '%s?info_hash=%s' % (SCRAPE_URL,t.eschash())
-    dict = {}
-    try:
-        c = httplib.HTTPConnection(TRACKER_ADDR)
-        c.request('GET', url)
-        txt = c.getresponse().read()
-        response = bdecode(txt)
-        dict = response['files'][t.hashval.decode('hex')]
-    except Exception,e:
-        pass
-    
-    return json_response(dict)
 
+    hash = t.hashval
+    status = peer_status([hash])
+    return json_response(status[hash])
+
+@login_required
 def scrape_hash(request,hash):
     qst = Torrent.objects.filter(hashval=hash);
     if not qst:
         return HttpResponseNotFound("No such torrent")
     t = qst[0]
-    
-    url = '%s?info_hash=%s' % (SCRAPE_URL,_urlesc(hash))
-    dict = {}
-    try:
-        c = httplib.HTTPConnection(TRACKER_ADDR)
-        c.request('GET', url)
-        txt = c.getresponse().read()
-        response = bdecode(txt)
-        dict = response['files'][t.hashval.decode('hex')]
-    except Exception,e:
-        pass
-    
-    return json_response(dict)
+
+    hash = t.hashval
+    status = peer_status([hash])
+    return json_response(status[hash])
 
 @login_required
 def upload_jnlp(req):
@@ -296,6 +289,17 @@ def upload_jnlp(req):
          'apiurl': NORDUSHARE_URL} # ==> upload_form() via urls.py.
     return render_to_response('share/launch.jnlp', d,
                               mimetype='application/x-java-jnlp-file')
+
+def exists_new(req,inst):
+    count = Torrent.objects.filter(hashval=inst).count()
+    r = None
+    if count > 0:
+        r = HttpResponse(inst)
+        r['Cache-Control'] = 'max-age=604800'
+    else:
+        r = HttpResponseNotFound()
+        r['Cache-Control'] = 'max-age=2'
+    return r
 
 def exists(req, inst):
     r = HttpResponse(status=200);
@@ -317,7 +321,6 @@ def add_torrent(request):
             t = _store_torrent(request, form)
             if not t:
                 return HttpResponseServerError('error creating torrent')
-            _prefetch_existlink(t.hashval)
             return respond_to(request,
                               {'application/json': json_response(t.id),
                                'text/html': HttpResponseRedirect("/torrent#%d" % t.id)})
@@ -327,6 +330,34 @@ def add_torrent(request):
     return respond_to(request,
                       {'application/json': HttpResponseServerError("Invalid request"),
                        'text/html': 'share/upload-torrent.html'},{'form': form})
+
+
+@login_required
+def show(request, inst=None):
+    if not inst:
+        return _torrentlist(request, find_torrents(request.user, request.GET.lists()))
+    
+    t = get_object_or_404(Torrent,pk=inst)
+    if not t.authz(request.user,'r'):
+        return HttpResponseForbidden("You don't have read access on %s" % inst)
+    
+    d = torrentdict(request, t)
+    d['edit'] = True
+    return respond_to(request,
+                      {'text/html': 'share/torrent.html',
+                       'application/x-bittorrent': _torrent_file_response},d)
+
+@login_required
+def land(request, inst):
+    t = get_object_or_404(Torrent,pk=inst)
+    if not t.authz(request.user,'r'):
+        return HttpResponseForbidden("You don't have read access on %s" % inst)
+    
+    d = torrentdict(request, t)
+    d['edit'] = False
+    return respond_to(request,
+                      {'text/html': 'share/torrent.html',
+                       'application/x-bittorrent': _torrent_file_response},d)
 
 ## TODO: This class stuff wasn't so neat after all - refactor to regular methods checking for the method instead
 
@@ -342,7 +373,6 @@ class TorrentViewBase(Resource):
             t = _store_torrent(req, form)
             if not t:
                 return HttpResponse('error creating torrent')
-            _prefetch_existlink(t.hashval)
             return HttpResponseRedirect('/torrent/#%d' % t.id)
         else:
             return render_to_response('share/upload-torrent.html',
@@ -355,7 +385,6 @@ class TorrentViewBase(Resource):
             t = _store_torrent(req, form)
             if not t:
                 return HttpResponse('error creating torrent')
-            _prefetch_existlink(t.hashval)
             return HttpResponseRedirect('/torrent/#%d' % t.id)
         else:
             logger.info("upload_form: received invalid form")
@@ -376,7 +405,7 @@ class TorrentView(TorrentViewBase):
         
         t = get_object_or_404(Torrent,pk=inst)
         if not t.authz(request.user,'r'):
-            return HttpResponseForbidden("You don't have read access on %d" % inst)
+            return HttpResponseForbidden("You don't have read access on %s" % inst)
         
         d = torrentdict(request, t)
         return respond_to(request,
@@ -389,7 +418,7 @@ def torrent_by_hashval(request, inst):
         t = Torrent.objects.get(hashval=inst)
     except ObjectDoesNotExist:
         return render_to_response('share/index.html',
-                                  make_response_dict(request, {'error': "No such torrent: %s" % inst}))
+                                  make_response_dict(request, {'refresh': 20,'error': "No such torrent: %s" % inst}))
     except MultipleObjectsReturned:
         return _torrentlist(request,
                             filter(lambda t: t.authz(request.user,'r'),Torrent.objects.filter(hashval=inst).order_by('-creation_date')))

@@ -11,7 +11,7 @@ APPLICATION_CTX = ''
 NORDUSHARE_URL = BASE_UI_URL 
 TRACKER_EXIST_URL = '%s/torrent/exists' % BASE_URL
 
-#TRACKER_ADDR = 'tracker-dev.lobber.se:4711'
+#TRACKER_ADDR = 'tracker-dev.lobber.se:443'
 TRACKER_ADDR = 'localhost:8000'
 ANNOUNCE_BASE_URL = 'http://' + TRACKER_ADDR
 ANNOUNCE_URL = ANNOUNCE_BASE_URL + '/tracker/announce'
@@ -54,7 +54,7 @@ USE_I18N = True
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 MEDIA_ROOT = "%s/src/site-media" % BASE_DIR
-ADMIN_MEDIA_ROOT = "/usr/lib/pymodules/python2.5/django/contrib/admin/media"
+ADMIN_MEDIA_ROOT = "%s/src/admin-media" % BASE_DIR
 TORRENTS = "%s/torrents" % BASE_DIR
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a

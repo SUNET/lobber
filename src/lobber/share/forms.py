@@ -1,5 +1,5 @@
 from django import forms
-from django.forms.widgets import CheckboxInput, CheckboxSelectMultiple,\
+from django.forms.widgets import CheckboxSelectMultiple,\
     HiddenInput, TextInput, SelectMultiple, Textarea
 
 class UploadForm(forms.Form):

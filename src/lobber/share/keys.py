@@ -1,13 +1,12 @@
 from datetime import datetime as dt
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect,\
-    HttpResponseForbidden, HttpResponseBadRequest
+from django.http import HttpResponseRedirect,HttpResponseForbidden
 from forms import CreateKeyForm
 from lobber.settings import LOBBER_LOG_FILE
 from django.contrib.auth.models import User
 from lobber.share.users import create_key_user
 from lobber.share.models import UserProfile, user_profile
-from lobber.multiresponse import respond_to, json_response
+from lobber.multiresponse import respond_to
 import lobber.log
 from django.shortcuts import get_object_or_404
 
