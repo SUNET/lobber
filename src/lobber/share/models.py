@@ -65,6 +65,13 @@ class Torrent(models.Model):
         else:   
             return self.effective_rights['w']
 
+    # very quick way to determine if a torrent is public read
+    def is_public_read(self):
+        for ace in self.acl.split():
+            if ace.startswith('#') and 'r' in ace:
+                return True
+        return False
+
     def authz_i(self, user, perm):
         """Does USER have PERM on torrent?"""
         entitlements = ['user:%s' % user.username]

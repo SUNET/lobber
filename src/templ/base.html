@@ -21,6 +21,7 @@
         <script type="text/javascript" src="/site-media/js/deployJava.js"></script> <!-- http://java.com/js/deployJava.js -->
         <script type="text/javascript" src="/site-media/js/jquery.webstart.js"></script>
         <script type="text/javascript" src="/site-media/js/jquery.validate.min.js"></script>
+        <script type="text/javascript" src="/site-media/js/bbq.js"></script>
         <!-- 
         <script src="{{orbited_prefix}}/static/Orbited.js"></script>
         <script>
@@ -93,14 +94,12 @@
 			   <div class="ui-widget ui-corner-all navlist toolbar">
 			      <ul class="rlist">
 			         <li class="button" style="margin-right: 50px"><a class="tip" title="Logout" id="logout" href="/auth/logout/">Logout</a></li>
-			         <li class="button"><a class="tip" title="{{ user.get_full_name }}" href="/user">Profile</a></li>
 			         <li style="margin-right: 50px">
 			            <form method="POST" action="/torrent/search">
 			               <input type="text" id="searchbox" name="q" style="margin-right: 5px;"></input><input type="submit" value="Search"/>
 			            </form>
 			         </li>
 			         <li class="button"><a class="tip" title="Data" href="/torrent">Downloads</a></li>
-					 <li class="button"><a class="tip" title="Keys" href="/key">Keys</a></li>
 			      </ul>
 			   </div>
 			   {% endif %}
@@ -120,11 +119,29 @@
 			</div>
 			<div class="clear"></div>
 			<div id="footer">
-			   <!-- ul>
-			     <li><a href="#about">About Lobber</a></li>
-			     <li><a href="#about">Terms Of Use</a></li>
-			     <li><a href="#about">System Status</a></li>
-			   </ul -->
+			   <ul>
+				   	<li>
+				   		<ul>
+				   			<li><h3>Users</h3></li>
+				   			<li><a class="tip" title="{{ user.get_full_name }}" href="/user">My Profile</a></li>
+				   			<li><a class="tip" title="{{ user.get_full_name }}" href="http://lobber.se/about">About Lobber</a></li>
+				   			<li><a class="tip" title="{{ user.get_full_name }}" href="http://lobber.se/news">Lobber News</a></li>
+				   		</ul>
+				   	</li>
+				   	<li>
+				   		<ul>
+				   			<li><h3>Developers and Deployers</h3></li>
+				   			<li><a class="tip" title="Application Keys" href="/key">Application Keys</a></li>
+				   			<li><a class="tip" title="Application Keys" href="http://lobber.se/documentation">Documentation</a></li>
+				   		</ul>
+				   	</li>
+				   	<li>
+				   		<ul>
+				   			<li><h3>Legal</h3></li>
+				   			<li><a class="tip" title="{{ user.get_full_name }}" href="http://lobber.se/terms-of-use">Terms of Use</a></li>
+				   		</ul>
+				   	</li>
+			   </ul>
 			</div>
 		</div>
 	</body>
