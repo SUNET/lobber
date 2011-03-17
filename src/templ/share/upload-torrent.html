@@ -15,12 +15,15 @@ $(function() {
 {% endblock %}
 {% block main %}
 <h1>Please upload some data</h1>
-    <div class="ui-helper-reset ui-widget ui-state-highlight ui-corner-all infopanel">
-      <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
-        When using this form to upload a torrent file (.torrent), the tracker announce URL must be: <br/> <code>{{ announce_url }}</code></p>
-    </div>
+<div class="ui-helper-reset ui-widget ui-state-highlight ui-corner-all">
+  <div class="infopanel">
+  	<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+    	When using this form to upload a torrent file (.torrent), the tracker announce URL must be: <br/> <code>{{ announce_url }}</code>
+    </p>
+   </div>
+</div>
 <form class="cmxform" enctype="multipart/form-data" method="post">
-  <fieldset class="ui-widget-content ui-corner-all infopanel">
+  <fieldset class="ui-widget-content ui-corner-all infopanel" style="margin: 2em 0;">
       <legend>Describe your upload</legend>
       <ol>
       {% for field in form %}
@@ -36,11 +39,9 @@ $(function() {
       {% endfor %}
       </ol>
   </fieldset>
-
-  <br/>
-  <div class="button">
-    <input type="submit" value="Share it!" />
-    <input type="button" onClick="document.location='/torrent'" value="Cancel"/>
-  </div>
+  <ul class="ilist">
+    <li class="button"><input type="submit" value="Share it!" /></li>
+    <li class="button"><input type="button" onClick="document.location='/torrent'" value="Cancel"/></li>
+  </ul>
 </form>
 {% endblock %}
