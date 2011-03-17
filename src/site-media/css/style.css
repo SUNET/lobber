@@ -13,7 +13,7 @@ label { display:block; }
 		height: 90px; 
 		background-color: transparent; 
 }
-div#footer { margin-right: 50px; border-top: 1px solid #CECECE; position: absolute; bottom: 0; padding-bottom: 0px; width: 100%; }
+div#footer { margin-right: 50px; border-top: 1px solid #CECECE; position: absolute; bottom: 0; padding-bottom: 0px; width: 95%; }
 div#footer ul { list-style: none; padding: 0; margin: 0; }
 div#footer li { display: inline; }
 div#footer li li { display: block; }
