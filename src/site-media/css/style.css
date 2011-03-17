@@ -1,14 +1,16 @@
 html,body { font-size: 80%; font-family: arial, sans-serif; height: 100%; margin:0; padding:0;}
 body { width: 80%; }
-div#container { position: relative; height:auto !important; height: 99%; min-height: 80%; margin-left: 50px; margin-top: 0; padding-bottom: 50px;}
+div#container { position: relative; height:auto !important; height: 100%; min-height: 80%; margin-left: 50px; margin-top: 0; padding-bottom: 80px;}
 label { display:block; }
 #modal-dialog { font-size: 110%; }
 #modal-dialog input.text textarea { margin-bottom:12px; width:95%; padding: .4em; }
 #modal-dialog fieldset { padding:0; border:0; margin-top:25px; }
 div#thisislobber { font: 150% "Trebuchet MS", sans-serif; margin-top: 150px; }
-div#footer { border-top: 1px solid #CECECE; position: absolute; bottom: 0; padding-bottom: 10px; width: 100%; }
-div#footer ul { margin-right: 50px; list-style: none; padding: 0; margin: 0; }
-div#footer li { float: left; margin: 0 0.15em}
+div#footer { margin-right: 50px; border-top: 1px solid #CECECE; position: absolute; bottom: 0; padding-bottom: 0px; width: 100%; }
+div#footer ul { list-style: none; padding: 0; margin: 0; }
+div#footer li { display: inline; }
+div#footer li li { display: block; }
+div#footer ul ul { float: left; padding-right: 50px; }
 div#header { margin-top: 5px; margin-bottom: 10px; background-image: url('../images/lobber-banner.jpg'); background-repeat:no-repeat; height: 100px; }
 .navlist ul { list-style: none; padding: 0; margin: 0; }
 .navlist li { float: right; display: inline;}
@@ -31,7 +33,7 @@ div.toolbar{ padding: 4px; float: right; margin-right: 30px; margin-bottom: 20px
 a { text-decoration: none; }
 a:hover { text-decoration: underline; }
 .clear { clear: both; }
-#content{ }
+#content{ padding-bottom: 50px; }
 .code{font: 110% "Courier", fixed}
 #rhs{ float: right; margin-right: 80px; width: 20%; }
 #main{ float: left; margin-left: 0px; width:70%}
@@ -49,7 +51,12 @@ li.links { padding: 0; margin: 0; }
 .altitem { margin-top: 20px; }
 .ui-icon { display: inline-block !important; }
 .minipanel { padding-top: 5px; padding-bottom: 5px; padding-left: 6px; padding-right: 6px; }
+.right  { float: right; }
+.left { float: left; }
 
+form.cmxform {
+  margin: 0px; padding: 0px; 	
+}
 form.cmxform fieldset {
   margin-bottom: 10px;
 }
@@ -63,6 +70,7 @@ form.cmxform label {
   line-height: 1.8;
   vertical-align: top;
   font-size: 120%;
+  width: 120px; 
 }
 form.cmxform fieldset ol {
   margin: 0;
@@ -89,9 +97,6 @@ form.cmxform em {
   font-weight: bold;
   font-style: normal;
   color: #f00;
-}
-form.cmxform label {
-  width: 120px; /* Width of labels */
 }
 form.cmxform fieldset fieldset label {
   margin-left: 123px; /* Width plus 3 (html space) */
