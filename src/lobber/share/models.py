@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from lobber.settings import TORRENTS,BASE_URL, LOBBER_LOG_FILE
 import tagging
 from tagging.models import Tag
-from deluge.bencode import bdecode
+from lobber.torrenttools import bdecode
 import os
 from lobber.notify import notifyJSON
 import shutil

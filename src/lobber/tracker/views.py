@@ -7,7 +7,7 @@ Created on Oct 17, 2010
 from lobber.tracker.models import PeerInfo
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from deluge.bencode import bencode
+from lobber.torrenttools import bencode
 from lobber.share.models import Torrent
 from urllib import unquote
 from ctypes import create_string_buffer
