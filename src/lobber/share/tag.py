@@ -50,6 +50,7 @@ def tags(request,tid):
                     notifyJSON("/torrent/tag/add",tag)
         
         d = torrentdict(request,t,formdict())
+        d['edit'] = True
         return respond_to(request, {'application/json': json_response(d.get('tags')),
                                     'text/html': "share/torrent.html" },d)
     

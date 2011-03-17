@@ -133,7 +133,7 @@ function removeit(id) {
    	  	<p>{{torrent.meta_info.name}}</p>
    	  	{% if torrent.meta_info.files %}
    	  	<h4>Files</h4>
-   	  	<ul class="links">
+   	  	<ul class="clist">
    	  	{% for f in torrent.meta_info.files %}
    	  	   <li>{{f|metainfofile}}</li>
    	  	{% endfor %}

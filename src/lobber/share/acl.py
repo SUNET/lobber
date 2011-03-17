@@ -67,4 +67,5 @@ def edit(request,tid):
             t.save()
     
     d = torrentdict(request,t,forms)
+    d['edit'] = True
     return respond_to(request,{'text/html': 'share/torrent.html'},d)
