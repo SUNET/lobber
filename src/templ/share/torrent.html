@@ -110,6 +110,7 @@ function removeit(id) {
    	  	<p>{{torrent.description}}</p>
    	  	{% endif %}
    	  	{% if torrent.meta_info.files %}
+   	  	<h4>Files</h4>
    	  	<div id="files">
 			<div class="scrollbar">
 				<div class="track">
@@ -121,7 +122,6 @@ function removeit(id) {
 			</div> 
 			<div class="viewport">
 				<div class="overview">
-				   	<h4>Files</h4>
 			   	  	<ul class="clist">
 			   	  	{% for f in torrent.meta_info.files %}
 			   	  	   <li>{{f|metainfofile}}</li>
