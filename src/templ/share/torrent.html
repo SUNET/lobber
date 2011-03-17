@@ -23,6 +23,10 @@ $(function() {
 	$('#settings').tabs({
 		cookie: { expires: 1 }
 	});
+	files = $('#files')
+	if (!files.empty()) {
+		files.tinyscrollbar();
+	}
 	$.getJSON('/torrent/scrape/{{torrent.id}}.json',function(data) {
 	   $('#scrape').text('seeders: '+data['downloaded']+' leechers: '+data['incomplete']);
 	});
@@ -99,20 +103,34 @@ function removeit(id) {
    	  	<p id="scrape"></p>
    	  	<h4>Name</h4>
    	  	<p>{{torrent.meta_info.name}}</p>
-   	  	{% if torrent.meta_info.files %}
-   	  	<h4>Files</h4>
-   	  	<ul class="clist">
-   	  	{% for f in torrent.meta_info.files %}
-   	  	   <li>{{f|metainfofile}}</li>
-   	  	{% endfor %}
-   	  	</ul>
-   	  	{% endif %}
    	  	<h4>Creator</h4>
    	  	<p>{{torrent.creator|userdisplay}}</p>
    	  	{% if torrent.description %}
    	  	<h4>Description</h4>
    	  	<p>{{torrent.description}}</p>
    	  	{% endif %}
+   	  	{% if torrent.meta_info.files %}
+   	  	<div id="files">
+			<div class="scrollbar">
+				<div class="track">
+					<div class="thumb">
+						<div class="end">
+						</div>
+					</div>
+				</div>
+			</div> 
+			<div class="viewport">
+				<div class="overview">
+				   	<h4>Files</h4>
+			   	  	<ul class="clist">
+			   	  	{% for f in torrent.meta_info.files %}
+			   	  	   <li>{{f|metainfofile}}</li>
+			   	  	{% endfor %}
+			   	  	</ul>
+			   	</div>
+			</div>
+		</div>
+		{% endif %}
    </div>
    {% endif %}
    {% if edit and torrent.effective_rights.w %}

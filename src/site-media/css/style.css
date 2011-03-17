@@ -109,3 +109,15 @@ form.cmxform em {
 form.cmxform fieldset fieldset label {
   margin-left: 123px; /* Width plus 3 (html space) */
 }
+
+
+#files { width: 520px; clear: both; margin: 20px 0 10px; }
+#files .viewport { width: 500px; height: 200px; overflow: hidden; position: relative; }
+#files .overview { list-style: none; position: absolute; left: 0; top: 0; }
+#files .thumb .end,
+#files .thumb { background-color: #003D5D; }
+#files .scrollbar { position: relative; float: right; width: 15px; }
+#files .track { background-color: #D8EEFD; height: 100%; width:13px; position: relative; padding: 0 1px; }
+#files .thumb { height: 20px; width: 13px; cursor: pointer; overflow: hidden; position: absolute; top: 0; }
+#files .thumb .end { overflow: hidden; height: 5px; width: 13px; }
+#files .disable{ display: none; }
