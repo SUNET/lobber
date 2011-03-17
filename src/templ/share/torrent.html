@@ -20,40 +20,8 @@ $(function() {
 				return false;
 			}
 	});
-	$('#settings > div > h3').each(function(index) {
-		$(this).append($("<span class=\"ui-icon\" style=\"float: left;\"></span>"));
-		$(this).attr("style","clear: both;");
-	});
-	var cookieValue = $.cookie('menuCookie') || '';
-	$('#settings > div').each(function(index) {
-	    var h3 = $(this).children('h3');
-		if (cookieValue.indexOf($(this).attr('id')) > -1) {
-			h3.children('.ui-icon').addClass("ui-icon-triangle-1-s");
-		   	h3.next().show();
-		} else {
-			h3.children('.ui-icon').addClass("ui-icon-triangle-1-e");
-			h3.next().hide();
-		}
-	});
-	$('#settings > div > h3').click(function() {
-		var id = $(this).parent().attr('id');
-		if ($(this).next().is(':visible')) {
-		    cookieValue = cookieValue.replace(id,"");
-			cookieValue = cookieValue.replace("--","-");
-			var span = $(this).children('span');
-			span.addClass("ui-icon-triangle-1-e");
-			span.removeClass("ui-icon-triangle-1-s");
-			$(this).next().hide();
-		} else {
-			if (cookieValue.indexOf(id) == -1)
-			   cookieValue = cookieValue + "-" + id
-			var span = $(this).children('span');
-			span.addClass("ui-icon-triangle-1-s");
-			span.removeClass("ui-icon-triangle-1-e");
-			$(this).next().show();
-		}
-		$.cookie('menuCookie', cookieValue);
-		return false;
+	$('#settings').tabs({
+		cookie: { expires: 1 }
 	});
 	$.getJSON('/torrent/scrape/{{torrent.id}}.json',function(data) {
 	   $('#scrape').text('seeders: '+data['downloaded']+' leechers: '+data['incomplete']);
@@ -98,35 +66,35 @@ function removeit(id) {
 {% endif %}
 
 <h1>{{torrent.name}} - created {{torrent.creation_date|datehumanize}}</h1>
-<div class="navlist" style="margin-top: 50px;">
-   <ul>
-	   <li><div class="button"><a href="/torrent/{{torrent.id}}.torrent{{lkey}}">Download</a></div></li>
-	   {% if edit %}
-	   {% if torrent.effective_rights.w or torrent.effective_rights.d %}
-	   <li><div class="button"><a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{torrent.id}}')">Delete</a></div></li>
-	   {% endif %}
-	   {% if torrent.effective_rights.w %}
-	   <li><div class="button"><a class="tip" title="Share a link to this data" href="/link/torrent/{{torrent.id}}">Share a link</a></div></li>
-   	   {% endif %}
-   </ul>
-</div>
-{% endif %}
-<div class="clear"></div>
+<ul class="ilist">
+   <li class="button"><a href="/torrent/{{torrent.id}}.torrent{{lkey}}">Download</a></li>
+   {% if edit %}
+   {% if torrent.effective_rights.w or torrent.effective_rights.d %}
+   <li class="button right"><a class="tip" title="Remove this torrent" href="javascript:void(0);" onClick="removeit('{{torrent.id}}')">Delete</a></li>
+   {% endif %}
+   {% if torrent.effective_rights.w %}
+   <li class="button"><a class="tip" title="Share a link to this data" href="/link/torrent/{{torrent.id}}">Share</a></li>
+   {% endif %}
+   {% endif %}
+</ul>
 <br/>
 
-{% if torrent.description %}
-<div class="ui-helper-reset ui-state-highlight ui-widget ui-corner-all">
-	<div class="infopanel">
-		<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>{{torrent.description}}</p>
-	</div>
-</div>
-{% endif %}
-
 <div id="settings">
+   <!-- tab names -->
+   <ul>
+   	  {% if torrent.effective_rights.r or torrent.effective_rights.w or torrent.effective_rights.d %}
+      <li><a href="#info">Information</a></li>
+      {% endif %}
+      {% if edit and torrent.effective_rights.w %}
+      <li><a href="#tags">Tags</a></li>
+      {% endif %}
+      {% if edit and torrent.effective_rights.w and forms.permissions %}
+      <li><a href="#permissions">Permissions</a></li>
+      {% endif %}
+   </ul>
+   <!-- tab contents -->
    {% if torrent.effective_rights.r or torrent.effective_rights.w or torrent.effective_rights.d %}
-   <div id="info" class="ui-widget-content ui-corner-all altitem">
-   	  <h3 class="altheader">Information</h3>
-   	  <div class="altcontent">
+   <div id="info">
    	    <h4>Download status</h4>
    	  	<p id="scrape"></p>
    	  	<h4>Name</h4>
@@ -141,15 +109,16 @@ function removeit(id) {
    	  	{% endif %}
    	  	<h4>Creator</h4>
    	  	<p>{{torrent.creator|userdisplay}}</p>
-   	  </div>
+   	  	{% if torrent.description %}
+   	  	<h4>Description</h4>
+   	  	<p>{{torrent.description}}</p>
+   	  	{% endif %}
    </div>
    {% endif %}
    {% if edit and torrent.effective_rights.w %}
-   <div id="tags" class="ui-widget-content ui-corner-all altitem">
-      <h3 class="altheader">Tags</h3>
-      <div class="altcontent">
-      	<form id="tagform" enctype="multipart/form-data" method="POST" action="/torrent/{{torrent.id}}/tags">
-		  <div style="margin-top: 20px;">
+   <div id="tags">
+	  	<form id="tagform" enctype="multipart/form-data" method="POST" action="/torrent/{{torrent.id}}/tags">
+		  <div style="margin-top: 10px;">
 		    <ul id="taglist"></ul>
 		  </div>
 		  <br/>
@@ -158,13 +127,10 @@ function removeit(id) {
 			<input type="button" onClick="document.location='/torrent'" value="Cancel"/>
 		  </div>
 		</form>
-      </div>
    </div>
    {% endif %}
    {% if edit and torrent.effective_rights.w and forms.permissions %}
-   <div id="permissions" class="ui-widget-content ui-corner-all altitem">
-	<h3 class="altheader">Permissions</h3>
-	<div class="altcontent">
+   <div id="permissions">
 		<div>
 			<table>
 			{% for ace in acl %}
@@ -175,7 +141,6 @@ function removeit(id) {
 			{% endfor %}
 			</table>
 		</div>
-
 		<br/>
 		<form id="aclform" class="cmxform" enctype="multipart/form-data" method="post" action="/torrent/{{torrent.id}}/ace">
 		  <fieldset class="ui-widget-content ui-corner-all infopanel">
@@ -187,7 +152,7 @@ function removeit(id) {
 		      		{% else %}
 		        	<li><label for="id_{{ field.html_name }}">{{ field.label }}
 		        		{% if field.field.required %}<em>*</em>{% endif %}</label>
-		        		{{ field }}
+		        		<div class="fieldinput">{{ field }}</div>
 		        		{% if field.errors %}<em>{{field.errors}}</em>{% endif %}
 		        	</li>
 		        	{% endif %}
@@ -201,7 +166,6 @@ function removeit(id) {
 		    <input type="button" onClick="document.location='/torrent'" value="Cancel"/>
 		  </div>
 		</form>
-	</div>
    </div>
    {% endif %}
 </div>

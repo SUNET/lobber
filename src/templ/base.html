@@ -90,21 +90,18 @@
 		<div id="notification"></div>
 		<div id="container">
 			<div id="header">
-			   {% if user.is_authenticated %}
 			   <a href="/" id="thisislobber"></a>
-			   <div class="ui-widget ui-corner-all navlist toolbar">
-			      <ul class="rlist">
-			         <li class="button" style="margin-right: 50px"><a class="tip" title="Logout" id="logout" href="/auth/logout/">Logout</a></li>
-			         <li style="margin-right: 50px">
-			            <form method="POST" action="/torrent/search">
-			               <input type="text" id="searchbox" name="q" style="margin-right: 5px;"></input><input type="submit" value="Search"/>
-			            </form>
-			         </li>
-			         <li class="button"><a class="tip" title="Data" href="/torrent">Downloads</a></li>
-			      </ul>
-			   </div>
+			   {% if user.is_authenticated %}
+			   <ul class="ilist" style="margin-left: 500px; padding-top: 50px;">
+			      <li class="button"><a class="tip" title="Downloads" href="/torrent">Downloads</a></li>
+			      <li>
+			         <form method="POST" action="/torrent/search">
+			            <input type="text" id="searchbox" name="q" style="margin-right: 5px;"></input><input type="submit" value="Search"/>
+			         </form>
+			      </li>
+			      <li style="margin-left: 50px;" class="button"><a class="tip" title="Logout" id="logout" href="/auth/logout/">Logout</a></li>
+			   </ul>
 			   {% endif %}
-			   <div class="clear"></div>
 			</div>
 			<div id="content">
 				<div id="main">

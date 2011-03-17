@@ -22,8 +22,6 @@ function _update_tags(id) {
    			if (nlinks > 0) {
 	   			tags.html(links.join("&nbsp;"));
 	   			tags.addClass("ui-state-active");
-	   		} else {
-	   			tags.html("<a class=\"tip\" title=\"Add tags to this torrent...\" href=\"/torrent/"+id+"#tags\">No tags yet - add some!</a>");
 	   		}
 		});
 	}
@@ -145,10 +143,13 @@ function removeit(id) {
             {% endif %}
             <li style="float: right;">
                <div class="button">
-	               <a class="tip" title="Modify torrent" href="/torrent/{{t.id}}#permissions">Modify</a>
+	               <a class="tip" title="Modify torrent" href="/torrent/{{t.id}}">Modify</a>
 	           </div>
             </li>
-            <li class="minipanel"><a class="tip" title="This torrent is {% if t.is_public_read %}public{%else%}protected{%endif%}" href="/torrent/{{t.id}}">{% if t.is_public_read %}<span class="ui-icon ui-icon-unlocked"></span>{% else %}<span class="ui-icon ui-icon-locked"></span>{% endif %}</a></li>
+            <li class="minipanel"><a class="tip" title="This torrent is {% if t.is_public_read %}public{%else%}protected{%endif%}" href="/torrent/{{t.id}}#permissions">{% if t.is_public_read %}<span class="ui-icon ui-icon-unlocked"></span>{% else %}<span class="ui-icon ui-icon-locked"></span>{% endif %}</a></li>
+         	<li style="float: left;" class="button">
+         		<a class="tip button" title="Add tags to this torrent..." href="/torrent/{{t.id}}#tags">Tags</a>
+         	</li>
          	<li style="float: left;">
                <div class="tags minipanel ui-corner-all"></div>
             </li>

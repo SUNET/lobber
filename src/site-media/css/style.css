@@ -1,17 +1,18 @@
 html,body { font-size: 80%; font-family: arial, sans-serif; height: 100%; margin:0; padding:0;}
 body { width: 80%; }
-div#container { position: relative; height:auto !important; height: 100%; min-height: 80%; margin-left: 50px; margin-top: 0; padding-bottom: 80px;}
+div#container { position: relative; height:auto !important; height: 100%; min-height: 80%; margin-left: 50px; margin-top: 0; padding-bottom: 90px;}
 label { display:block; }
 #modal-dialog { font-size: 110%; }
 #modal-dialog input.text textarea { margin-bottom:12px; width:95%; padding: .4em; }
 #modal-dialog fieldset { padding:0; border:0; margin-top:25px; }
 div#intro { font: 150% "Trebuchet MS", sans-serif; margin-top: 150px; }
-#thisislobber { 
+#thisislobber {
 		position: absolute; 
 		top: 0px; 
 		left: 0px; 
-		width: 90%; 
+		width: 400px; 
 		height: 90px; 
+		z-index: +1;
 		background-color: transparent; 
 }
 div#footer { margin-right: 50px; border-top: 1px solid #CECECE; position: absolute; bottom: 0; padding-bottom: 0px; width: 95%; }
@@ -19,8 +20,8 @@ div#footer ul { list-style: none; padding: 0; margin: 0; }
 div#footer li { display: inline; }
 div#footer li li { display: block; }
 div#footer ul ul { float: left; padding-right: 50px; }
-div#header { margin-top: 5px; margin-bottom: 10px; background-image: url('../images/lobber-banner.jpg'); background-repeat:no-repeat; height: 100px; }
-.navlist ul { list-style: none; padding: 0; margin: 0; }
+div#header { margin-top: 5px; margin-bottom: 0; background-image: url('../images/lobber-banner.jpg'); background-repeat:no-repeat; height: 95px; clear: both; }
+.navlist ul { list-style: none; padding: 0; margin: 0; font-size: 90%; }
 .navlist li { float: right; display: inline;}
 .ilist { padding: 0px; margin: 0px; }
 .ilist ul { list-style: none; }
@@ -54,13 +55,12 @@ form .ui-widget li { float: right; border-right: 1px solid #CECECE; padding-righ
 .fieldlabel { font-weight: bold; }
 ul.links { list-style: none inside; padding: 0; margin: 0; }
 li.links { padding: 0; margin: 0; }
-.altheader { padding-left: 20px; padding-bottom: 10px; border-bottom: 1px solid #CECECE;}
-.altcontent { padding-left: 20px; padding-bottom: 10px; width: 80%; }
-.altitem { margin-top: 20px; }
 .ui-icon { display: inline-block !important; }
 .minipanel { padding-top: 5px; padding-bottom: 5px; padding-left: 6px; padding-right: 6px; }
 .right  { float: right; }
 .left { float: left; }
+.fieldinput ul { list-style: none inside; padding: 0; margin: 0; }
+.fieldinput li { padding: 0; margin: 0; display: inline; float: left; }
 
 form.cmxform {
   margin: 0px; padding: 0px; 	

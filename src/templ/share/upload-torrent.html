@@ -32,7 +32,7 @@ $(function() {
       		{% else %}
         	<li><label for="id_{{ field.html_name }}">{{ field.label }}
         		{% if field.field.required %}<em>*</em>{% endif %}</label>
-        		{{ field }}
+        		<div class="fieldinput">{{ field }}</div>
         		{% if field.errors %}<em>{{field.errors}}</em>{% endif %}
         	</li>
         	{% endif %}
