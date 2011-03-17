@@ -114,11 +114,13 @@ function removeit(id) {
 <div class="clear"></div>
 <br/>
 
+{% if torrent.description %}
 <div class="ui-helper-reset ui-state-highlight ui-widget ui-corner-all">
 	<div class="infopanel">
 		<p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>{{torrent.description}}</p>
 	</div>
 </div>
+{% endif %}
 
 <div id="settings">
    {% if torrent.effective_rights.r or torrent.effective_rights.w or torrent.effective_rights.d %}
