@@ -5,7 +5,14 @@ label { display:block; }
 #modal-dialog { font-size: 110%; }
 #modal-dialog input.text textarea { margin-bottom:12px; width:95%; padding: .4em; }
 #modal-dialog fieldset { padding:0; border:0; margin-top:25px; }
-div#thisislobber { font: 150% "Trebuchet MS", sans-serif; margin-top: 150px; }
+#thisislobber { 
+		position: absolute; 
+		top: 0px; 
+		left: 0px; 
+		width: 90%; 
+		height: 90px; 
+		background-color: transparent; 
+}
 div#footer { margin-right: 50px; border-top: 1px solid #CECECE; position: absolute; bottom: 0; padding-bottom: 0px; width: 100%; }
 div#footer ul { list-style: none; padding: 0; margin: 0; }
 div#footer li { display: inline; }
