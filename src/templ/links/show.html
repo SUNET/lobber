@@ -8,7 +8,7 @@
 <div class="infopanel ui-corner-all ui-widget-content">
 <p>Give this link to anyone who should have access to {% if tag %}<a href="/torrent/tag/{{tag}}">torrents tagged with {{tag}}</a>{% endif %}{% if torrent %}<a href="/torrent/{{t.id}}">{{torrent.name}}</a>{% endif %}:</p>
 <form>
-   <input type="text" size="60" disabled="true" value="{{link}}"/>
+   <input type="text" size="60" readonly="readonly" value="{{link}}"/>
 </form>
 {%if torrent %}
 <p>You can also <a href="/link/{{pid}}/torrent/{{torrent.id}}/message"><span class="ui-icon ui-icon-mail-closed"></span>email the link to someone</a>.</p>
