@@ -56,8 +56,8 @@ def _sanitize_fn(name):
 def _sanitize_re(str):
     """
     When doing searches that starts with *, ?, +, ie. special regexp chars, 
-    MySQLdb will throw "OperationalError: (1139, "Got error 'repetition-operator
-    operand invalid' from regexp")".
+    MySQLdb and psycopg2 will throw "OperationalError: (1139, "Got error 
+    'repetition-operator operand invalid' from regexp")".
     This function returns a regexp string with the starting special chars 
     escaped.
     """
