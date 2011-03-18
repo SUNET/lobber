@@ -8,7 +8,7 @@ from lobber.tracker.models import PeerInfo
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from lobber.torrenttools import bencode
-from lobber.share.models import Torrent
+from lobber.share.models import Torrent, user_profile
 from urllib import unquote
 from ctypes import create_string_buffer
 
@@ -155,11 +155,19 @@ def announce(request,info_hash=None):
 def tracker_response(dict):
     return HttpResponse(bencode(dict),mimetype="text/plain")
 
-def summarize(qs):
+def summarize(qs,entitlement=None):
     count = 0
     downloaded = 0
     seeding = 0
     for pi in qs:
+        if entitlement:
+            if not pi.user:
+                continue
+            
+            profile = user_profile(pi.user)
+            if not entitlement in profile.get_entitlements():
+                continue
+        
         if pi.state == PeerInfo.STARTED or pi.state == PeerInfo.COMPLETED:
             count = count + 1
             if pi.left == 0:
@@ -169,10 +177,13 @@ def summarize(qs):
                 downloaded = downloaded + 1
     return count,downloaded,seeding
     
-def peer_status(hashvals):
+def peer_status(hashvals,entitlement=None):
     files = {}
     for info_hash in hashvals:
-        count,downloaded,seeding = summarize(PeerInfo.objects.filter(info_hash=info_hash))
+        qs = PeerInfo.objects.filter(info_hash=info_hash)
+        if entitlement:
+            qs = qs.filter(user__profile__entitlements__contains=entitlement) #this is just a course filter - need to verify
+        count,downloaded,seeding = summarize(qs,entitlement)
         files[info_hash]= {'complete': seeding, 'downloaded': downloaded, 'incomplete': count - seeding}
     return files;
     
