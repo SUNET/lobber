@@ -52,6 +52,19 @@ def _sanitize_fn(name):
     # Remove double periods.
     name = unicode(re.sub('\.\.', '', name))
     return name
+    
+def _sanitize_re(str):
+    """
+    When doing searches that starts with *, ?, +, ie. special regexp chars, 
+    MySQLdb will throw "OperationalError: (1139, "Got error 'repetition-operator
+    operand invalid' from regexp")".
+    This function returns a regexp string with the starting special chars 
+    escaped.
+    """
+    special_chars = ['*','+','?']
+    if str[0] in special_chars:
+        return '\\%s' % str
+    return str
 
 def _store_torrent(req, form):
     """
@@ -145,6 +158,7 @@ def find_torrents(user, args, max=40):
             q = q.filter(creator=u)
         elif e == 'txt':
             for re in vals:
+                re = _sanitize_re(re)
                 q = q.filter(description__iregex=re) | q.filter(name__iregex=re)
         elif e == 'tag':
             for val in vals:
