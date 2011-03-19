@@ -5,4 +5,5 @@ urlpatterns = patterns('',
     (r'^announce$', "lobber.tracker.views.announce"),
     (r'^uannounce$', "lobber.tracker.views.user_announce"),
     (r'^scrape$', "lobber.tracker.views.scrape"),
+    (r'^scrape/(?P<entitlement>.+)$', "lobber.tracker.views.scrape"),
     )

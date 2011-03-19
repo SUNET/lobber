@@ -187,11 +187,18 @@ def peer_status(hashvals,entitlement=None):
         files[info_hash]= {'complete': seeding, 'downloaded': downloaded, 'incomplete': count - seeding}
     return files;
     
-def scrape(request):
+def scrape(request,entitlement=None):
     if request.GET.has_key('info_hash'):
-        return tracker_response({'files': peer_status(request.GET.getlist('info_hash'))})
-    else:
+        info_hash = get_from_qs(request.META['QUERY_STRING'], 'info_hash=')
+        #logger.debug("announce: getting hash from request: %s" % request.META['QUERY_STRING'])
+    
+    if not info_hash:
         return _err("I'm not going to tell you about all torrents n00b!")
+
+    info_hash = hexify(unquote(info_hash))
+    
+    return tracker_response({'files': peer_status(info_hash,entitlement)})
+    
     
 @login_required
 def user_announce(request):
