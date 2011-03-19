@@ -188,6 +188,7 @@ def peer_status(hashvals,entitlement=None):
     return files;
     
 def scrape(request,entitlement=None):
+    info_hash = None
     if request.GET.has_key('info_hash'):
         info_hash = get_from_qs(request.META['QUERY_STRING'], 'info_hash=')
         #logger.debug("announce: getting hash from request: %s" % request.META['QUERY_STRING'])
@@ -197,7 +198,7 @@ def scrape(request,entitlement=None):
 
     info_hash = hexify(unquote(info_hash))
     
-    return tracker_response({'files': peer_status(info_hash,entitlement)})
+    return tracker_response({'files': peer_status([info_hash],entitlement)})
     
     
 @login_required
