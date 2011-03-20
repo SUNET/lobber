@@ -87,13 +87,12 @@ function removeit(id) {
 
 </script>
 {% endblock %}
+{% block buttons %}
+  <li class="button"><a id="launch-dlmanager" href="javascript:void(0);">Upload using Java Web Start</a></li>
+  <li class="button"><a href="/torrent/add">Upload using your Browser</a></li>
+{% endblock %}
 
 {% block main %}
-<div class="button">
-  <a id="launch-dlmanager" href="javascript:void(0);">Upload using Java Web Start</a>
-  <a href="/torrent/add">Upload using your Browser</a>
-</div>
-
 <div id="remove-torrent-dialog" class="modal-dialog" title="Really remove this torrent?">
     <form action="">
 		<p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>
