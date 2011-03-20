@@ -3,7 +3,7 @@ from django.forms.widgets import CheckboxSelectMultiple,\
     HiddenInput, TextInput, SelectMultiple, Textarea
 
 class UploadForm(forms.Form):
-    description = forms.CharField(label="Description", widget=forms.Textarea,required=False)
+    description = forms.CharField(label="Description", widget=forms.Textarea(attrs={'rows':6,'cols':60}),required=False)
     expires = forms.DateTimeField(label="Expiration")
     file = forms.FileField(label="Data")
     publicAccess = forms.BooleanField(required=False,label="Allow public access?")

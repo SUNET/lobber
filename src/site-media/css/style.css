@@ -1,7 +1,6 @@
 html,body { font-size: 80%; font-family: arial, sans-serif; height: 100%; margin:0; padding:0;}
 body { width: 80%; }
 div#container { position: relative; height:auto !important; height: 100%; min-height: 80%; margin-left: 50px; margin-top: 0; padding-bottom: 90px;}
-label { display:block; }
 #modal-dialog { font-size: 110%; }
 #modal-dialog input.text textarea { margin-bottom:12px; width:95%; padding: .4em; }
 #modal-dialog fieldset { padding:0; border:0; margin-top:25px; }
@@ -48,7 +47,6 @@ a:hover { text-decoration: underline; }
 #main{ float: left; margin-left: 0px; width:70%}
 .code{font: 110% "Courier", fixed}
 .infopanel { padding: 1em 2.2em; }
-.infopanel label { display:block; }
 div .hidden {visibility:hidden;}
 form .ui-widget ul { list-style: none inside; padding: 0; margin: 0; }
 form .ui-widget li { float: right; border-right: 1px solid #CECECE; padding-right: 5px; margin: 0; vertical-align: middle;}
@@ -98,7 +96,7 @@ form.cmxform fieldset fieldset legend {
   font-weight: normal;
 }
 form.cmxform fieldset fieldset label {
-  display: block;
+  display: inline-block;
   width: auto;
 }
 form.cmxform em {
