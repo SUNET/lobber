@@ -70,7 +70,7 @@ def link_to_torrent(request,tid):
             keyp = create_key_user_profile(creator=request.user,
                                           urlfilter='/torrent/%d.torrent[^/]*$' % t.id,
                                           tagconstraints='',
-                                          entitlements='user:%s:$self' % request.user.username,
+                                          entitlements='user:%s' % request.user.username,
                                           expires=form.cleaned_data['expires'])
             return HttpResponseRedirect("/link/%d/torrent/%d" % (keyp.id,t.id))
     else:
