@@ -19,7 +19,7 @@ div#footer ul { list-style: none; padding: 0; margin: 0; }
 div#footer li { display: inline; }
 div#footer li li { display: block; }
 div#footer ul ul { float: left; padding-right: 50px; }
-div#header { margin-top: 5px; margin-bottom: 0; background-image: url('../images/lobber-banner.jpg'); background-repeat:no-repeat; height: 95px; clear: both; }
+div#header { margin-bottom: 0; background-image: url('../images/lobber-banner.jpg'); background-repeat:no-repeat; height: 95px; clear: both; }
 .navlist ul { list-style: none; padding: 0; margin: 0; font-size: 90%; }
 .navlist li { float: right; display: inline;}
 .ilist { padding: 0px; margin: 0px; }

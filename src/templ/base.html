@@ -97,7 +97,7 @@
 			    {% if user.is_authenticated %}
 			    <ul class="ilist">
 			   	  {% block buttons %}{% endblock %}
-			      <li class="button right"><a class="tip" title="Logout" id="logout" href="/auth/logout/">Logout</a></li>
+			      <li class="button right" style="padding-right: 15px;"><a class="tip" title="Logout" id="logout" href="/auth/logout/">Logout</a></li>
 			      <li class="right" style="margin-right: 20px;">
 			         <form method="POST" action="/torrent/search">
 			            <input type="text" id="searchbox" name="q" style="margin-right: 5px;"></input><input type="submit" value="Search"/>
