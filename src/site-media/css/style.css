@@ -50,63 +50,21 @@ a:hover { text-decoration: underline; }
 div .hidden {visibility:hidden;}
 form .ui-widget ul { list-style: none inside; padding: 0; margin: 0; }
 form .ui-widget li { float: right; border-right: 1px solid #CECECE; padding-right: 5px; margin: 0; vertical-align: middle;}
+form fieldset legend { font-size: 120%; font-weight: bold; padding: 5px; }
+form fieldset { margin-left: 20px; }
+form fieldset input[type=text] { height: 25px; }
+.error { padding: 5px; }
 .fieldlabel { font-weight: bold; }
 ul.links { list-style: none inside; padding: 0; margin: 0; }
 li.links { padding: 0; margin: 0; }
+form .ui-widget ul { list-style: none inside; padding: 0; margin: 0; }
+form .ui-widget li { float: right; border-right: 1px solid #CECECE; padding-right: 5px; margin: 0; vertical-align: middle;}
 .ui-icon { display: inline-block !important; }
 .minipanel { padding-top: 5px; padding-bottom: 5px; padding-left: 6px; padding-right: 6px; }
 .right  { float: right; }
 .left { float: left; }
 .fieldinput ul { list-style: none inside; padding: 0; margin: 0; }
 .fieldinput li { padding: 0; margin: 0; display: inline; float: left; }
-
-form.cmxform {
-  margin: 0px; padding: 0px; 	
-}
-form.cmxform fieldset {
-  margin-bottom: 10px;
-}
-form.cmxform legend {
-  padding: 0 2px;
-  font-weight: bold;
-  font-size: 120%;
-}
-form.cmxform label {
-  display: inline-block;
-  line-height: 1.8;
-  vertical-align: top;
-  font-size: 120%;
-  width: 120px; 
-}
-form.cmxform fieldset ol {
-  margin: 0;
-  padding: 0;
-}
-form.cmxform fieldset li {
-  list-style: none;
-  padding: 5px;
-  margin: 0;
-}
-form.cmxform fieldset fieldset {
-  border: none;
-  margin: 3px 0 0;
-}
-form.cmxform fieldset fieldset legend {
-  padding: 0 0 5px;
-  font-weight: normal;
-}
-form.cmxform fieldset fieldset label {
-  display: inline-block;
-  width: auto;
-}
-form.cmxform em {
-  font-weight: bold;
-  font-style: normal;
-  color: #f00;
-}
-form.cmxform fieldset fieldset label {
-  margin-left: 123px; /* Width plus 3 (html space) */
-}
 
 
 #files { width: 520px; clear: both; margin: 20px 0 10px; }

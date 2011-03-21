@@ -4,11 +4,12 @@
 	    {% if refresh %}
 	    <!-- META HTTP-EQUIV="Refresh" CONTENT="{{refresh}}"/ -->
 	    {% endif %}
-	    <link type="text/css" href="/site-media/css/style.css" rel="stylesheet" />
 	    <link type="text/css" href="/site-media/css/jquery.ui.autocomplete.custom.css" rel="stylesheet" />
         <link type="text/css" href="/site-media/css/lobberui/jquery-ui-1.8.6.custom.css" rel="stylesheet" />
         <link type="text/css" href="/site-media/css/jquery.jnotify.css" rel="stylesheet" />
         <link type="text/css" href="/site-media/css/jquery.tooltip.css" rel="stylesheet" />
+        <link type="text/css" href="/site-media/css/fileinput.css" rel="stylesheet" />
+        <link type="text/css" href="/site-media/css/style.css" rel="stylesheet" />
         <script type="text/javascript" src="/site-media/js/jquery-1.4.2.min.js"></script>
         <script type="text/javascript" src="/site-media/js/jquery-ui-1.8.6.custom.min.js"></script>
         <script type="text/javascript" src="/site-media/js/jquery.tooltip.pack.js"></script>
@@ -20,22 +21,12 @@
         <script type="text/javascript" src="/site-media/js/jquery.timers.js"></script>
         <script type="text/javascript" src="/site-media/js/deployJava.js"></script> <!-- http://java.com/js/deployJava.js -->
         <script type="text/javascript" src="/site-media/js/jquery.webstart.js"></script>
-        <script type="text/javascript" src="/site-media/js/jquery.validate.min.js"></script>
         <script type="text/javascript" src="/site-media/js/bbq.js"></script>
         <script type="text/javascript" src="/site-media/js/jquery.tinyscrollbar.min.js"></script>
-        <!-- 
-        <script src="{{orbited_prefix}}/static/Orbited.js"></script>
-        <script>
-           TCPSocket = Orbited.TCPSocket
-           document.domain = document.domain;
-        </script>
-        <script src="{{orbited_prefix}}/static/protocols/stomp/stomp.js"></script>
-        <script type="text/javascript">
-           debug = {% if debug %}1{% else %}0{% endif %}
-           stomp_host = '{{stomp_host}}'
-           stomp_port = {{stomp_port}}
-        </script>
-        -->
+        <script type="text/javascript" src="/site-media/js/jquery.validate.js"></script>
+        <script type="text/javascript" src="/site-media/js/bbq.js"></script>
+        <script type="text/javascript" src="/site-media/js/jquery.form.wizard-3.0.4.js"></script>
+        <script type="text/javascript" src="/site-media/js/jquery.fileinput.min.js"></script>
         <script type="text/javascript" src="/site-media/js/lobber-common.js"></script>
         {% if error %}
 		<script type="text/javascript">

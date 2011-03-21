@@ -27,7 +27,10 @@ function getDialogButton( dialog_selector, button_name )
   return null;
 }
 $(function() {
-   $("input:submit, input:button").button();
+   $("input:submit, input:button, input:reset").button();
+   $('input:file').fileinput();
+   $('label.error').addClass('ui-state-error');
+   $('input:text,textarea').addClass('ui-corner-all');
    $("a",".button").button();
    $('#notification').jnotifyInizialize({
       oneAtTime: false,
