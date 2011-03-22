@@ -120,6 +120,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'lobber.extensions',
     'tagging',
+    'lobber.userprofile',
     'lobber.share',
     'lobber.links',
     'lobber.tracker',

@@ -16,13 +16,14 @@ from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL,
 from lobber.resource import Resource
 import lobber.log
 from lobber.share.forms import UploadForm
-from lobber.share.models import Torrent, user_profile
+from lobber.share.models import Torrent
 from lobber.notify import notifyJSON
 from lobber.share.forms import formdict
 from tempfile import NamedTemporaryFile
 from lobber.share.models import DataLocation
 import tempfile
 from lobber.tracker.views import peer_status
+from lobber.userprofile.models import user_profile
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
@@ -259,9 +260,6 @@ def canhaz(request,hash,entitlement=None,scheme="http"):
             urls.append(dl.url)
     
     return json_response(urls)
-    
-def welcome(req):
-    return HttpResponseRedirect("/torrent/")
 
 @login_required
 def remove_torrent(request, tid):
@@ -307,6 +305,7 @@ def upload_jnlp(req):
     return render_to_response('share/launch.jnlp', d,
                               mimetype='application/x-java-jnlp-file')
 
+# remove - leifj ????
 def exists_new(req,inst):
     count = Torrent.objects.filter(hashval=inst).count()
     r = None
@@ -364,6 +363,7 @@ def show(request, inst=None):
                       {'text/html': 'share/torrent.html',
                        'application/x-bittorrent': _torrent_file_response},d)
 
+#remove - leifj
 @login_required
 def land(request, inst):
     t = get_object_or_404(Torrent,pk=inst)

@@ -1,22 +1,11 @@
 {% extends "base.html" %}
-
-{% block title %}Lobber{% endblock %}
-
+{% block title %}Application Keys{% endblock %}
+{% block buttons %}
+<li class="button"><a class="tip" title="Create new application key" href="/user/key/add">Create Application Key</a></li>
+{% endblock %}
 {% block js %}
 <script type="text/javascript">
 $(function() {
-	$('#id_expires').datepicker({'dateFormat': 'yy-mm-dd'});
-	$('#expdate-dialog form').submit(function() {
-		$.post($(this).attr('action'),$(this).serialize(),function(data) {
-		   if (data) {
-   	          $('#notification').jnotifyAddMessage({
-                 text: data,
-                 permanent: false
-              });
-   	       }
-		});
-		return false;
-	});
 	$("#keys").accordion({ 
    			header: "h3", 
    			event: "click", 
@@ -26,36 +15,10 @@ $(function() {
 });
 </script>
 {% endblock %}
-
 {% block main %}
-<h1>Application Keys</h1>
-<form class="cmxform" enctype="multipart/form-data" method="post">
-  <fieldset class="ui-widget-content ui-corner-all infopanel">
-      <legend>Create a new key</legend>
-      <ol>
-      {% for field in form %}
-      		{% if field.is_hidden %}
-      		{{ field }}
-      		{% else %}
-        	<li><label for="id_{{ field.html_name }}">{{ field.label }}
-        		{% if field.field.required %}<em>*</em>{% endif %}</label>
-        		{{ field }}
-        		{% if field.errors %}<em>{{field.errors}}</em>{% endif %}
-        	</li>
-        	{% endif %}
-      {% endfor %}
-      </ol>
-  </fieldset>
-
-  <br/>
-  <div class="button">
-    <input type="submit" value="Create Key" />
-    <input type="button" onClick="document.location='/torrent'" value="Cancel"/>
-  </div>
-</form>
-<br/>
 {% if keys %}
 <div id="keys">
+  <h1>Application Keys</h1>
   {% for profile in keys %}
     <div class="key" id="{{ profile.get_username }}">
       <h3><a href="#{{ profile.get_username }}">{{ profile.get_username }}</a></h3>

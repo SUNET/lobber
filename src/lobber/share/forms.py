@@ -1,6 +1,5 @@
 from django import forms
-from django.forms.widgets import CheckboxSelectMultiple,\
-    HiddenInput, TextInput, SelectMultiple, Textarea
+from django.forms.widgets import CheckboxSelectMultiple,HiddenInput, TextInput
 from form_utils.forms import BetterForm
 from lobber.settings import ANNOUNCE_URL
 
@@ -38,11 +37,6 @@ class AddACEForm(forms.Form):
     entitlement = forms.CharField(required=False,max_length=255,widget=HiddenInput)
     subject = forms.CharField(max_length=255,widget=TextInput(attrs={'size':'40'}))
     permissions = forms.MultipleChoiceField(widget=CheckboxSelectMultiple,choices=[('r','read'),('w','write'),('d','delete')])
-        
-class CreateKeyForm(forms.Form):
-    entitlements = forms.MultipleChoiceField(label="Entitlements",widget=SelectMultiple,required=False)
-    urlfilter = forms.CharField(label="URL filter", required=False,widget=Textarea(attrs={'rows':'4'}))
-    expires = forms.DateTimeField(label="Expiration date",required=False)
 
 class DataLocationForm(forms.Form):
     url = forms.URLField()

@@ -24,13 +24,12 @@ div#header img { width: 100%; border: 0;}
 .clist ul { list-style: none; }
 .clist li { display: block; }
 .description { clear: both; margin-top: 10px; padding-top: 15px; }
+p.info { font-size: 120%; margin-top: 10px; padding-top: 15px; }
 div.toolbar{ padding: 4px; float: right; margin-right: 30px; margin-bottom: 20px; margin-top: 50px; }
 #linklist { float: right; }
 #linklist ul{ list-style: none; padding: 0; margin: 0; }
 #linklist li{ float: left; margin: 0 0.15em}
 #linklist a{ font: 120% "Trebuchet MS", sans-serif; }
-a { text-decoration: none; }
-a:hover { text-decoration: underline; }
 .clear { clear: both; }
 #content{ padding-bottom: 50px; }
 .code{font: 110% "Courier", fixed}

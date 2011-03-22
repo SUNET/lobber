@@ -3,14 +3,15 @@ from time import gmtime, strftime
 from django.http import HttpResponseRedirect, HttpResponseNotAllowed
 from django.contrib.auth.decorators import login_required
 from lobber.settings import NORDUSHARE_URL, LOBBER_LOG_FILE
-from lobber.share.models import Torrent, UserProfile
 from lobber.notify import notifyJSON
 import lobber.log
 from django.shortcuts import get_object_or_404
 from lobber.links.forms import LinkForm, LinkMessageForm
 from lobber.multiresponse import respond_to
-from lobber.share.users import create_key_user_profile
 from django.core.mail import send_mail
+from lobber.userprofile.views import create_key_user_profile
+from lobber.userprofile.models import UserProfile
+from lobber.share.models import Torrent
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 

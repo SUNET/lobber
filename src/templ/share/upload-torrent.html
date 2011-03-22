@@ -18,3 +18,13 @@ $(function() {
 });
 </script>
 {% endblock %}
+{% block beforeform %}
+<div class="ui-state-highlight ui-corner-all" style="margin-bottom: 5px;">
+<p class="infopanel">
+<span class="ui-icon ui-icon-info"></span>
+Here you can upload data to Lobber for sharing either publicly or within a group of users who share a common entitlement-value. Either
+upload a plain file or a <a class="tip" title="About Torrent Files" href="http://torrent.se/documentation#torrent">torrent</a> file. If
+you upload a plain (non-torrent) file Lobber will create a torrent file for you. After you have uploaded your data you can share it by
+creating a share-link or by assigning it to a group.
+</p></div>
+{% endblock %}
