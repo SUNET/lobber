@@ -32,6 +32,9 @@ class PeerInfo(models.Model):
     state = models.SmallIntegerField(blank=True,null=True,choices=((STARTED,"started"),(COMPLETED,"completed"),(STOPPED,"stopped"),(PAUSED,'paused')))
     last_seen = models.DateTimeField(auto_now=True)
     
+    class Meta:
+        unique_together = ('info_hash','address','port')
+    
     def __unicode__(self):
         return "%s@%s:%s" % (self.eschash(),self.address,self.port)
     
