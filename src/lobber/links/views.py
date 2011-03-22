@@ -32,7 +32,7 @@ def send_link_mail(request,pid,tid):
                       msg, 
                       request.user.email, 
                       [form.cleaned_data['to']])
-            return HttpResponseRedirect("/torrent/%d" % (t.id))
+            return HttpResponseRedirect("/torrent/%d#info" % (t.id))
     else:
         form = LinkMessageForm()
     

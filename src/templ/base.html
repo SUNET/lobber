@@ -81,22 +81,19 @@
 	<body>
 		<div id="notification"></div>
 		<div id="container">
-			<div id="header">
-			   <a href="/" id="thisislobber"></a>
-			</div>
-		    <div style="padding-right: 60px;">
-			    {% if user.is_authenticated %}
-			    <ul class="ilist">
+		    <div id="header">
+			   <a href="/"><img src="/site-media/images/lobber-banner.jpg"/></a>
+			   {% if user.is_authenticated %}
+			   <ul class="ilist">
 			   	  {% block buttons %}{% endblock %}
-			      <li class="button right" style="padding-right: 15px;"><a class="tip" title="Logout" id="logout" href="/auth/logout/">Logout</a></li>
-			      <li class="right" style="margin-right: 20px;">
+			      <li class="right ui-helper-reset ui-widget ui-widget-content" ">
 			         <form method="POST" action="/torrent/search">
-			            <input type="text" id="searchbox" name="q" style="margin-right: 5px;"></input><input type="submit" value="Search"/>
+			            <input type="text" id="searchbox" name="q" size="20" style="margin-right: 5px;"></input><input type="submit" value="Search"/>
 			         </form>
 			      </li>
-			      <li class="button right"><a class="tip" title="Downloads" href="/torrent">Downloads</a></li>
-			    </ul>
-			   {% endif %}
+			      <li class="button left"><a class="tip" title="Downloads" href="/torrent">Downloads</a></li>
+			   </ul>
+			  {% endif %}
 			</div>
 			<div id="content">
 				<div id="main">
@@ -117,6 +114,7 @@
 				   		<ul>
 				   			<li><h3>Users</h3></li>
 				   			<li><a class="tip" title="{{ user.get_full_name }}" href="/user">My Profile</a></li>
+				   			<li><a class="tip" title="Logout" id="logout" href="/auth/logout/">Logout</a></li>
 				   			<li><a class="tip" title="{{ user.get_full_name }}" href="http://lobber.se/about">About Lobber</a></li>
 				   			<li><a class="tip" title="{{ user.get_full_name }}" href="http://lobber.se/news">Lobber News</a></li>
 				   		</ul>
