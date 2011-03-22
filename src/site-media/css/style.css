@@ -11,7 +11,7 @@ div#footer li { display: inline; }
 div#footer li li { display: block; }
 div#footer ul ul { float: left; padding-right: 50px; }
 div#header { margin: 0; padding: 0; }
-div#header img { width: 100%; }
+div#header img { width: 100%; border: 0;}
 .navlist ul { list-style: none; padding: 0; margin: 0; font-size: 90%; }
 .navlist li { float: right; display: inline;}
 .ilist { padding: 0px; margin: 0px; }
