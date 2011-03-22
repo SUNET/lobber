@@ -42,6 +42,7 @@ def removekey(request,key):
 def addkey(request):
     if request.method == 'POST':
         form = CreateKeyForm(request.POST)
+        form.fields['entitlements'].choices = [(e,e) for e in user_profile(request.user).get_entitlements()]
         if form.is_valid():
             logger.info(form.cleaned_data['entitlements'])
             secret = create_key_user(request.user,
@@ -54,8 +55,8 @@ def addkey(request):
                                'text/html': HttpResponseRedirect("/user/key")})
     else:        
         form = CreateKeyForm()
+        form.fields['entitlements'].choices = [(e,e) for e in user_profile(request.user).get_entitlements()]
     
-    form.fields['entitlements'].choices = [(e,e) for e in user_profile(request.user).get_entitlements()]
     return respond_to(request,
                       {'application/json': HttpResponseBadRequest("invalid request"),
                        'text/html': 'userprofile/addkey.html'},{'form': form})
