@@ -10,7 +10,7 @@ div#footer ul { list-style: none; padding: 0; margin: 0; }
 div#footer li { display: inline; }
 div#footer li li { display: block; }
 div#footer ul ul { float: left; padding-right: 50px; }
-div#header { margin: 0; padding: 0; }
+div#header { margin: 0; padding: 0; padding-bottom: 30px; }
 div#header img { width: 100%; border: 0;}
 .navlist ul { list-style: none; padding: 0; margin: 0; font-size: 90%; }
 .navlist li { float: right; display: inline;}
@@ -39,13 +39,13 @@ a:hover { text-decoration: underline; }
 .code{font: 110% "Courier", fixed}
 .infopanel { padding: 1em 2.2em; }
 div .hidden {visibility:hidden;}
-form .ui-widget ul { list-style: none inside; padding: 0; margin: 0; }
+form .ui-widget ul,ol { list-style: none inside; padding: 0; margin: 0; }
 form .ui-widget li { float: right; border-right: 1px solid #CECECE; padding-right: 5px; margin: 0; vertical-align: middle;}
 form fieldset legend { font-size: 120%; font-weight: bold; padding: 5px; }
 form fieldset { margin-left: 20px; }
 form fieldset input[type=text] { height: 25px; }
+form fieldset label {font-weight: bold; }
 .error { padding: 5px; }
-.fieldlabel { font-weight: bold; }
 ul.links { list-style: none inside; padding: 0; margin: 0; }
 li.links { padding: 0; margin: 0; }
 form .ui-widget ul { list-style: none inside; padding: 0; margin: 0; }
