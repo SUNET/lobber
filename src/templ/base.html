@@ -81,22 +81,20 @@
 	<body>
 		<div id="notification"></div>
 		<div id="container">
-			<div id="header">
-			   <a href="/" id="thisislobber"></a>
-			</div>
-		    <div style="padding-right: 60px;">
-			    {% if user.is_authenticated %}
-			    <ul class="ilist">
+		    <div id="header">
+			   <a href="/"><img src="/site-media/images/lobber-banner.jpg"/></a>
+			   {% if user.is_authenticated %}
+			   <ul class="ilist">
 			   	  {% block buttons %}{% endblock %}
-			      <li class="button right" style="padding-right: 15px;"><a class="tip" title="Logout" id="logout" href="/auth/logout/">Logout</a></li>
+			      <li class="button right"><a class="tip" title="Logout" id="logout" href="/auth/logout/">Logout</a></li>
 			      <li class="right" style="margin-right: 20px;">
 			         <form method="POST" action="/torrent/search">
 			            <input type="text" id="searchbox" name="q" style="margin-right: 5px;"></input><input type="submit" value="Search"/>
 			         </form>
 			      </li>
 			      <li class="button right"><a class="tip" title="Downloads" href="/torrent">Downloads</a></li>
-			    </ul>
-			   {% endif %}
+			   </ul>
+			  {% endif %}
 			</div>
 			<div id="content">
 				<div id="main">
