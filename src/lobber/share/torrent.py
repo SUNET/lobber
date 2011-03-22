@@ -33,10 +33,15 @@ from hashlib import sha1
 
 def _torrent_info(data):
     """
-    Return (name, hash) of torrent file.
+    Return (name, hash) of torrent file or None if an invalid file.
     """
-    info = bdecode(data)['info']
+    try:
+        info = bdecode(data)['info']
+    except Exception: # not a valid bencoded string
+        return None, None
+        
     return info['name'], sha1(bencode(info)).hexdigest()
+    
 
 def _create_torrent(filename, announce_url, target_file, comment=None):
     make_meta_file(filename, announce_url, 2 ** 18, comment=comment, target=target_file)
@@ -108,6 +113,9 @@ def _store_torrent(req, form):
         os.unlink(tmptf.name)
     
     torrent_name, torrent_hash = _torrent_info(torrent_file_content)
+    if not torrent_name and not torrent_hash:
+        logger.error('%s: Not a valid torrent file.' % ff.name)
+        return None
 
     acl = []
     publicAccess = form.cleaned_data['publicAccess']
