@@ -6,11 +6,11 @@ Created on Tue Mar 22 17:17:05 2011
 """
 
 from django.core.management.base import NoArgsCommand
-from lobber.share.models import UserProfile
+from lobber.userprofile.models import UserProfile
 import datetime
 import lobber.log
 from lobber.settings import LOBBER_LOG_FILE
-logger = lobber.log.Logger("share", LOBBER_LOG_FILE)
+logger = lobber.log.Logger("userprofile", LOBBER_LOG_FILE)
 
 class Command(NoArgsCommand):
     help = 'Deletes keys that has expiration_data < now().'
