@@ -80,17 +80,26 @@ def _store_torrent(req, form):
     """
     ff = form.cleaned_data['file']
     datafile = None
-    if ff.content_type == 'application/x-bittorrent':
+    
+    # Read the files first 11 bytes
+    first_bytes = ff.read(11)
+    # Reset the file
+    ff.seek(0, 0)
+    
+    if first_bytes.startswith('d8:announce'): 
+        torrent_file_content = ''
         # FIXME: Limit amount read and check length of returned data.
-        torrent_file_content = ff.read()
+        for chunk in ff.chunks():
+            torrent_file_content += chunk
         ff.close()
     else:
         tmptf = NamedTemporaryFile(delete=False)
         datafile = file("%s%s%s" % (tempfile.gettempdir(),
                                     os.sep,
                                     _sanitize_fn(ff.name)),
-                        "w")
-        datafile.write(ff.read())
+                                    "w")
+        for chunk in ff.chunks():
+            datafile.write(chunk)
         datafile.close()
         make_meta_file(datafile.name,ANNOUNCE_URL, 2**18, comment=form.cleaned_data['description'], target=tmptf.name)
         torrent_file_content = tmptf.read()
