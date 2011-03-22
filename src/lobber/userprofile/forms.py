@@ -20,7 +20,7 @@ class CreateKeyForm(BetterForm):
                      ('expiration', {'fields': ['expires'],
                                      'legend': 'Step 2: Expiration date (optional)',
                                      'classes': ['step'],
-                                     'description': 'By selecting an expiration date you limit the time this key is valid.'}),
+                                     'description': 'By selecting an expiration date you limit the time this key will be valid.'}),
                      ('constraints', {'fields': ['urlfilter'],
                                       'legend': 'Step 3: Constraints (optional)',
                                       'description': 'Constrain the things an application can do using this key by entering a set of regular expressions. At least one of these regular expressions must match the request URL. If you leave this field blank no URLs will be permitted.',
