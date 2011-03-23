@@ -204,12 +204,6 @@ class Torrent(models.Model):
         data = self.file().read()
         return bdecode(data)['info']
     
-    def cleanup_datalocations(self):
-        ntorrents = Torrent.objects.filter(hashval=self.hashval).count()
-        if ntorrents <= 1:
-            for loc in DataLocation.objects.filter(hashval=self.hashval).all():
-                loc.delete()
-    
     def remove(self):
         Tag.objects.update_tags(self,None)
         self.cleanup_datalocations()
@@ -222,15 +216,5 @@ class Torrent(models.Model):
         hashval = self.hashval
         self.delete()
         notifyJSON("/torrents/notify",{'delete': [id,hashval]})
- 
-class DataLocation(models.Model):
-    hashval = models.CharField(max_length=40)
-    owner = models.ForeignKey(User)
-    url = models.CharField(max_length=1024)
-    timecreated = models.DateTimeField(auto_now_add=True)
-    lastupdated = models.DateTimeField(auto_now=True)
-    
-    def __unicode__(self):
-        return '%s @ %s' % (self.hashval,self.url)
 
 tagging.register(Torrent)
