@@ -22,7 +22,7 @@ from tempfile import NamedTemporaryFile
 import tempfile
 from lobber.tracker.views import peer_status
 from django.utils.datastructures import MultiValueDictKeyError
-from lobber.userprofile.models import user_profile
+from lobber.userprofile.models import request_user_profile
 from django.utils.html import escape
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
@@ -379,7 +379,7 @@ def tag_usage(request):
                 tags = Tag.objects.usage_for_model(Torrent,counts=True)
 
             tagnames = [tag.name for tag in tags]
-            profile = user_profile(request.user)
+            profile = request_user_profile(request)
             tagnames.extend(profile.get_entitlements())
             r = json_response(tagnames)
         except MultiValueDictKeyError,e:

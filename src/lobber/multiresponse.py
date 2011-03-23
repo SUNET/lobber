@@ -4,7 +4,7 @@ from django.conf import settings
 from django.shortcuts import render_to_response
 from django.core.exceptions import ObjectDoesNotExist
 from lobber.settings import STOMP_HOST, STOMP_PORT, ORBITED_PREFIX, ANNOUNCE_URL, DEBUG
-from lobber.userprofile.models import UserProfile
+from lobber.userprofile.models import UserProfile, request_user_profile
 from datetime import datetime
 from django.http import HttpResponse
 from orbited import json
@@ -34,12 +34,7 @@ def make_response_dict(request,d_in={}):
     d = d_in
     if request.user.is_authenticated():
         d['user'] = request.user
-        profile = None
-        try:
-            profile = request.user.profile.get();
-        except ObjectDoesNotExist:
-            profile = UserProfile()
-            d['profile'] = profile
+        d['profile'] = request_user_profile(request)
 
     d['stomp_host'] = STOMP_HOST
     d['stomp_port'] = STOMP_PORT
