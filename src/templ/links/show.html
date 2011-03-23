@@ -6,7 +6,7 @@
 <h1>A shareable link to {% if tag %}<a href="/torrent/tag/{{tag}}">torrents tagged with {{tag}}</a>{% endif %}{% if torrent %}<a href="/torrent/{{torrent.id}}">{{torrent.name}}</a>{% endif %}</h1>
 
 <div class="infopanel ui-corner-all ui-widget-content">
-<p>Give this link to anyone who should have access to {% if tag %}<a href="/torrent/tag/{{tag}}">torrents tagged with {{tag}}</a>{% endif %}{% if torrent %}<a href="/torrent/{{t.id}}">{{torrent.name}}</a>{% endif %}:</p>
+<p>Give this link to anyone who should have access to {% if tag %}<a href="/torrent/tag/{{tag}}">torrents tagged with {{tag}}</a>{% endif %}{% if torrent %}<a href="/torrent/{{torrent.id}}/info">{{torrent.name}}</a>{% endif %}:</p>
 <form>
    <input type="text" size="60" readonly="readonly" value="{{link}}"/>
 </form>
