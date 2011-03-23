@@ -43,7 +43,7 @@ def show_torrent_link(request,pid,tid):
     if not keyp.creator == request.user:
         return HttpResponseNotAllowed("Only the key owner may look at this")
     
-    link = '%s/torrent/%d.torrent?lkey=%s' % (NORDUSHARE_URL, t.id, keyp.get_username())
+    link = '%s/torrent/%d/info?lkey=%s' % (NORDUSHARE_URL, t.id, keyp.get_username())
     return respond_to(request, {"text/html": "links/show.html"}, {'link': link,'pid': keyp.id,'key': keyp.get_username(),'torrent': t})
 
 @login_required
