@@ -308,7 +308,14 @@ def add_torrent(request):
 
 
 @login_required
-def show(request, inst=None):
+def show(request,inst=None):
+    return _show(request,inst,True)
+
+@login_required
+def info(request,inst=None):
+    return _show(request,inst,False)
+
+def _show(request, inst=None, edit=False):
     if not inst:
         return _torrentlist(request, _find_torrents(request.user, request.GET.lists()))
     
@@ -317,7 +324,7 @@ def show(request, inst=None):
         return HttpResponseForbidden("You don't have read access on %s" % inst)
     
     d = _torrentdict(request, t)
-    d['edit'] = True
+    d['edit'] = edit
     return respond_to(request,
                       {'text/html': 'share/torrent.html',
                        'application/x-bittorrent': _torrent_file_response},d)

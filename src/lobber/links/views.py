@@ -1,9 +1,6 @@
-from time import gmtime, strftime
-
 from django.http import HttpResponseRedirect, HttpResponseNotAllowed
 from django.contrib.auth.decorators import login_required
 from lobber.settings import NORDUSHARE_URL, LOBBER_LOG_FILE
-from lobber.notify import notifyJSON
 import lobber.log
 from django.shortcuts import get_object_or_404
 from lobber.links.forms import LinkForm, LinkMessageForm
@@ -25,7 +22,7 @@ def send_link_mail(request,pid,tid):
     if request.method == 'POST':
         form = LinkMessageForm(request.POST)
         if form.is_valid():        
-            link = '%s/torrent/%d?lkey=%s' % (NORDUSHARE_URL, t.id, keyp.get_username())
+            link = '%s/torrent/%d/info?lkey=%s' % (NORDUSHARE_URL, t.id, keyp.get_username())
             msg = form.cleaned_data['message']
             msg += "\n"
             msg = "Follow this link to download the data: "+link+"\n\n"
@@ -65,7 +62,7 @@ def link_to_torrent(request,tid):
         form = LinkForm(request.POST)
         if form.is_valid():
             keyp = create_key_user_profile(creator=request.user,
-                                          urlfilter='/torrent/%d.torrent[^/]*$ /torrent/%d$' % (t.id,t.id),
+                                          urlfilter='/torrent/%d.torrent$ /torrent/%d/info$' % (t.id,t.id),
                                           tagconstraints='',
                                           entitlements='user:%s' % request.user.username,
                                           expires=form.cleaned_data['expires'])
@@ -81,7 +78,7 @@ def link_to_tag(request,tag):
         form = LinkForm(request.POST)
         if form.is_valid():
             keyp = create_key_user_profile(creator=request.user,
-                                           urlfilter='/torrent/tag/%s /torrent/.*[^/]+$' % tag,
+                                           urlfilter='/torrent/tag/%s$ /torrent/[0-9]+\.torrent$ /torrent/[0-9]+/info$' % tag,
                                            tagconstraints=tag,
                                            entitlements='user:%s:$self' % request.user.username)
 
