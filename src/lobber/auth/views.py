@@ -30,7 +30,7 @@ def logout(request):
 
 @never_cache
 def login(request):
-    return render_to_response('share/login.html',make_response_dict(request,{'next': request.REQUEST.get("next")}));
+    return render_to_response('auth/login.html',make_response_dict(request,{'next': request.REQUEST.get("next")}));
 
 def login_federated(request):
     def logfailure():
@@ -41,7 +41,7 @@ def login_federated(request):
     # Authenticated?
     if not request.user.is_authenticated():
         logfailure()
-        return render_to_response('share/login.html',
+        return render_to_response('auth/login.html',
                                   make_response_dict(request,
                                                      {'error': "Authentication failed",
                                                       'next': request.REQUEST.get("next")}));

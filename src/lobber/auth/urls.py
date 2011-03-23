@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import patterns
 
-urlpatterns = patterns('lobber.auth.authn',
-    (r'^login-federated/$', 'login_federated'),
-    (r'^login/$', 'login'),
-    (r'^logout/$', 'logout'),
+urlpatterns = patterns('',
+    (r'^login-federated/$', 'lobber.auth.views.login_federated'),
+    (r'^login/$', 'lobber.auth.views.login'),
+    (r'^logout/$', 'lobber.auth.views.logout'),
     )
