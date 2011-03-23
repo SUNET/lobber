@@ -57,26 +57,32 @@ def announce(request,info_hash=None):
         return _err('Missing info_hash')
 
     info_hash = hexify(unquote(info_hash))
-    logger.debug("announce: info_hash=%s" % info_hash)
+    #logger.debug("announce: info_hash=%s" % info_hash)
     
-    if Torrent.objects.filter(hashval=info_hash).count() < 1:
+    event = None
+    if request.GET.has_key('event'):
+        event = request.GET['event']
+    
+    torrents = Torrent.objects.filter(hashval=info_hash)
+    if not (torrents or event == 'stopped' or event == 'paused'):
+        #logger.debug("unauthorized")
         return _err("Not authorized")
     
     ip,port = peer_address(request)
-    logger.debug("called from %s:%s" % (ip,port))
+    #logger.debug("called from %s:%s" % (ip,port))
     pi = None
     qs = PeerInfo.objects.filter(info_hash=info_hash,port=port,address=ip)
-    logger.debug("qs1: %s" % pformat(qs))
+    #logger.debug("qs1: %s" % pformat(qs))
     if qs:
         pi = qs[0]
-    logger.debug("qs2: %s" % pformat(qs))
+    #logger.debug("qs2: %s" % pformat(qs))
     if not pi:
         pi = PeerInfo.objects.create(info_hash=info_hash,port=port,address=ip)
-    logger.debug("qs3: %s" % pformat(qs))
+    #logger.debug("qs3: %s" % pformat(qs))
     if not pi:
         return _err("Unable to establish state")
     
-    logger.debug("state established for %s:%s" % (ip,port))
+    #logger.debug("state established for %s:%s" % (ip,port))
     
     if request.user and not request.user.is_anonymous():
         pi.user = request.user
@@ -97,10 +103,6 @@ def announce(request,info_hash=None):
             value = request.GET[key]
             key = key.replace(' ','_')
             setattr(pi,key,int(value))
-
-    event = None
-    if request.GET.has_key('event'):
-        event = request.GET['event']
         
     if request.GET.has_key('peer_id'):
         pi.peer_id = request.GET['peer_id']
@@ -118,12 +120,12 @@ def announce(request,info_hash=None):
     elif event == 'started':
         pi.state = PeerInfo.STARTED
    
-    logger.debug("save started")
-    logger.debug(event) 
-    logger.debug(pformat(pi))
+    #logger.debug("save started")
+    #logger.debug(event) 
+    #logger.debug(pformat(pi))
     pi = pi.save(force_update=True)
-    logger.debug("save done")
-    logger.debug(pformat(pi))
+    #logger.debug("save done")
+    #logger.debug(pformat(pi))
     p4str = create_string_buffer(numwant*6+1)
     p6str = create_string_buffer(numwant*18+1)
     offset = 0
