@@ -3,17 +3,17 @@
 {% block js %}
 <script type="text/javascript">
 $(function() {
-	$('#id_expires').datepicker({'dateFormat': 'yy-mm-dd'});
-   	$('#wizard').formwizard({
-	    	validationEnabled: true,
-	    	focusFirstInput: true,
-	    	textSubmit: "Create Key",
-	    	validationOptions: {
-	    		rules: {
-	    		    entitlement: 'required'
-	    		}
-	    	}
-	 });
+    $('#id_expires').datepicker({'dateFormat': 'yy-mm-dd', minDate: "+1D"});
+    $('#wizard').formwizard({
+            validationEnabled: true,
+            focusFirstInput: true,
+            textSubmit: "Create Key",
+            validationOptions: {
+                rules: {
+                    entitlement: 'required'
+                }
+            }
+     });
 });
 </script>
 {% endblock %}
@@ -21,7 +21,7 @@ $(function() {
 <div class="ui-state-highlight ui-corner-all" style="margin-bottom: 5px;">
 <p class="infopanel">
 <span class="ui-icon ui-icon-info"></span>
-Here you can create an application key. Application keys are used to allow applications rights in Lobber. 
+Here you can create an application key. Application keys are used to allow applications rights in Lobber.
 In order to setup and connect a <a class="tip" title="About Lobber Storage Nodes" href="http://lobber.se/documentation#storage-node">storage node</a> to
 Lobber you need to create an application key for each instance.
 </p></div>
