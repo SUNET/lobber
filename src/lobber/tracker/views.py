@@ -63,13 +63,16 @@ def announce(request,info_hash=None):
         return _err("Not authorized")
     
     ip,port = peer_address(request)
-    
+    logger.debug("called from %s:%s" % (ip,port))
     pi = None
     qs = PeerInfo.objects.filter(info_hash=info_hash,port=port,address=ip)
+    logger.debug("qs1: %s" % pformat(qs))
     if qs:
         pi = qs[0]
+    logger.debug("qs2: %s" % pformat(qs))
     if not pi:
         pi = PeerInfo.objects.create(info_hash=info_hash,port=port,address=ip)
+    logger.debug("qs3: %s" % pformat(qs))
     if not pi:
         return _err("Unable to establish state")
     
