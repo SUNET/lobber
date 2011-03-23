@@ -206,7 +206,6 @@ class Torrent(models.Model):
     
     def remove(self):
         Tag.objects.update_tags(self,None)
-        self.cleanup_datalocations()
         try:
             os.unlink(self.file().name)
         except IOError, e:
