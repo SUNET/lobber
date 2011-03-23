@@ -49,7 +49,7 @@ class Torrent(models.Model):
     def compute_effective_rights(self,user,profile=None):
         self.effective_rights = {}
         for perm in ['r','w','d']:
-            if self.authz_i(user, perm,profile):
+            if self.authz_i(user,perm,profile):
                 self.effective_rights[perm] = True
             else:
                 self.effective_rights[perm] = False
