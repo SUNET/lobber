@@ -62,19 +62,18 @@ def announce(request,info_hash=None):
     if Torrent.objects.filter(hashval=info_hash).count() < 1:
         return _err("Not authorized")
     
-    pi = None
-    #if request.GET.has_key('trackerid'):
-    #    try:
-    #        pi = PeerInfo.objects.get(pk=request.GET['trackerid'])
-    #    except Exception,ex:
-    #        pass
-        
     ip,port = peer_address(request)
     
-    if pi == None:
-        pi,created = PeerInfo.objects.get_or_create(info_hash=info_hash,port=port,address=ip)
+    pi = None
+    qs = PeerInfo.objects.filter(info_hash=info_hash,port=port,address=ip)
+    if qs:
+        pi = qs[0]
+    if not pi:
+        pi = PeerInfo.objects.create(info_hash=info_hash,port=port,address=ip)
+    if not pi:
+        return _err("Unable to establish state")
     
-    logger.debug("created=%s for %s:%s" % (created,ip,port))
+    logger.debug("state established for %s:%s" % (ip,port))
     
     if request.user and not request.user.is_anonymous():
         pi.user = request.user
