@@ -59,7 +59,13 @@ def announce(request,info_hash=None):
     info_hash = hexify(unquote(info_hash))
     logger.debug("announce: info_hash=%s" % info_hash)
     
-    if Torrent.objects.filter(hashval=info_hash).count() < 1:
+    event = None
+    if request.GET.has_key('event'):
+        event = request.GET['event']
+    
+    torrents = Torrent.objects.filter(hashval=info_hash)
+    if not (torrents or event == 'stopped' or event == 'paused'):
+        logger.debug("unauthorized")
         return _err("Not authorized")
     
     ip,port = peer_address(request)
@@ -97,10 +103,6 @@ def announce(request,info_hash=None):
             value = request.GET[key]
             key = key.replace(' ','_')
             setattr(pi,key,int(value))
-
-    event = None
-    if request.GET.has_key('event'):
-        event = request.GET['event']
         
     if request.GET.has_key('peer_id'):
         pi.peer_id = request.GET['peer_id']
