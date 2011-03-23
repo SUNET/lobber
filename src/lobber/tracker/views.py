@@ -47,9 +47,13 @@ def get_from_qs(qs, key):
     
 def announce(request,info_hash=None):
     
+    logger("announce called: %s" % pformat(request.META))
+    
     if not info_hash and request.GET.has_key('info_hash'):
         info_hash = get_from_qs(request.META['QUERY_STRING'], 'info_hash=')
         #logger.debug("announce: getting hash from request: %s" % request.META['QUERY_STRING'])
+    
+    logger.debug("info_hash=%s" % info_hash)
     
     if not info_hash:
         return _err('Missing info_hash')
@@ -71,6 +75,8 @@ def announce(request,info_hash=None):
     
     if pi == None:
         pi,created = PeerInfo.objects.get_or_create(info_hash=info_hash,port=port,address=ip)
+    
+    logger.debug("created=%s for %s:%s" % (created,ip,port))
     
     if request.user and not request.user.is_anonymous():
         pi.user = request.user
