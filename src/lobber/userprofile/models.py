@@ -115,7 +115,7 @@ class UserProfile(models.Model):
     
 def request_user_profile(request):
     profile = request.session.get('lobber_userprofile',user_profile(request.user))
-    request.session.set('lobber_userprofile',profile)
+    request.session['lobber_userprofile'] = profile
     return profile
     
     return profile
