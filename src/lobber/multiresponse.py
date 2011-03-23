@@ -48,13 +48,14 @@ def make_response_dict(request,d_in={}):
     return d
 
 
-def _adjust_count_to_readable(tag,user):
-    tag.count = len(filter(lambda t: t.authz(user,'r'),TaggedItem.objects.get_by_model(Torrent, tag).all()))
+def _adjust_count_to_readable(tag,user,profile):
+    tag.count = len(filter(lambda t: t.authz(user,'r',profile),TaggedItem.objects.get_by_model(Torrent, tag).all()))
     return tag
 
 def make_tag_cloud(request):
     if request.user.is_authenticated():
-        return calculate_cloud(filter(lambda x: x.count > 0,[_adjust_count_to_readable(tag,request.user) for tag in Tag.objects.usage_for_model(Torrent, counts=True)]))
+        profile = request_user_profile(request)
+        return calculate_cloud(filter(lambda x: x.count > 0,[_adjust_count_to_readable(tag,request.user,profile) for tag in Tag.objects.usage_for_model(Torrent, counts=True)]))
     else:
         return []
 

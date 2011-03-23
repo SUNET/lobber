@@ -46,18 +46,18 @@ class Torrent(models.Model):
     def abs_url(self):
         return "%s%s" % (BASE_URL,self.url())
 
-    def compute_effective_rights(self,user):
+    def compute_effective_rights(self,user,profile=None):
         self.effective_rights = {}
         for perm in ['r','w','d']:
-            if self.authz_i(user, perm):
+            if self.authz_i(user, perm,profile):
                 self.effective_rights[perm] = True
             else:
                 self.effective_rights[perm] = False
         return self
 
-    def authz(self,user,perm):
+    def authz(self,user,perm,profile=None):
         if not self.effective_rights:
-            self.compute_effective_rights(user)
+            self.compute_effective_rights(user,profile)
         
         if perm == 'd':
             return self.effective_rights['d'] or self.effective_rights['w']
@@ -73,10 +73,12 @@ class Torrent(models.Model):
                 return True
         return False
 
-    def authz_i(self, user, perm):
+    def authz_i(self, user, perm, profile=None):
         """Does USER have PERM on torrent?"""
         entitlements = ['user:%s' % user.username]
-        profile = user_profile(user)
+        if not profile:
+            profile = user_profile(user)
+        
         if profile:
             entitlements += profile.get_entitlements()
             
