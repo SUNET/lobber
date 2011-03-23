@@ -28,7 +28,7 @@ class PeerInfo(models.Model):
     uploaded = models.IntegerField(blank=True,null=True)
     downloaded = models.IntegerField(blank=True,null=True)
     left = models.IntegerField(blank=True,null=True)
-    currupt = models.IntegerField(blank=True,null=True)
+    corrupt = models.IntegerField(blank=True,null=True)
     state = models.SmallIntegerField(blank=True,null=True,choices=((STARTED,"started"),(COMPLETED,"completed"),(STOPPED,"stopped"),(PAUSED,'paused')))
     last_seen = models.DateTimeField(auto_now=True)
     
