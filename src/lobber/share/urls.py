@@ -14,7 +14,7 @@ urlpatterns = patterns('',
     (r'^scrape/(?P<inst>[^\.]+)\.([^\.]+)$', "lobber.share.views.scrape"),
     (r'^scrapehash/(?P<hash>[^\.]+)(?:\.(?:[^\.]+))?$', "lobber.share.views.scrape_hash"),
     # Tagging.
-    (r'^tags.json$', "lobber.share.tag.tag_usage"),
+    (r'^tags.json$', "lobber.share.views.tag_usage"),
     (r'^tag/(?P<name>.+)\.([^\.]+)$', "lobber.share.views.list_torrents_for_tag"),
     (r'^(?P<tid>[0-9]+)/tags(?:\.([^\.]+))?$', "lobber.share.views.tags"),
     # ACL handling.
