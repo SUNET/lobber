@@ -112,9 +112,11 @@ def announce(request,info_hash=None):
     elif event == 'started':
         pi.state = PeerInfo.STARTED
    
-    logger.debug("event: "+event) 
+    logger.debug("save started")
+    logger.debug(event) 
     logger.debug(pformat(pi))
     pi = pi.save(force_update=True)
+    logger.debug("save done")
     logger.debug(pformat(pi))
     p4str = create_string_buffer(numwant*6+1)
     p6str = create_string_buffer(numwant*18+1)
