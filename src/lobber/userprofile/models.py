@@ -114,11 +114,11 @@ class UserProfile(models.Model):
         return False
     
 def request_user_profile(request):
-    if request.session.has_key('lobber.userprofile'):
-        profile = request.session['lobber.userprofile']
+    if request.session.has_key('lobber_userprofile'):
+        profile = request.session['lobber_userprofile']
     else:
         profile = user_profile(request.user)
-        request.session['lobber.userprofile'] = profile
+        request.session['lobber_userprofile'] = profile
     
     return profile
     
