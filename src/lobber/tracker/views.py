@@ -47,20 +47,18 @@ def get_from_qs(qs, key):
     
 def announce(request,info_hash=None):
     
-    logger("announce called: %s" % pformat(request.META))
+    logger.debug("announce called: %s" % pformat(request.META))
     
     if not info_hash and request.GET.has_key('info_hash'):
         info_hash = get_from_qs(request.META['QUERY_STRING'], 'info_hash=')
         #logger.debug("announce: getting hash from request: %s" % request.META['QUERY_STRING'])
     
-    logger.debug("info_hash=%s" % info_hash)
-    
     if not info_hash:
         return _err('Missing info_hash')
 
     info_hash = hexify(unquote(info_hash))
-    #logger.debug("announce: info_hash=%s" % info_hash)
-
+    logger.debug("announce: info_hash=%s" % info_hash)
+    
     if Torrent.objects.filter(hashval=info_hash).count() < 1:
         return _err("Not authorized")
     
