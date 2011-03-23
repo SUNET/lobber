@@ -38,8 +38,5 @@ class AddACEForm(forms.Form):
     subject = forms.CharField(max_length=255,widget=TextInput(attrs={'size':'40'}))
     permissions = forms.MultipleChoiceField(widget=CheckboxSelectMultiple,choices=[('r','read'),('w','write'),('d','delete')])
 
-class DataLocationForm(forms.Form):
-    url = forms.URLField()
-
 def formdict():
     return {'permissions': AddACEForm()}

@@ -13,22 +13,23 @@ from tagging.models import Tag, TaggedItem
 
 from lobber.multiresponse import respond_to, make_response_dict, json_response
 from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE, DROPBOX_DIR
-from lobber.resource import Resource
 import lobber.log
-from lobber.share.forms import UploadForm
+from lobber.share.forms import UploadForm, AddACEForm
 from lobber.share.models import Torrent
 from lobber.notify import notifyJSON
 from lobber.share.forms import formdict
 from tempfile import NamedTemporaryFile
-from lobber.share.models import DataLocation
 import tempfile
 from lobber.tracker.views import peer_status
+from django.utils.datastructures import MultiValueDictKeyError
 from lobber.userprofile.models import user_profile
+from django.utils.html import escape
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 ####################
-# Helper functions. FIXME: Move to some other file.
+# Helper functions.
+
 from lobber.torrenttools import bdecode, bencode, make_meta_file
 from hashlib import sha1
 
@@ -157,7 +158,7 @@ def _urlesc(s):
         r += '%%%s' % s[n:n+2].upper()
     return r
 
-def find_torrents(user, args, max=40):
+def _find_torrents(user, args, max=40):
     """Search for torrents for which USER has read access.
     Filter on certain properties found in ARGS.
 
@@ -209,7 +210,7 @@ def _torrentlist(request, torrents):
                        'title': 'Search result',
                        'description': 'Search result'})
 
-def torrentdict(request,t,forms=None):
+def _torrentdict(request,t,forms=None):
     if not forms:
         forms = formdict()
     tags = map(lambda t: t.name,t.readable_tags(request.user))
@@ -229,54 +230,7 @@ def torrentdict(request,t,forms=None):
 ####################
 # External functions, called from urls.py.
 
-@login_required
-def ihaz(request,hash,url=None):
-    if url == None:
-        url = "torrent:%s" % hash
-        
-    if Torrent.objects.filter(hashval=hash).count() > 0:
-        DataLocation.objects.get_or_create(owner=request.user,url=url,hashval=hash)
-        return json_response(url)
-    else:
-        return json_response("")
-        
-@login_required
-def inohaz(request,hash,url=None):
-    if url == None:
-        url = "torrent:%s" % hash
-    for loc in DataLocation.objects.filter(owner=request.user,url=url,hashval=hash).all():
-        loc.delete()
-    return json_response(url)
-    
-def _locations(hash,entitlement,scheme):
-    locations = DataLocation.objects.filter(url__startswith=scheme,hashval=hash)
-    #if entitlement != None:
-    #    locations = locations.filter(owner__profile__entitlements__contains=entitlement)
-        
-    return locations.all()
-    
-def hazcount(request,hash,entitlement=None,scheme="torrent"):
-    count = 0
-    for dl in _locations(hash,entitlement,scheme):
-        if entitlement != None:
-            owner_profile = user_profile(dl.owner)
-            if entitlement in owner_profile.get_entitlements():
-                count = count+1
-        else:
-            count = count+1
-    return json_response({'count': count})
-    
-def canhaz(request,hash,entitlement=None,scheme="http"):
-    urls = []
-    for dl in _locations(hash,entitlement,scheme):
-        if entitlement != None:
-            owner_profile = user_profile(dl.owner)
-            if entitlement in owner_profile.get_entitlements():
-                urls.append(dl.url)
-        else:
-            urls.append(dl.url)
-    
-    return json_response(urls)
+# Torrents
 
 @login_required
 def remove_torrent(request, tid):
@@ -322,18 +276,6 @@ def upload_jnlp(req):
     return render_to_response('share/launch.jnlp', d,
                               mimetype='application/x-java-jnlp-file')
 
-# remove - leifj ????
-def exists_new(req,inst):
-    count = Torrent.objects.filter(hashval=inst).count()
-    r = None
-    if count > 0:
-        r = HttpResponse(inst)
-        r['Cache-Control'] = 'max-age=604800'
-    else:
-        r = HttpResponseNotFound()
-        r['Cache-Control'] = 'max-age=2'
-    return r
-
 def exists(req, inst):
     r = HttpResponse(status=200);
     r['Cache-Control'] = 'max-age=604800' # 1 week in seconds
@@ -368,83 +310,17 @@ def add_torrent(request):
 @login_required
 def show(request, inst=None):
     if not inst:
-        return _torrentlist(request, find_torrents(request.user, request.GET.lists()))
+        return _torrentlist(request, _find_torrents(request.user, request.GET.lists()))
     
     t = get_object_or_404(Torrent,pk=inst)
     if not t.authz(request.user,'r'):
         return HttpResponseForbidden("You don't have read access on %s" % inst)
     
-    d = torrentdict(request, t)
+    d = _torrentdict(request, t)
     d['edit'] = True
     return respond_to(request,
                       {'text/html': 'share/torrent.html',
                        'application/x-bittorrent': _torrent_file_response},d)
-
-#remove - leifj
-@login_required
-def land(request, inst):
-    t = get_object_or_404(Torrent,pk=inst)
-    if not t.authz(request.user,'r'):
-        return HttpResponseForbidden("You don't have read access on %s" % inst)
-    
-    d = torrentdict(request, t)
-    d['edit'] = False
-    return respond_to(request,
-                      {'text/html': 'share/torrent.html',
-                       'application/x-bittorrent': _torrent_file_response},d)
-
-## TODO: This class stuff wasn't so neat after all - refactor to regular methods checking for the method instead
-
-class TorrentViewBase(Resource):
-    """
-    POST and PUT creates/updates a torrent
-    """
-
-    @login_required
-    def post(self, req):
-        form = UploadForm(req.POST, req.FILES)    
-        if form.is_valid():
-            t = _store_torrent(req, form)
-            if not t:
-                return HttpResponse('error creating torrent')
-            return HttpResponseRedirect('/torrent/#%d' % t.id)
-        else:
-            return render_to_response('share/upload-torrent.html',
-                                      make_response_dict(req,{'form': form}))
-        
-    @login_required
-    def put(self, req):
-        form = UploadForm(req.POST, req.FILES)
-        if form.is_valid():
-            t = _store_torrent(req, form)
-            if not t:
-                return HttpResponse('error creating torrent')
-            return HttpResponseRedirect('/torrent/#%d' % t.id)
-        else:
-            logger.info("upload_form: received invalid form")
-
-class TorrentForm(TorrentViewBase):
-
-    @login_required
-    def get(self, req):
-        return render_to_response('share/upload-torrent.html',
-                                   make_response_dict(req,{'form': UploadForm()}))
-
-class TorrentView(TorrentViewBase):
-
-    @login_required
-    def get(self, request, inst=None):
-        if not inst:
-            return _torrentlist(request, find_torrents(request.user, request.GET.lists()))
-        
-        t = get_object_or_404(Torrent,pk=inst)
-        if not t.authz(request.user,'r'):
-            return HttpResponseForbidden("You don't have read access on %s" % inst)
-        
-        d = torrentdict(request, t)
-        return respond_to(request,
-                          {'text/html': 'share/torrent.html',
-                           'application/x-bittorrent': _torrent_file_response},d)
 
 @login_required
 def torrent_by_hashval(request, inst):
@@ -474,10 +350,128 @@ def search(request):
         term = request.REQUEST['term']
     
     if term:
-        tag = find_torrents(request.user, [('tag',[term])])
-        txt = find_torrents(request.user, [('txt',[term])])
+        tag = _find_torrents(request.user, [('tag',[term])])
+        txt = _find_torrents(request.user, [('txt',[term])])
         torrents = tag;
         torrents.extend(txt);
         return _torrentlist(request, torrents);
     else:
         return HttpResponseRedirect("/torrent")
+    
+    
+## Tagging
+
+@login_required
+def tag_usage(request):
+        r = None
+        try:
+            tags = []
+            if request.GET.has_key('search'): 
+                tags = filter(lambda x: x.name.startswith(request.GET['search']),Tag.objects.usage_for_model(Torrent,counts=False))
+            else:
+                tags = Tag.objects.usage_for_model(Torrent,counts=True)
+
+            tagnames = [tag.name for tag in tags]
+            profile = user_profile(request.user)
+            tagnames.extend(profile.get_entitlements())
+            r = json_response(tagnames)
+        except MultiValueDictKeyError,e:
+            logger.error(e)
+        return r
+    
+@login_required
+def tags(request,tid):
+        t = get_object_or_404(Torrent,pk=tid)
+        
+        if request.method == 'POST':
+            to_tags = request.POST.getlist('tags[]')
+            from_tags = [tag.name for tag in Tag.objects.get_for_object(t)]
+            Tag.objects.update_tags(t,' '.join(to_tags))
+            
+            # figure out the diff and notify subscribers
+            for tag in from_tags:
+                if not tag in to_tags:
+                    notifyJSON("/torrent/tag/remove",tag)
+            for tag in to_tags:
+                if not tag in from_tags:
+                    notifyJSON("/torrent/tag/add",tag)
+        
+        d = _torrentdict(request,t,formdict())
+        d['edit'] = True
+        return respond_to(request, {'application/json': json_response(d.get('tags')),
+                                    'text/html': "share/torrent.html" },d)
+    
+@login_required
+def list_torrents_for_tag(request,name):
+        return respond_to(request,
+                          {'text/html': 'share/index.html',
+                           'application/rss+xml': 'share/rss2.xml',
+                           'text/rss': 'share/rss2.xml'},
+                          {'torrents': _find_torrents(request.user, [('tag',[name])]),
+                           'title': 'Torrents tagged with '+name,
+                           'tag': name,
+                           'description': 'Torrents tagged with '+name})
+
+
+## ACL
+
+def valid_ace_p(ace):
+    """Return True if ACE is a valid access control entry, otherwise
+    False.
+
+    BUG: We don't allow '.' and potential other characters needed.
+    """
+    entl, _, perm = ace.partition('#')
+    if not entl or not perm:
+        return False
+    if not entl.replace(':', '').replace('_', '').isalnum():
+        return False
+    if len(perm) > 1:
+        return False
+    if not perm in 'rwd':
+        return False
+    return True        
+
+@login_required
+def add_ace(req, tid, ace):
+    "Add ACE to ACL of torrent with id TID."
+    t = get_object_or_404(Torrent,pk=int(tid))
+
+    if not valid_ace_p(ace):
+        return HttpResponse("invalid ace: %s" % escape(ace), status=400)
+
+    if not t.add_ace(req.user, ace):
+        return HttpResponse("Permission denied.", status=403)
+
+    t.save()
+    return respond_to(req,{'text/html': HttpResponseRedirect("/torrent/%d" % (t.id)),
+                           'application/json': json_response(ace)})
+
+@login_required
+def remove_ace(req, tid, ace):
+    "Remove ACE from ACL of torrent with id TID."
+    t = get_object_or_404(Torrent,pk=int(tid))
+
+    if not t.remove_ace(req.user, ace):
+        return HttpResponse("Permission denied.", status=403)
+        
+    t.save()
+    return respond_to(req,{'text/html': HttpResponseRedirect("/torrent/%d" % (t.id)),
+                           'application/json': json_response(ace)})
+
+@login_required
+def edit(request,tid):
+    t = get_object_or_404(Torrent,pk=int(tid))
+    
+    forms = formdict()
+    if request.method == 'POST':
+        form = forms['permissions'] = AddACEForm(request.POST)
+        if form.is_valid():
+            ace = "%s#%s" % (form.cleaned_data['entitlement'],''.join(form.cleaned_data['permissions']))
+            t.add_ace(request.user,ace)
+            t.save()
+    
+    d = _torrentdict(request,t,forms)
+    d['edit'] = True
+    return respond_to(request,{'text/html': 'share/torrent.html'},d)
+

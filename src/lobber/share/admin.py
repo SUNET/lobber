@@ -1,5 +1,4 @@
-from lobber.share.models import Torrent, DataLocation
+from lobber.share.models import Torrent
 from django.contrib import admin
 
 admin.site.register(Torrent)
-admin.site.register(DataLocation)
