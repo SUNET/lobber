@@ -15,6 +15,7 @@ from ctypes import create_string_buffer
 import lobber.log
 from lobber.settings import LOBBER_LOG_FILE
 from lobber.common import hexify
+from pprint import pformat
 logger = lobber.log.Logger("tracker", LOBBER_LOG_FILE)
 
 def _err(msg):
@@ -101,7 +102,7 @@ def announce(request,info_hash=None):
     compact = True
     if request.GET.has_key('compact') and not request.GET['compact']:
         compact = False
-    
+   
     if event == 'stopped':
         pi.state = PeerInfo.STOPPED
     elif event == 'completed':
@@ -110,8 +111,11 @@ def announce(request,info_hash=None):
         pi.state = PeerInfo.PAUSED  
     elif event == 'started':
         pi.state = PeerInfo.STARTED
-    
-    pi.save(force_update=True)
+   
+    logger.debug("event: "+event) 
+    logger.debug(pformat(pi))
+    pi = pi.save(force_update=True)
+    logger.debug(pformat(pi))
     p4str = create_string_buffer(numwant*6+1)
     p6str = create_string_buffer(numwant*18+1)
     offset = 0
