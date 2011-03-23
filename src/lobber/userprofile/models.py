@@ -114,8 +114,10 @@ class UserProfile(models.Model):
         return False
     
 def request_user_profile(request):
-    profile = request.session.get('lobber_userprofile',user_profile(request.user))
-    request.session['lobber_userprofile'] = profile
+    profile = request.session.get('lobber_userprofile',None)
+    if not profile:
+        profile = user_profile(request.user)
+        request.session['lobber_userprofile'] = profile
     return profile
     
     return profile
