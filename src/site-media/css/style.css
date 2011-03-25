@@ -1,5 +1,5 @@
 html,body { font-size: 80%; font-family: arial, sans-serif; height: 100%; margin:0; padding:0;}
-body { width: 80%; }
+body { min-width: 900px; width: 90%; }
 div#container { position: relative; height:auto !important; height: 100%; min-height: 80%; margin-left: 50px; margin-top: 0; padding-bottom: 90px;}
 #modal-dialog { font-size: 110%; }
 #modal-dialog input.text textarea { margin-bottom:12px; width:95%; padding: .4em; }
