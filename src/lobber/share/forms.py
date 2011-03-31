@@ -8,8 +8,8 @@ class UploadForm(BetterForm):
     expires = forms.DateTimeField(label="Expiration")
     file = forms.FileField(label="Data")
     publicAccess = forms.BooleanField(required=False,label="Allow public access?")
-    readers = forms.ChoiceField(label="Readers")
-    writers = forms.ChoiceField(label="Writers")
+    readers = forms.ChoiceField(required=False,label="Readers")
+    writers = forms.ChoiceField(required=False,label="Writers")
     #acl = forms.HiddenInput()
     
     class Meta:
@@ -26,7 +26,7 @@ class UploadForm(BetterForm):
                                      'legend': 'Step 3: Describe your data (optional)',
                                      'description': 'By providing a short description of your data you make it easier to understand and find for other users.',
                                      'classes': ['step']}),
-                     ('access',{'fields': ['publicAccess','groups'],
+                     ('access',{'fields': ['publicAccess','readers', 'writers'],
                                 'legend': 'Step 4: Access control (optional)',
                                 'description': 'Here you can control the access restrictions on your data.',
                                 'classes': ['step','submit_step']})
