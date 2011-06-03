@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.utils.html import escape
 
 from lobber.share.models import Torrent
-from django.core.exceptions import ObjectDoesNotExist
 from lobber.multiresponse import respond_to, json_response
 from lobber.share.forms import AddACEForm
 from django.shortcuts import get_object_or_404

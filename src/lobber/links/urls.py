@@ -3,7 +3,7 @@ Created on Oct 23, 2010
 
 @author: leifj
 '''
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns
 
 urlpatterns = patterns('',
     (r'(?P<pid>[0-9]+)/tag/(?P<tag>.+)$','lobber.links.views.show_tag_link'),

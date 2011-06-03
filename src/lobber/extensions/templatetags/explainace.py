@@ -6,7 +6,6 @@ Created on Aug 9, 2010
 
 from django import template
 from django.contrib.auth.models import User
-from lobber.share.models import user_profile
 from lobber.extensions.templatetags.userdisplay import userdisplay
  
 register = template.Library()

@@ -2,16 +2,12 @@ from time import gmtime, strftime
 
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist
-from django.utils.html import escape
 from orbited import json
-from tagging.models import Tag
 
 from lobber.share.users import create_key_user
-from lobber.settings import NORDUSHARE_URL, LOBBER_LOG_FILE
+from lobber.settings import NORDUSHARE_URL
 from lobber.share.models import Torrent
 from lobber.notify import notify
-import lobber.log
 from django.shortcuts import get_object_or_404
 
 def _make_share_link(user, torrent, expires=None):

@@ -7,9 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
 from lobber.multiresponse import make_response_dict
-from lobber.settings import LOBBER_LOG_FILE
 from lobber.share.models import Torrent, UserProfile, user_profile
-import lobber.log
 from lobber.multiresponse import json_response
 
 def create_key_user_profile(creator, urlfilter, tagconstraints, entitlements, expires=None):

@@ -89,19 +89,18 @@
 		<div id="notification"></div>
 		<div id="container">
 			<div id="header">
-			   <a href="/"><img src="/site-media/images/lobber-small.jpg" border="0" style="float: left; margin-left: 50px;"/></a>
 			   {% if user.is_authenticated %}
-			   <div class="ui-widget ui-state-default ui-corner-all navlist toolbar">
-			      <ul>
-			         <li style="padding-right: 10px; margin-right: 20px; border-right: 1px solid #CECECE">
+			   <div class="ui-widget ui-corner-all navlist toolbar">
+			      <ul class="rlist">
+			         <li class="button" style="margin-right: 50px"><a class="tip" title="Logout" id="logout" href="/auth/logout/">Logout</a></li>
+			         <li class="button"><a class="tip" title="{{ user.get_full_name }}" href="/user">Profile</a></li>
+			         <li style="margin-right: 50px">
 			            <form method="POST" action="/torrent/search">
 			               <input type="text" id="searchbox" name="q" style="margin-right: 5px;"></input><input type="submit" value="search"/>
 			            </form>
 			         </li>
-					 <li style="margin-top: 4px;"><a class="tip" title="Application keys" href="/key"><span class="ui-icon ui-icon-key"></span></a></li>
-					 <li style="margin-top: 4px;"><a class="tip" title="Torrents" href="/torrent"><span class="ui-icon ui-icon-transferthick-e-w"></span></a></li>
-					 <li style="margin-top: 4px;"><a class="tip" title="{{ user.get_full_name }}" href="/user"><span class="ui-icon ui-icon-home"></span></a></li>
-			         <li style="margin-top: 4px;"><a class="tip" title="Logout" id="logout" href="/auth/logout/"><span class="ui-icon ui-icon-power"></span></a></li>
+			         <li class="button"><a class="tip" title="Data" href="/torrent">Downloads</a></li>
+					 <li class="button"><a class="tip" title="Keys" href="/key">Keys</a></li>
 			      </ul>
 			   </div>
 			   {% endif %}
@@ -112,7 +111,11 @@
 				   	{% block main %}{% endblock %}
 				</div>
 				<div id="rhs">
-				    {% block rhs %}{% endblock %}
+				    <div style="padding: 5px;">
+						{% for tag in tagcloud %}
+						<font class="tag" size="{{tag.font_size}}"><a href="/torrent/tag/{{tag.name}}.html">{{tag.name}}</a></font>  
+						{% endfor %}
+					</div>
 				</div>
 			</div>
 			<div class="clear"></div>

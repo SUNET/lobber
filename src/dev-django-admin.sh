@@ -9,4 +9,4 @@ fi
 
 DJANGO_SETTINGS_MODULE=lobber.settings; export DJANGO_SETTINGS_MODULE
 
-env PYTHONPATH=${dir}:$PYTHONPATH django-admin $*
+env PYTHONPATH=${dir}:$PYTHONPATH django-admin.py $*
