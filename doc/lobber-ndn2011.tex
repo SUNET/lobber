@@ -1,11 +1,12 @@
 % Copyright 2011 by NORDUnet A/S <info@nordu.net>
+% Author: Linus Nordberg <linus@nordu.net> 
 %
 % This presentation is based on the conference-ornate-20min template
 % by Till Tantau <tantau@users.sourceforge.net>.  You may redistribute
 % and/or modify it under the terms of the GNU Public License, version
 % 2.
-
-% To produce a pdf, do something like
+%
+% To produce a PDF from this document, do something like
 %   latex lobber-ndn2011.tex && dvipdf lobber-ndn2011.dvi
 
 \documentclass{beamer}
@@ -29,6 +30,12 @@
 {The 26th NORDUnet Conference, 2011}
 \pgfdeclareimage[height=0.3cm]{ndn-logo}{NORDUnet-Logo.eps}
 \logo{\pgfuseimage{ndn-logo}}
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>{Outline}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
 %\beamerdefaultoverlayspecification{<+->}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
@@ -52,7 +59,7 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Why BitTorrent?}
+\begin{frame}{Why use BitTorrent?}
   \begin{itemize}
   \item
     Decentralised storage
@@ -81,8 +88,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Done so far}
 
-\subsection{Design}
-\begin{frame}{Use case: Email with a link}
+\subsection{Use cases}
+\begin{frame}{Email containing a link}
   \begin{itemize}
   \item
     Researcher with small data set uploads the data
@@ -96,7 +103,7 @@
     Receiver gets torrent through link and starts downloading
   \end{itemize}
 \end{frame}
-\begin{frame}{Use case: Data archives}
+\begin{frame}{Data archives}
   \begin{itemize}
   \item
     A data archive service (like ftp.sunet.se)
@@ -107,10 +114,10 @@
   \item
     Mix cheap and expensive storage
   \item
-    Change it over time
+    Change storage solution over time
   \end{itemize}
 \end{frame}
-\begin{frame}{Use case: Broadcasting with receiver stream selection}
+\begin{frame}{Broadcasting with receiver stream selection}
   \begin{itemize}
   \item
     Media distribution
@@ -122,6 +129,8 @@
     Requiring no fancy equipment
   \end{itemize}
 \end{frame}
+
+\subsection{Design}
 \begin{frame}{Decentralised design}
   \begin{itemize}
   \item
@@ -134,37 +143,126 @@
     Autonomous storage nodes 
   \end{itemize}
 \end{frame}
-\begin{frame}{Data value is changing over time}
+\begin{frame}{Federated authentication}
   \begin{itemize}
   \item
-    todo
+    Redirecting to an identity provider
+  \item
+    Trusting a set of federations like SWAMID and Kalmar
+  \item
+    Local, simple authorisation
+  \item
+    Decentralised authorisation using COIP
   \end{itemize}
 \end{frame}
-\begin{frame}{}
+
+\begin{frame}{A RESTful HTTP API}
   \begin{itemize}
   \item
-    todo
+    Encouraging new clients
+  \item
+    Easily scriptable
+  \item
+    Arbitrarily complex
+  \item
+    Flexible development of the system
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{A flat namespace for tags}
+  \begin{itemize}
+  \item
+    No central name management
+  \item
+    Local decisions make deployment easier
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Autonomous storage nodes}
+  \begin{itemize}
+  \item
+    The value of data is best known by those close to it
+  \item
+    Mixing high and low
+  \item
+    The value of data is changing over time
   \end{itemize}
 \end{frame}
 
 \subsection{Implementation}
-\begin{frame}{Describe development briefly 1}
+\begin{frame}{Languages and tools used}
+  \begin{itemize}
+  \item
+    Python, Twisted, Django
+  \item
+    SQL database
+  \item
+    Transmission for headless BitTorrent client on servers
+  \end{itemize}
 \end{frame}
-\begin{frame}{Describe development briefly 2}
+
+\begin{frame}{Languages and tools used (cont.)}
+  \begin{itemize}
+  \item
+    JavaScript for GUI (optional)
+  \item
+    Java for a user BitTorrent client (optional)
+  \end{itemize}
 \end{frame}
-\begin{frame}{Swestore}
+
+\begin{frame}{Swestore FIXME}
+  \begin{itemize}
+  \item
+    FIXME
+  \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{What's in the pipe}
-\begin{frame}{Packeting}
-\end{frame}
+\section{In the pipe}
 \begin{frame}{Mobile clients}
+  \begin{itemize}
+  \item
+    BitTorrent clients are not welcome on all platforms
+  \item
+    But we're talking to an important one
+  \item
+    Initiated discussions with external developers for doing portable
+    platform ports
+  \end{itemize}
 \end{frame}
 \begin{frame}{Desktop clients}
+  \begin{itemize}
+  \item
+    DropBox like functionality mostly in place...
+  \item
+    ...storage nodes are basically just that
+  \item
+    Requirements on the platform: Running Transmission
+  \end{itemize}
 \end{frame}
 \begin{frame}{Connect to FileSender}
+  \begin{itemize}
+  \item
+    FileSender can act as a front end to Lobber
+  \end{itemize}
 \end{frame}
 \begin{frame}{Federation of Lobbers}
+  \begin{itemize}
+  \item
+    No reason we couldn't federate multiple Lobber instances
+  \item
+    Reasons to do that include disassociating yourself from NORDUnet
+    and complete control of authorisation and logging
+  \end{itemize}
+\end{frame}
+\begin{frame}{Packeting}
+  \begin{itemize}
+  \item
+    Ease of use
+  \item
+    Configuration
+  \item
+    Deployment
+  \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Summary}
@@ -186,7 +284,7 @@
   \item
     Find Lobber at https://beta.lobber.se/
   \item
-    Ask questions, go deploy!
+    Ask questions, try it out and go deploy!
   \end{itemize}
 \end{frame}  
 
