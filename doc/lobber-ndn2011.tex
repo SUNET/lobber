@@ -20,17 +20,13 @@
 \usepackage{times}
 \usepackage[T1]{fontenc}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title
-{Lobber}
-\subtitle
-{Decentralised data distribution using BitTorrent}
-\author
-{Linus Nordberg, NORDUnet A/S}
-\date[NDN 2011]
-{The 26th NORDUnet Conference, 2011}
+\title{Lobber}
+\subtitle{Decentralised data distribution using BitTorrent}
+\author{Linus Nordberg, NORDUnet A/S}
+\date[NDN 2011]{The 26th NORDUnet Conference, 2011}
 \pgfdeclareimage[height=0.3cm]{ndn-logo}{NORDUnet-Logo.eps}
 \logo{\pgfuseimage{ndn-logo}}
-\AtBeginSubsection[]
+\AtBeginSection[]
 {
   \begin{frame}<beamer>{Outline}
     \tableofcontents[currentsection,currentsubsection]
@@ -66,7 +62,7 @@
   \item
     ``Multicast for data''
   \item
-    Application level resume
+    Application level resume for network roaming
   \end{itemize}
 \end{frame}
 
@@ -141,6 +137,8 @@
     A flat namespace for tags
   \item
     Autonomous storage nodes 
+  \item
+    ==> decentralised, agile and self organising system
   \end{itemize}
 \end{frame}
 \begin{frame}{Federated authentication}
@@ -148,11 +146,11 @@
   \item
     Redirecting to an identity provider
   \item
-    Trusting a set of federations like SWAMID and Kalmar
+    Trusting a set of federations like SWAMID, Kalmar and COIN
   \item
-    Local, simple authorisation
+    Local, simple authorisation...
   \item
-    Decentralised authorisation using COIP
+    ...or decentralised authorisation using COIP
   \end{itemize}
 \end{frame}
 
@@ -189,7 +187,7 @@
   \end{itemize}
 \end{frame}
 
-\subsection{Implementation}
+\subsection{Implementation and deployment}
 \begin{frame}{Languages and tools used}
   \begin{itemize}
   \item
@@ -210,10 +208,25 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Swestore FIXME}
+\begin{frame}{NORDUnet's Lobber instance}
   \begin{itemize}
   \item
-    FIXME
+    https://beta.lobber.se/
+  \item
+    Small deployment
+  \item
+    Single web server and tracker
+  \item
+    Few storage nodes
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{SweStore storage node}
+  \begin{itemize}
+  \item
+    The Swedish Storage Initiative, a SNIC project
+  \item
+    Running a storage node in NORDUnet's Lobber instance
   \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -282,7 +295,13 @@
       a RESTful API
     \end{itemize}
   \item
-    Find Lobber at https://beta.lobber.se/
+    Find Lobber at
+    \begin{itemize}
+    \item
+      https://beta.lobber.se/
+    \item
+      https://portal.nordu.net/display/LOBBER
+    \end{itemize}
   \item
     Ask questions, try it out and go deploy!
   \end{itemize}
