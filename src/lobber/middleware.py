@@ -6,9 +6,10 @@ import re
 from django.contrib import auth
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.http import HttpResponse
 from django.shortcuts import render_to_response
-from lobber.multiresponse import make_response_dict
 from lobber.common import HttpResponseNotAuthorized
+from lobber.torrenttools import bencode
 from lobber.settings import LOBBER_LOG_FILE
 import lobber.log
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
@@ -81,18 +82,11 @@ class KeyMiddleware(object):
         Handles uncaught exceptions.
         '''
         logger.error("KeyMiddleware uncaught error: %s" % exception)
+        if request.META['PATH_INFO'].split('/')[1] == 'tracker':
+            return HttpResponse(bencode({'failure reason': '%s' % exception}),
+                                        mimetype='text/plain')
         return render_to_response('handle_error.html', 
-                                  make_response_dict(request, 
-                                        {'exception': '%s' % exception}))
-                                        
-    def handle_exception(self, request, message):
-        '''
-        Create helpful error messages directed to the user.
-        '''
-        logger.error("KeyMiddleware handled error: %s" % message)
-        return render_to_response('handle_error.html', 
-                                  make_response_dict(request, 
-                                        {'message': message}))
+                                              {'exception': '%s' % exception})
         
     def clean_username(self, username, request):
         """
