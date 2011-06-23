@@ -11,7 +11,7 @@ class HttpResponseNotAuthorized(HttpResponse):
     def __init__(self, content=None):
         self.status_code = 401
         HttpResponse.__init__(self)
-        self['WWW-Authenticate'] = 'Key'
+        self['WWW-Authenticate'] = 'Key' # Better with something than nothing?
         self.content = content
         
 
