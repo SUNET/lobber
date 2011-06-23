@@ -6,9 +6,9 @@ import re
 from django.contrib import auth
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.http import HttpResponseForbidden
 from django.shortcuts import render_to_response
 from lobber.multiresponse import make_response_dict
+from lobber.common import HttpResponseNotAuthorized
 from lobber.settings import LOBBER_LOG_FILE
 import lobber.log
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
@@ -37,18 +37,18 @@ class KeyMiddleware(object):
             user = User.objects.get(username=username)
         except ObjectDoesNotExist:
             logger.info("%s: user not found" % username)
-            return HttpResponseForbidden('Not a valid key.')
+            return HttpResponseNotAuthorized('Not a valid key.')
 
         try:
             profile = user.profile.get()
         except ObjectDoesNotExist:
             logger.error("%s: user profile not found" % username)
-            return HttpResponseForbidden('Not a valid key.')
+            return HttpResponseNotAuthorized('Not a valid key.')
 
         if profile.expiration_date is not None and \
                profile.expiration_date <= dt.now():
             logger.info("%s: key expired" % secret)
-            return HttpResponseForbidden('The key has expired.')
+            return HttpResponseNotAuthorized('The key has expired.')
 
         filtermatch_flag = False
         cmd = request.path
@@ -60,7 +60,7 @@ class KeyMiddleware(object):
         if not filtermatch_flag:
             logger.info("%s: no match for url in filter (url=%s, filter=%s)"
                         % (username, cmd, urlfilter))
-            return HttpResponseForbidden('Not a valid key for that URL.')
+            return HttpResponseNotAuthorized('Not a valid key for that URL.')
 
         # Authenticate and login user.
         auth_user = auth.authenticate(username=username, password=username)
@@ -71,7 +71,7 @@ class KeyMiddleware(object):
             request.session.flush()
         else:
             logger.debug("%s: failed authentication" % username)
-            return HttpResponseForbidden('Not authorized.')
+            return HttpResponseNotAuthorized('Failed to authenticate.')
 
         # EPIC SUCCESS!!!  This is where we do anything needed for an
         # authenticated and logged in user.
