@@ -64,9 +64,14 @@ def announce(request,info_hash=None):
         event = request.GET['event']
     
     torrents = Torrent.objects.filter(hashval=info_hash)
-    if not (torrents or event == 'stopped' or event == 'paused'):
-        #logger.debug("unauthorized")
-        return _err("Not authorized")
+    try:
+        logger.debug(torrents)
+        if not (torrents or event == 'stopped' or event == 'paused'):
+            #logger.debug("unauthorized")
+            return _err("Not authorized")
+    except Exception as e: # Database specific exception
+        logger.error("Database unavailable: %s" % e)
+        return _err('Database unavailable')
     
     ip,port = peer_address(request)
     #logger.debug("called from %s:%s" % (ip,port))
@@ -173,22 +178,26 @@ def summarize(qs,entitlement=None):
     count = 0
     downloaded = 0
     seeding = 0
-    for pi in qs:
-        if entitlement:
-            if not pi.user:
-                continue
+    try:
+        for pi in qs:
+            if entitlement:
+                if not pi.user:
+                    continue
+                
+                profile = user_profile(pi.user)
+                if not entitlement in profile.get_entitlements():
+                    continue
             
-            profile = user_profile(pi.user)
-            if not entitlement in profile.get_entitlements():
-                continue
-        
-        if pi.state == PeerInfo.STARTED or pi.state == PeerInfo.COMPLETED:
-            count = count + 1
-            if pi.left == 0:
-                seeding = seeding + 1
-            
-            if pi.state == PeerInfo.COMPLETED:
-                downloaded = downloaded + 1
+            if pi.state == PeerInfo.STARTED or pi.state == PeerInfo.COMPLETED:
+                count = count + 1
+                if pi.left == 0:
+                    seeding = seeding + 1
+                
+                if pi.state == PeerInfo.COMPLETED:
+                    downloaded = downloaded + 1
+    except Exception as e: # Database specific exception
+        logger.error("Database unavailable: %s" % e)
+        return _err('Database unavailable')
     return count,downloaded,seeding
     
 def peer_status(hashvals,entitlement=None):
