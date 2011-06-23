@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Something went horribly wrong...{% endblock %}
+{% block main %}
+<h1>Sorry!</h1> 
+<p>Something went horribly wrong...</p>
+<p>
+  Error message:<br />
+  {% if exception %}
+    <b>{{ exception }}</b>
+  {% else %}
+    <b>{{ message }}</b>    
+  {% endif %}
+</p>
+{% endblock %}
