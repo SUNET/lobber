@@ -6,11 +6,11 @@ import re
 from django.contrib import auth
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response
 from lobber.common import HttpResponseNotAuthorized
 from lobber.torrenttools import bencode
-from lobber.settings import LOBBER_LOG_FILE
+from lobber.settings import DEBUG, LOBBER_LOG_FILE
 import lobber.log
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
@@ -47,7 +47,7 @@ class KeyMiddleware(object):
             return HttpResponseNotAuthorized('Not a valid key.')
 
         if profile.expiration_date is not None and \
-               profile.expiration_date <= dt.now():
+                                           profile.expiration_date <= dt.now():
             logger.info("%s: key expired" % secret)
             return HttpResponseNotAuthorized('The key has expired.')
 
@@ -79,14 +79,26 @@ class KeyMiddleware(object):
         
     def process_exception(self, request, exception):
         '''
-        Handles uncaught exceptions.
+        Handles uncaught exceptions in KeyMiddleware.
         '''
         logger.error("KeyMiddleware uncaught error: %s" % exception)
+        # Send a bencoded response to a torrent client if the request came
+        # in to the tracker.
         if request.META['PATH_INFO'].split('/')[1] == 'tracker':
-            return HttpResponse(bencode({'failure reason': '%s' % exception}),
-                                        mimetype='text/plain')
-        return render_to_response('handle_error.html', 
-                                              {'exception': '%s' % exception})
+                return HttpResponse(bencode({'failure reason':
+                                            '%s' % exception}),
+                                            mimetype='text/plain')
+        # If it's a 404, just let Django handle it as always.
+        if isinstance(exception, Http404):
+            return None
+        # Don't show a user friendly error page if DEBUG is True in settings.py.
+        elif not DEBUG:
+            host = request.META['HTTP_HOST']
+            path = request.META['PATH_INFO']
+            # Return a user friendly error page.
+            return render_to_response('unknown_error.html', 
+                                      {'exception': '%s' % exception,
+                                      'url': '%s%s' % (host, path)})
         
     def clean_username(self, username, request):
         """
