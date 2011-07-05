@@ -1,4 +1,5 @@
 import os
+import shutil
 from datetime import datetime as dt
 
 from django.http import HttpResponse, HttpResponseRedirect,\
@@ -8,7 +9,6 @@ from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.contrib.auth.models import User
-
 from tagging.models import Tag, TaggedItem
 
 from lobber.multiresponse import respond_to, make_response_dict, json_response
@@ -24,6 +24,7 @@ from lobber.tracker.views import peer_status
 from django.utils.datastructures import MultiValueDictKeyError
 from lobber.userprofile.models import request_user_profile
 from django.utils.html import escape
+from lobber.userprofile.models import user_profile
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
@@ -120,11 +121,13 @@ def _store_torrent(req, form):
         return None
 
     acl = []
+    acl.append('user:%s#w' % req.user.username)
     publicAccess = form.cleaned_data['publicAccess']
     if publicAccess:
         acl.append("#r")
-    acl.append('user:%s#w' % req.user.username)
-    acl.append('urn:x-lobber:storagenode#r')
+    for e in user_profile(req.user).get_entitlements():
+        if str(e) in form.cleaned_data:
+            acl.append("%s#%s" % (str(e),''.join(form.cleaned_data[str(e)])))
 
     t = Torrent(acl=" ".join(acl),
                 creator=req.user,
@@ -149,7 +152,8 @@ def _store_torrent(req, form):
     
     notifyJSON('/torrents/notify', {'add': [t.id,torrent_hash]})
     if datafile:
-        os.rename(datafile.name,"%s%s%s" % (DROPBOX_DIR,os.sep,torrent_name)) # must be same FS - performance would suck otherwize
+        #os.rename(datafile.name,"%s%s%s" % (DROPBOX_DIR,os.sep,torrent_name)) # must be same FS - performance would suck otherwize
+        shutil.move(datafile.name,"%s%s%s" % (DROPBOX_DIR,os.sep,torrent_name)) # must be same FS - performance would suck otherwize
     return t
     
 def _urlesc(s):
@@ -291,7 +295,7 @@ def exists(req, inst):
 
 def add_torrent(request):
     if request.method == 'POST':
-        form = UploadForm(request.POST, request.FILES)        
+        form = UploadForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             t = _store_torrent(request, form)
             if not t:
@@ -300,8 +304,7 @@ def add_torrent(request):
                               {'application/json': json_response(t.id),
                                'text/html': HttpResponseRedirect("/torrent#%d" % t.id)})
     else:
-        form = UploadForm()
-        
+        form = UploadForm(user=request.user)
     return respond_to(request,
                       {'application/json': HttpResponseServerError("Invalid request"),
                        'text/html': 'share/upload-torrent.html'},{'form': form})
