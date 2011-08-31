@@ -1,61 +1,44 @@
-from django.forms import Form
-from django.forms.widgets import CheckboxSelectMultiple, HiddenInput, TextInput
-from django.forms.widgets import Textarea
-from django.forms.fields import CharField, MultipleChoiceField, DateTimeField
-from django.forms.fields import FileField, BooleanField
+from django import forms
+from django.forms.widgets import TextInput, HiddenInput
 from form_utils.forms import BetterForm
 from lobber.settings import ANNOUNCE_URL
-from lobber.userprofile.models import user_profile
+from django.forms.models import ModelChoiceField
+from django.contrib.auth.models import Group
+from django.forms.forms import Form
+from django.db.models import Q
 
 class UploadForm(BetterForm):
-    description = CharField(label="Description", widget=Textarea(attrs={'rows':6,'cols':60}),required=False)
-    expires = DateTimeField(label="Expiration")
-    file = FileField(label="Data")
-    publicAccess = BooleanField(required=False,label="Allow public access?")
-    
-    def __init__(self, *args, **kwargs):
-        '''
-        Adds the users available entitlements to the access restriction part of
-        the upload form.
-        '''
-        user = kwargs.pop('user')
-        super(UploadForm, self).__init__(*args, **kwargs)
-        # We need to show the generated fields but Meta is already read.
-        # Solution?
-        for e in user_profile(user).get_entitlements():
-            self.fields[str(e)] = MultipleChoiceField(required=False, 
-                                widget=CheckboxSelectMultiple,
-                                choices=[('r','read'),('w','write'),('d','delete')])
+    description = forms.CharField(label="Description", widget=forms.Textarea(attrs={'rows':6,'cols':60}),required=False)
+    expires = forms.DateTimeField(label="Expiration")
+    file = forms.FileField(label="Data")
+    storage = ModelChoiceField(Group.objects.filter(Q(user__username__startswith='key:') | Q(name='Public Storage')),required=False)
+    public = forms.BooleanField(label='Allow public access?')
     
     class Meta:
         fieldsets = [('data',{'fields': ['file'],
-              'legend': 'Step 1: Select file to share',
-              'description': 'Select a plain file or a torrent-file for upload. If you provide a torrent-file it has to include the tracker URL <b>'+ANNOUNCE_URL+'</b>',
-              'classes': ['step']
-              }),
-            ('expiration',{'fields': ['expires'],
-                    'legend': 'Step 2: How long should it be valid?',
-                    'description': 'Set an expiration-date for your data. After this day your data will be removed.',
-                    'classes': ['step']}),
-            ('description',{'fields': ['description'],
-                     'legend': 'Step 3: Describe your data (optional)',
-                     'description': 'By providing a short description of your data you make it easier to understand and find for other users.',
-                     'classes': ['step']}),
-            ('access',{'fields': ['publicAccess'],
-                'legend': 'Step 4: Access control (optional)',
-                'description': 'Here you can control the access restrictions on your data.',
-                'classes': ['step','submit_step']})]
-
-
-class ACLForm(Form):
-    acl = MultipleChoiceField(label="Permissions")
-
-
+                              'legend': 'Step 1: Select file to share',
+                              'description': 'Select a plain file or a torrent-file for upload. If you provide a torrent-file it has to include the tracker URL <b>'+ANNOUNCE_URL+'</b>',
+                              'classes': ['step']
+                              }),
+                     ('expiration',{'fields': ['expires','public'],
+                                    'legend': 'Step 2: How long should it be valid?',
+                                    'description': 'Set an expiration-date for your data. After this day your data will be removed. If you want your data to be readable by all users on the system check the box for public access.',
+                                    'classes': ['step']}),
+                     ('description',{'fields': ['description'],
+                                     'legend': 'Step 3: Describe your data (optional)',
+                                     'description': 'By providing a short description of your data you make it easier to understand and find for other users.',
+                                     'classes': ['step']}),
+                     ('storage',{'fields': ['storage'],
+                                'legend': 'Step 4: Storage (optional)',
+                                'description': 'Select storage for your data. Each item represents a group of storage resources. Pick one you trust to keep your data safe! Public storage is provided by the operators of the system. If you do not select any storage below, public storage will be used.',
+                                'classes': ['step','submit_step']})
+                     ]
+    
 class AddACEForm(Form):
-    entitlement = CharField(required=False,max_length=255,widget=HiddenInput)
-    subject = CharField(max_length=255,widget=TextInput(attrs={'size':'40'}))
-    permissions = MultipleChoiceField(widget=CheckboxSelectMultiple,choices=[('r','read'),('w','write'),('d','delete')])
-
+    subject_id = forms.IntegerField(widget=HiddenInput(),required=False)
+    subject_type = forms.CharField(widget=HiddenInput(),required=False)
+    who = forms.CharField(max_length=255,widget=TextInput(attrs={'size':'40'}))
+    permission = forms.ChoiceField(choices=(('r','read'),('w','read and write'),('d','remove')))
 
 def formdict():
     return {'permissions': AddACEForm()}

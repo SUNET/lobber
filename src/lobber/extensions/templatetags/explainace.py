@@ -11,21 +11,16 @@ from lobber.extensions.templatetags.userdisplay import userdisplay
 register = template.Library()
 
 def explainace(a):
-    (ent,hash,perm) = a.rpartition("#")
     explain = {"r": "read","w": "read and write", "d": "remove"}
-    what = " and ".join(explain[p] for p in perm)
     who = ""
-    if not ent:
-        who = "anyone"
-    elif ent.startswith("user:"):
-        (user,colon,theuser) = ent.partition(":")
-        who = userdisplay(User.objects.get(username=theuser))
-    elif ent == 'urn:x-lobber:storagenode':
-        who = "all system storage nodes"
+    if not a.group and not a.user:
+        who = "Anyone"
+    elif a.user:
+        who = userdisplay(a.user)
     else:
-        who = ent
+        who = "The group called '%s'" % a.group
         
-    return "%s can %s" % (who,what)
+    return "%s can %s" % (who,explain[a.permission])
 
 explainace.is_safe = True
 register.filter(explainace)

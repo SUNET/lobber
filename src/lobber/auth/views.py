@@ -11,6 +11,7 @@ from lobber.settings import LOBBER_LOG_FILE
 
 import lobber.log
 from lobber.multiresponse import make_response_dict
+from django_co_connector.models import co_import_from_request
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
 
@@ -101,6 +102,8 @@ def login_federated(request):
 
     if update_profile:
         profile.save()
+
+    co_import_from_request(request)
 
     # Successful login.
     logger.debug("User %s profile: %s" % (username, repr(profile)))

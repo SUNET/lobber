@@ -7,16 +7,17 @@
 {% block js %}
 <script type="text/javascript">
 $(function() {
-	$("#id_subject").autocomplete({
+	$("#id_who").autocomplete({
 			source: "/user/ace_subjects",
 			minLength: 1,
 			focus: function(event, ui) {
-				$('#id_subject').val(ui.item.label);
+				$('#id_who').val(ui.item.label);
 				return false;
 			},
 			select: function(event, ui) {
-				$('#id_subject').val(ui.item.label);
-				$('#id_entitlement').val(ui.item.value);
+				$('#id_who').val(ui.item.label);
+				$('#id_subject_id').val(ui.item.id);
+				$('#id_subject_type').val(ui.item.type);
 				return false;
 			}
 	});
@@ -154,7 +155,7 @@ function removeit(id) {
 			{% for ace in acl %}
 			   <tr>
 			      <td>{{ace|explainace}}</td>
-			      <td><a href="/torrent/{{torrent.id}}/ace/remove/{{ace|urlencode}}"><span class="ui-icon ui-icon-trash"></span></a></td>
+			      <td><a href="/torrent/{{torrent.id}}/ace/{{ace.id}}/remove"><span class="ui-icon ui-icon-trash"></span></a></td>
 			   </tr>
 			{% endfor %}
 			</table>
