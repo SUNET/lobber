@@ -19,7 +19,7 @@ urlpatterns = patterns('',
     (r'^tag/(?P<name>.+)\.([^\.]+)$', "lobber.share.views.list_torrents_for_tag"),
     (r'^(?P<tid>[0-9]+)/tags(?:\.([^\.]+))?$', "lobber.share.views.tags"),
     # ACL handling.
-    (r'^(?P<tid>.+)/ace/add/(?P<ace>.+)(?:\.(?:[^\.]+))?$', "lobber.share.views.add_ace"),
-    (r'^(?P<tid>.+)/ace/remove/(?P<ace>.+)(?:\.(?:[^\.]+))?$', "lobber.share.views.remove_ace"),
-    (r'^(?P<tid>.+)/ace$', "lobber.share.views.edit"),
+    # -- remove -- (r'^(?P<tid>.+)/ace/add/(?P<group>.+)/(?P<permission>[a-zA-Z0-9]+)(?:\.(?:[^\.]+))?$', "lobber.share.views.add_ace"),
+    (r'^(?P<tid>.+)/ace/(?P<aid>[0-9]+)/remove?$', "lobber.share.views.remove_ace"),
+    (r'^(?P<tid>.+)/ace$', "lobber.share.views.edit_ace"),
     )

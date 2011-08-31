@@ -24,12 +24,24 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'sqlite3'
-DATABASE_NAME = '%s/db/nordushare.db' % BASE_DIR
-DATABASE_USER = 'www-data'
-DATABASE_PASSWORD = ''
-DATABASE_HOST = ''
-DATABASE_PORT = ''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': '%s/db/nordushare.db' % BASE_DIR,                      # Or path to database file if using sqlite3.
+        'USER': 'www-data',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
+        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    }
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake'
+    }
+}
+
 
 DROPBOX_DIR = '/var/lib/transmission-daemon/dropbox'
 TRANSMISSION_RPC = 'http://transmission:transmission@localhost:9091'
@@ -116,8 +128,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
-    'django_evolution',
     'django_extensions',
+    'django_co_connector',
+    'django_co_acls',
     'lobber.extensions',
     'tagging',
     'lobber.userprofile',
@@ -129,3 +142,5 @@ INSTALLED_APPS = (
 
 LOBBER_LOG_FILE = "%s/logs/web.log" % BASE_DIR
 import logging; LOBBER_LOG_LEVEL = logging.DEBUG
+
+

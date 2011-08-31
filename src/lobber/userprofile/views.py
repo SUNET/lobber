@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect,HttpResponseForbidden,\
     HttpResponseBadRequest
 from lobber.userprofile.forms import CreateKeyForm
 from lobber.settings import LOBBER_LOG_FILE
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from lobber.multiresponse import respond_to, make_response_dict, json_response
 import lobber.log
 from django.shortcuts import get_object_or_404, render_to_response
@@ -130,14 +130,11 @@ def ace_subjects(req):
     term = req.GET['term']
     subjects = []
     if term:
-        profile = user_profile(req.user)
-        subjects = [{'label': "Members of %s" % (x),'value': x} for x in filter(lambda e: e.find(term) > -1,profile.get_entitlements())]
-        if term.find('@') > -1:
-            subjects.append({'label': "User '%s'" % (term),'value': "user:%s" % (term)})
-        else:
-            subjects.append({'label': "Members of '%s'" % (term),'value': term})
-        subjects.append({'label': 'All storage nodes', 'value': 'urn:x-lobber:storagenode'})
-        subjects.append({'label': 'All users','value': ''})
+        subjects.append({'label': 'Anyone','id': 0,'type':'anyone'})
+        for g in Group.objects.filter(name__contains=term):
+            subjects.append({'label': "Members of '%s'" % g.name,'id':g.id,'type':'group'}) 
+        for u in User.objects.filter(username__contains=term):
+            subjects.append({'label': u.username,'id':u.id,'type':'group'}) 
         
     return json_response(subjects)
 

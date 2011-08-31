@@ -21,7 +21,6 @@
         <script type="text/javascript" src="/site-media/js/jquery.timers.js"></script>
         <script type="text/javascript" src="/site-media/js/deployJava.js"></script> <!-- http://java.com/js/deployJava.js -->
         <script type="text/javascript" src="/site-media/js/jquery.webstart.js"></script>
-        <script type="text/javascript" src="/site-media/js/bbq.js"></script>
         <script type="text/javascript" src="/site-media/js/jquery.tinyscrollbar.min.js"></script>
         <script type="text/javascript" src="/site-media/js/jquery.validate.js"></script>
         <script type="text/javascript" src="/site-media/js/bbq.js"></script>
@@ -79,13 +78,14 @@
         {% block js %}{% endblock %}
 	</head>
 	<body>
-		<div id="notification"></div>
+		<!-- div id="notification"></div -->
 		<div id="container">
 		    <div id="header">
 			   <a href="/"><img src="/site-media/images/lobber-banner.jpg"/></a>
 			   {% if user.is_authenticated %}
 			   <ul class="ilist">
-			   	  {% block buttons %}{% endblock %}
+                  <li class="button"><a id="launch-dlmanager" href="javascript:void(0);">Upload using Java Web Start</a></li>
+                  <li class="button"><a href="/torrent/add">Upload using your Browser</a></li>
 			      <li class="right ui-helper-reset ui-widget ui-widget-content" ">
 			         <form method="POST" action="/torrent/search">
 			            <input type="text" id="searchbox" name="q" size="20" style="margin-right: 5px;"></input><input type="submit" value="Search"/>
@@ -99,6 +99,7 @@
 				<div id="main">
 				   {% block main %}{% endblock %}
 				</div>
+				<div class="clear"></div>
 				<div id="rhs">
 				    <div style="padding: 5px; margin-top: 50px; ">
 						{% for tag in tagcloud %}
@@ -107,7 +108,6 @@
 					</div>
 				</div>
 			</div>
-			<div class="clear"></div>
 			<div id="footer">
 			   <ul>
 				   	<li>

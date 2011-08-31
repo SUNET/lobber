@@ -11,6 +11,7 @@ from lobber.notify import notifyJSON
 import shutil
 import lobber.log
 from lobber.userprofile.models import user_profile
+from django_co_acls.models import is_allowed, is_anyone_allowed
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
@@ -28,14 +29,12 @@ class Torrent(models.Model):
     expiration_date = models.DateTimeField() # FIXME: Default to something reasonable.
     data = models.FileField(upload_to='.') # upload_to: directory in TORRENTS.
     hashval = models.CharField(max_length=40,db_index=True)
-    acl = models.TextField()
     
     effective_rights = None
 
     def __unicode__(self):
-        return '%s (%d / %s) (acl=%s) (expire=%s)' % \
-               (self.name, self.id, self.hashval, self.acl,
-                self.expiration_date)
+        return '%s (%d / %s) (expire=%s)' % \
+               (self.name, self.id, self.hashval, self.expiration_date)
 
     def url(self):
         return "/torrent/%d.torrent" % self.id
@@ -68,20 +67,14 @@ class Torrent(models.Model):
 
     # very quick way to determine if a torrent is public read
     def is_public_read(self):
-        for ace in self.acl.split():
-            if ace.startswith('#') and 'r' in ace:
-                return True
-        return False
+        return is_anyone_allowed(self, 'r')
 
     def authz_i(self, user, perm, profile=None):
         """Does USER have PERM on torrent?"""
-        entitlements = ['user:%s' % user.username]
         if not profile:
             profile = user_profile(user)
         
         if profile:
-            entitlements += profile.get_entitlements()
-            
             tagconstraintsok_flag = True
             if profile.tagconstraints:
                 tagconstraintsok_flag = False
@@ -94,14 +87,9 @@ class Torrent(models.Model):
                 #print 'DEBUG: tag constraints not ok for %s with tag constraints %s, seeking #%c for torrrent %s' % (user, profile.tagconstraints, perm, self)
                 return False
 
-        for ace in self.acl.split():
-            (ace_user,hash,ace_perm) = ace.rpartition('#')
-            if ace_perm == perm:
-                for entitlement in entitlements:
-                    if not ace_user or ace_user == entitlement or ace_user.startswith('user:%s:' % user.username):
-                        return True
-        return False
+        return is_allowed(self, user, perm)
     
+    # XXX entitlements stuff must go
     def authz_tag(self, user, perm, tag):
         """Does USER have PERM on torrent w.r.t. tagging operations on
         the torrent with TAG?
@@ -122,62 +110,6 @@ class Torrent(models.Model):
                     return True
         #print 'DEBUG: perm %s denied for %s on %s for %s' % (perm, user, self, tag)
         return False
-
-    def authz_acl(self, user, perm):
-        "Does USER have PERM on torrent w.r.t. its ACL?"
-        if perm in 'rw':
-            return self.authz(user, perm)
-        return False                
-
-    def get_acl(self, user):
-        if not self.authz_acl(user, 'r'):
-            return []
-        return list(self.acl.split())
-
-    def set_acl(self, user, aces):
-        if not self.authz_acl(user, 'w'):
-            return False
-        self.acl = ' '.join(aces)
-        return self.acl
-
-    def add_ace(self, user, ace):
-        """
-        Add ACE to ACL of self.  Return True on success, False if
-        permission is denied.
-        """
-        acl = self.get_acl(user)
-        if ace in acl:           # Optimization: ACE already in place.
-            return True
-
-        u, perms1 = ace.split('#')      # New ACE.
-        perms2 = None
-        for a in acl:                   # Look for U in existing ACL.
-            if a.split('#')[0] == u:
-                perms2 = a.split('#')[1] # Save old permissions.
-                if not self.remove_ace(user, a): # Remove ACE.
-                    return False
-                break       # Optimization: There's at most one match.
-
-        if perms2:                    # Merging ACL's.
-            acl = self.get_acl(user)  # We removed ACE -- refresh ACL.
-            for p in perms1:          # Add new permissions not in place.
-                if p not in perms2:
-                    perms2 = perms2 + p
-        else:                           # Use permissions in new ACE.
-            perms2 = perms1
-
-        return self.set_acl(user, acl+['%s#%s' % (u, perms2)])
-    
-    def remove_ace(self, user, ace):
-        """
-        Remove ACE from ACL of self.
-        Return False if permission is denied, otherwise True.
-        """
-        aces = self.get_acl(user)
-        if ace in aces:
-            aces.remove(ace)
-            return self.set_acl(user, aces)
-        return True
 
     def readable_tags(self, user):
         return filter(lambda tag: self.authz_tag(user, "r", tag.name),

@@ -3,6 +3,7 @@
 	<name>lobber</name>
 	<comment></comment>
 	<projects>
+		<project>django-co-connector</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

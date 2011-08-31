@@ -3,6 +3,7 @@
 {% block js %}
 <script type="text/javascript">
 $(function() {
+	$('#id_readers').attr('style','min-width: 200px;');
 	$("#id_expires").datepicker({'dateFormat': 'yy-mm-dd', minDate: "+1D"});
 	$('#wizard').formwizard({
 	    	validationEnabled: true,

@@ -7,7 +7,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.core.servers.basehttp import FileWrapper
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
 from tagging.models import Tag, TaggedItem
 
@@ -23,7 +23,7 @@ import tempfile
 from lobber.tracker.views import peer_status
 from django.utils.datastructures import MultiValueDictKeyError
 from lobber.userprofile.models import request_user_profile
-from django.utils.html import escape
+from django_co_acls.models import allow, deny, acl, remove_permission
 
 logger = lobber.log.Logger("web", LOBBER_LOG_FILE)
 
@@ -118,22 +118,21 @@ def _store_torrent(req, form):
     if not torrent_name and not torrent_hash:
         logger.error('%s: Not a valid torrent file.' % ff.name)
         return None
-
-    acl = []
-    publicAccess = form.cleaned_data['publicAccess']
-    if publicAccess:
-        acl.append("#r")
-    acl.append('user:%s#w' % req.user.username)
-    acl.append('urn:x-lobber:storagenode#r')
-
-    t = Torrent(acl=" ".join(acl),
-                creator=req.user,
+    
+    t = Torrent(creator=req.user,
                 name=torrent_name,
                 description=form.cleaned_data['description'],
                 expiration_date=form.cleaned_data['expires'],
                 data='%s.torrent' % torrent_hash, # will change soon...
                 hashval=torrent_hash)
     t.save()
+    
+    if form.cleaned_data['public']:
+        allow(t,"anyone","r")
+        
+    allow(t,req.user,"w")
+    group = form.cleaned_data['storage']
+    allow(t,group,"r")
     
     name_on_disk = '%s/%d.torrent' % (TORRENTS,t.id)
     f = file(name_on_disk, 'w')
@@ -214,7 +213,6 @@ def _torrentdict(request,t,forms=None):
     if not forms:
         forms = formdict()
     tags = map(lambda t: t.name,t.readable_tags(request.user))
-    acl = t.get_acl(request.user)
     lkey = ""
     if request.GET.has_key('lkey'):
         lkey = "?lkey=%s" % request.GET['lkey']
@@ -222,7 +220,7 @@ def _torrentdict(request,t,forms=None):
             'lkey': lkey,
             'forms': forms,
             'tags': tags,
-            'acl': acl,
+            'acl': acl(t),
             'read': t.authz(request.user,'r'), 
             'write': t.authz(request.user,'w'), 
             'delete': t.authz(request.user,'d')}
@@ -289,9 +287,10 @@ def exists(req, inst):
         pass                            # Ok.
     return r;
 
+@login_required
 def add_torrent(request):
     if request.method == 'POST':
-        form = UploadForm(request.POST, request.FILES)        
+        form = UploadForm(request.POST, request.FILES)      
         if form.is_valid():
             t = _store_torrent(request, form)
             if not t:
@@ -422,63 +421,62 @@ def list_torrents_for_tag(request,name):
 
 ## ACL
 
-def valid_ace_p(ace):
-    """Return True if ACE is a valid access control entry, otherwise
-    False.
-
-    BUG: We don't allow '.' and potential other characters needed.
-    """
-    entl, _, perm = ace.partition('#')
-    if not entl or not perm:
-        return False
-    if not entl.replace(':', '').replace('_', '').isalnum():
-        return False
-    if len(perm) > 1:
-        return False
-    if not perm in 'rwd':
-        return False
-    return True        
-
 @login_required
-def add_ace(req, tid, ace):
+def add_ace(request, tid, gid, permission):
     "Add ACE to ACL of torrent with id TID."
     t = get_object_or_404(Torrent,pk=int(tid))
 
-    if not valid_ace_p(ace):
-        return HttpResponse("invalid ace: %s" % escape(ace), status=400)
+    if not t.authz(request.user,"w"):
+        return HttpResponseForbidden("You may not modify ACLs on this torrent")
 
-    if not t.add_ace(req.user, ace):
-        return HttpResponse("Permission denied.", status=403)
+    try:
+        group = Group.objects.get(pk=gid)
+    except ObjectDoesNotExist:
+        groups = Group.objects.filter(name=gid)
+        if groups and len(groups) == 1:
+            group = groups[0]
+    
+    if not group:
+        return HttpResponseNotFound("No such group")
 
+    allow(t, group, permission)
+    
     t.save()
-    return respond_to(req,{'text/html': HttpResponseRedirect("/torrent/%d" % (t.id)),
-                           'application/json': json_response(ace)})
+    return respond_to(request,{'text/html': HttpResponseRedirect("/torrent/%d" % (t.id)),
+                               'application/json': json_response([group.name,permission])})
 
 @login_required
-def remove_ace(req, tid, ace):
+def remove_ace(request, tid, aid):
     "Remove ACE from ACL of torrent with id TID."
     t = get_object_or_404(Torrent,pk=int(tid))
 
-    if not t.remove_ace(req.user, ace):
-        return HttpResponse("Permission denied.", status=403)
+    if not t.authz(request.user,"w"):
+        return HttpResponseForbidden("You may not modify ACLs on this torrent")
         
-    t.save()
-    return respond_to(req,{'text/html': HttpResponseRedirect("/torrent/%d" % (t.id)),
-                           'application/json': json_response(ace)})
+    remove_permission(aid)
+    return respond_to(request,{'text/html': HttpResponseRedirect("/torrent/%d" % (t.id)),
+                               'application/json': json_response(t.id)})
 
 @login_required
-def edit(request,tid):
+def edit_ace(request,tid):
     t = get_object_or_404(Torrent,pk=int(tid))
     
     forms = formdict()
     if request.method == 'POST':
         form = forms['permissions'] = AddACEForm(request.POST)
+        logger.debug("valid: %s" % form.is_valid())
         if form.is_valid():
-            ace = "%s#%s" % (form.cleaned_data['entitlement'],''.join(form.cleaned_data['permissions']))
-            t.add_ace(request.user,ace)
-            t.save()
+            subject = None
+            if form.cleaned_data['subject_type'] == 'user':
+                subject = User.objects.get(pk=int(form.cleaned_data['subject_id']))
+            elif form.cleaned_data['subject_type'] == 'group':
+                subject = Group.objects.get(pk=int(form.cleaned_data['subject_id']))
+            elif form.cleaned_data['subject_type'] == 'anyone':
+                subject = 'anyone'
+            logger.debug(subject)
+            if subject != None: 
+                allow(t,subject,form.cleaned_data['permission'])
     
     d = _torrentdict(request,t,forms)
     d['edit'] = True
     return respond_to(request,{'text/html': 'share/torrent.html'},d)
-
