@@ -300,7 +300,7 @@ def add_torrent(request):
                               {'application/json': json_response(t.id),
                                'text/html': HttpResponseRedirect("/torrent#%d" % t.id)})
     else:
-        form = UploadForm(user=request.user)
+        form = UploadForm()
     return respond_to(request,
                       {'application/json': HttpResponseServerError("Invalid request"),
                        'text/html': 'share/upload-torrent.html'},{'form': form})
