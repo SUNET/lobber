@@ -8,11 +8,16 @@ from django.forms.forms import Form
 from django.db.models import Q
 
 class UploadForm(BetterForm):
+
+    def __init__(self, *args, **kwargs):
+        super(UploadForm, self).__init__(*args, **kwargs)
+        self.fields['storage'].empty_label = None
+
     description = forms.CharField(label="Description", widget=forms.Textarea(attrs={'rows':6,'cols':60}),required=False)
     expires = forms.DateTimeField(label="Expiration")
     file = forms.FileField(label="Data")
     storage = ModelChoiceField(Group.objects.filter(Q(user__username__startswith='key:') | Q(name='Public Storage')),required=False)
-    public = forms.BooleanField(label='Allow public access?')
+    public = forms.BooleanField(label='Allow public access?', required=False)
     
     class Meta:
         fieldsets = [('data',{'fields': ['file'],
