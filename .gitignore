@@ -12,3 +12,4 @@ src/TAGS
 /torrents
 src/env
 src/admin-media
+src/lobber/settings.py
