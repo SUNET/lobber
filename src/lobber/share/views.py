@@ -12,7 +12,7 @@ from django.contrib.auth.models import User, Group
 from tagging.models import Tag, TaggedItem
 
 from lobber.multiresponse import respond_to, make_response_dict, json_response
-from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE, DROPBOX_DIR
+from lobber.settings import TORRENTS, ANNOUNCE_URL, NORDUSHARE_URL, BASE_UI_URL, LOBBER_LOG_FILE, SEED_DIR
 import lobber.log
 from lobber.share.forms import UploadForm, AddACEForm
 from lobber.share.models import Torrent
@@ -148,8 +148,9 @@ def _store_torrent(req, form):
     
     notifyJSON('/torrents/notify', {'add': [t.id,torrent_hash]})
     if datafile:
-        #os.rename(datafile.name,"%s%s%s" % (DROPBOX_DIR,os.sep,torrent_name)) # must be same FS - performance would suck otherwize
-        shutil.move(datafile.name,"%s%s%s" % (DROPBOX_DIR,os.sep,torrent_name)) # must be same FS - performance would suck otherwize
+        # must be same FS - performance would suck otherwize
+        os.makedirs("%s%s%s" % (SEED_DIR, os.sep, torrent_hash))
+        shutil.move(datafile.name,"%s%s%s%s%s" % (SEED_DIR, os.sep, torrent_hash, os.sep, torrent_name))
     return t
     
 def _urlesc(s):
