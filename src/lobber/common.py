@@ -13,13 +13,3 @@ class HttpResponseNotAuthorized(HttpResponse):
         HttpResponse.__init__(self)
         self['WWW-Authenticate'] = 'Key' # Better with something than nothing?
         self.content = content
-        
-
-'''
-Can be replaced with .encode('hex')?
-'''
-def hexify(s):
-    r = ''
-    for n in range(0, len(s)):
-        r += '%02x' % ord(s[n])
-    return r
