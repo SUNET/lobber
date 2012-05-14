@@ -11,10 +11,10 @@ from lobber.torrenttools import bencode
 from lobber.share.models import Torrent, user_profile
 from urllib import unquote
 from ctypes import create_string_buffer
+from binascii import hexlify, unhexlify
 
 import lobber.log
 from lobber.settings import LOBBER_LOG_FILE
-from lobber.common import hexify
 from pprint import pformat
 logger = lobber.log.Logger("tracker", LOBBER_LOG_FILE)
 
@@ -56,7 +56,7 @@ def announce(request,info_hash=None):
     if not info_hash:
         return _err('Missing info_hash')
 
-    info_hash = hexify(unquote(info_hash))
+    info_hash = hexlify(unquote(info_hash))
     #logger.debug("announce: info_hash=%s" % info_hash)
     
     event = None
@@ -207,8 +207,9 @@ def peer_status(hashvals,entitlement=None):
         if entitlement:
             qs = qs.filter(user__profile__entitlements__contains=entitlement) #this is just a course filter - need to verify
         count,downloaded,seeding = summarize(qs,entitlement)
+        info_hash = unhexlify(info_hash)
         files[info_hash]= {'complete': seeding, 'downloaded': downloaded, 'incomplete': count - seeding}
-    return files;
+    return files
     
 def scrape(request,entitlement=None):
     info_hash = None
@@ -219,7 +220,7 @@ def scrape(request,entitlement=None):
     if not info_hash:
         return _err("I'm not going to tell you about all torrents n00b!")
 
-    info_hash = hexify(unquote(info_hash))
+    info_hash = hexlify(unquote(info_hash))
     
     return tracker_response({'files': peer_status([info_hash],entitlement)})
     
