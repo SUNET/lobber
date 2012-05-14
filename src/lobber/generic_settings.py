@@ -21,7 +21,7 @@ ANNOUNCE_URL = ANNOUNCE_BASE_URL + '/tracker/announce'
 SCRAPE_URL = '/tracker/scrape'
 
 DROPBOX_DIR = '%s/dropbox' % BASE_DIR
-#TRANSMISSION_RPC = 'http://transmission:transmission@localhost:9091'
+SEED_DIR = '%s/seeding' % BASE_DIR
 
 STOMP_HOST = 'localhost'
 STOMP_PORT = 61613
