@@ -32,9 +32,7 @@ $(function() {
         <div class="description">
 			<table>
 			  <tr><td>Lobber Key</td><td>{{ profile.get_username}}</td></tr>
-			  {% if profile.entitlements %}
-		      <tr><td>Delegated Entitlements</td><td>{{ profile.entitlements}}</td></tr>
-		      {% endif %}
+		      <tr><td>Member of</td><td>{% for group in profile.get_groups %} {% if not forloop.last%}{{ group.name }}, {% else %}{{ group.name }}{% endif %}{% endfor %}</td></tr>
 			  {% if profile.urlfilter %}
 			  <tr><td>URL filter</td><td>{{ profile.urlfilter }}</td></tr>
 			  {% endif %}

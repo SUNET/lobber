@@ -34,6 +34,9 @@ class UserProfile(models.Model):
     def get_entitlements(self):
         return list(self.entitlements.split())
 
+    def get_groups(self):
+        return self.user.groups.all()
+
     ### URL-filter.
     def get_urlfilter(self, user):
         if not self.authz(user):
