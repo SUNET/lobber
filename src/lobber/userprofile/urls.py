@@ -9,7 +9,7 @@ urlpatterns = patterns('',
     # Keys
     (r'^key/add',"lobber.userprofile.views.addkey"),
     (r'^key(?:\.[^\.]+)?$',"lobber.userprofile.views.listkeys"),
-    (r'^key/(?P<key>[0-9]+)/remove$',"lobber.userprofile.views.removekey"),
+    (r'^key/(?P<key>[\w]+)/remove$',"lobber.userprofile.views.removekey"),
     # The user.
     (r'^$',"lobber.userprofile.views.user_self"),
     (r'^ace_subjects$',"lobber.userprofile.views.ace_subjects"),

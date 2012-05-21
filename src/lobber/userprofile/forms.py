@@ -8,14 +8,15 @@ from django import forms
 from form_utils.forms import BetterForm
 
 class CreateKeyForm(BetterForm):
-    entitlements = forms.MultipleChoiceField(label="Entitlements",widget=SelectMultiple,required=False)
+
+    groups = forms.MultipleChoiceField(label="Groups",widget=SelectMultiple,required=False)
     urlfilter = forms.CharField(label="URL filter", required=False,widget=Textarea(attrs={'rows':'4'}))
     expires = forms.DateTimeField(label="Expiration date",required=False)
     
     class Meta:
-        fieldsets = [('delegation', {'fields': ['entitlements'],
-                                     'legend': 'Step 1: Delegated Rights',
-                                     'description': 'Select a set of entitlements to delegate to the application key. When an application authenticates to lobber using this key it will have all rights given to any of the entitlements you choose in this step.',
+        fieldsets = [('delegation', {'fields': ['groups'],
+                                     'legend': 'Step 1: Choose groups',
+                                     'description': 'Select a set of groups to delegate to the application key. When an application authenticates to lobber using this key it will have read rights given to any of the groups you choose in this step.',
                                      'classes': ['step']}),
                      ('expiration', {'fields': ['expires'],
                                      'legend': 'Step 2: Expiration date (optional)',

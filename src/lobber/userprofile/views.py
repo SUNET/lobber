@@ -1,5 +1,7 @@
 from datetime import datetime as dt
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
+from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect,HttpResponseForbidden,\
     HttpResponseNotFound, HttpResponseNotAllowed, HttpResponse,\
     HttpResponseBadRequest
@@ -36,26 +38,25 @@ def removekey(request,key):
     
     keyprofile.delete()
     keyuser.delete()
-    return HttpResponseRedirect("/key")
+    return HttpResponseRedirect(reverse('lobber.userprofile.views.listkeys'))
 
 @login_required
 def addkey(request):
     if request.method == 'POST':
         form = CreateKeyForm(request.POST)
-        form.fields['entitlements'].choices = [(e,e) for e in user_profile(request.user).get_entitlements()]
+        form.fields['groups'].choices = [(g.id,g.name) for g in request.user.groups.all()]
         if form.is_valid():
-            logger.info(form.cleaned_data['entitlements'])
             secret = create_key_user(request.user,
                                      form.cleaned_data['urlfilter'] or "^.*$",
                                      "", #TODO: tagconstraints
-                                     " ".join(form.cleaned_data['entitlements']),
+                                     form.cleaned_data['groups'],
                                      form.cleaned_data['expires'])
             return respond_to(request,
                               {'application/json': json_response(secret),
                                'text/html': HttpResponseRedirect("/user/key")})
     else:        
         form = CreateKeyForm()
-        form.fields['entitlements'].choices = [(e,e) for e in user_profile(request.user).get_entitlements()]
+        form.fields['groups'].choices = [(g.id,g.name) for g in request.user.groups.all()]
     
     return respond_to(request,
                       {'application/json': HttpResponseBadRequest("invalid request"),
@@ -67,14 +68,9 @@ def listkeys(request):
                       {"text/html": 'userprofile/keys.html'},{'keys': _list_keys(request.user)})
 
 
-def create_key_user_profile(creator, urlfilter, tagconstraints, entitlements, expires=None):
+def create_key_user_profile(creator, urlfilter, tagconstraints, groups, expires=None):
     """
     Create a user profile named key:<random text>.
-
-    Each space separated entitlement in ENTITLEMENTS is checked.
-    Invalid entitlements are stripped.  Valid entitlements are
-    - user:<CREATOR> and "below" (i.e. user:<CREATOR>:$self)
-    - exact match of any entitlement carried by CREATOR
 
     Also, '$self' is substituted for the name of the newly created key-user.
     """
@@ -93,22 +89,18 @@ def create_key_user_profile(creator, urlfilter, tagconstraints, entitlements, ex
     urlfilter = ' '.join(urlfilter.split())
     tagconstraints = ' '.join(tagconstraints.split())
 
-    entls = []
-    lst = map(lambda s: s.replace('$self', username), entitlements.split())
-    for e in lst:
-        if e.startswith('user:%s' % creator.username):
-            entls.append(e)
-        elif e in creator_profile.get_entitlements():
-            entls.append(e)
-    entitlements=' '.join(entls)
-
     profile = UserProfile(user=user,
                           creator=creator,
                           urlfilter=urlfilter,
                           tagconstraints=tagconstraints,
-                          entitlements=entitlements,
+                          entitlements="",
                           expiration_date=expires)
     profile.save()
+
+    for group in groups:
+        g = Group.objects.get(pk=group[0])
+        user.groups.add(g)
+
     return profile
 
 def create_key_user(creator, urlfilter, tagconstraints, entitlements, expires=None):
