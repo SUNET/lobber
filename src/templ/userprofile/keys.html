@@ -1,8 +1,5 @@
 {% extends "base.html" %}
 {% block title %}Application Keys{% endblock %}
-{% block buttons %}
-<li class="button"><a class="tip" title="Create new application key" href="/user/key/add">Create Application Key</a></li>
-{% endblock %}
 {% block js %}
 <script type="text/javascript">
 $(function() {
@@ -54,4 +51,11 @@ $(function() {
 {% else %}
   <p>You don't have any application keys.</p>
 {% endif %}
+  <div class="navlist">
+    <br />
+    <br />
+    <ul class="ilist">
+      <li class="button"><a class="tip" title="Create new application key" href="/user/key/add">Create Application Key</a></li>
+    </ul>
+  </div>
 {% endblock %}
