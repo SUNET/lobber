@@ -86,6 +86,7 @@
 			   <ul class="ilist">
                   <li class="button"><a id="launch-dlmanager" href="javascript:void(0);">Upload using Java Web Start</a></li>
                   <li class="button"><a href="/torrent/add">Upload using your Browser</a></li>
+                  {% block buttons %}{% endblock %}
 			      <li class="right ui-helper-reset ui-widget ui-widget-content" ">
 			         <form method="POST" action="/torrent/search">
 			            <input type="text" id="searchbox" name="q" size="20" style="margin-right: 5px;"></input><input type="submit" value="Search"/>
